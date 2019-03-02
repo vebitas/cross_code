@@ -21,13 +21,13 @@ HRESULT mapTool::init()
 	IMAGEMANAGER->addImage("mapToolBackground", L"image/tileNode/mapToolBackground.png", WINSIZEX, WINSIZEY);
 	IMAGEMANAGER->addImage("build_LR", L"image/tileNode/build_LR.png", 64, 800);
 	IMAGEMANAGER->addImage("build_UD", L"image/tileNode/build_UD.png", 700, 64);
-	IMAGEMANAGER->addFrameImage("button", L"image/tileNode/button.png", 36, 48, 3, 4);
+	IMAGEMANAGER->addFrameImage("button", L"image/tileNode/button.png", 100, 133, 3, 4);
 	setTile();
 
 	_increaseXMap = std::move(bind(&mapTool::increaseX, this));
 
 	_increaseXButton = new button;
-	_increaseXButton->init("button", WINSIZEX / 2 + 200, 600, PointMake(0, 0), PointMake(0, 2), PointMake(0, 1), _increaseXMap);
+	_increaseXButton->init("button", WINSIZEX / 2 + 200, 600, PointMake(2, 0), PointMake(0, 0), PointMake(1, 0), _increaseXMap);
 
 	_ptIdX = 0;
 	_ptIdY = 0;
@@ -46,7 +46,7 @@ void mapTool::update()
 {
 	setMap();
 	pickSampleTile();
-	_increaseXButton->update(100, 100);
+	_increaseXButton->update(WINSIZEX / 2 + 200, 600);
 	
 
 	if (KEYMANAGER->isStayKeyDown(VK_UP))

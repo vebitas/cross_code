@@ -46,7 +46,7 @@ void button::update(float x, float y)
 	if (PtInRect(&_rc, p))
 	{
 		_direction = BUTTONDIRECTION_COLLISION;
-		if (KEYMANAGER->isOnceKeyDown(VK_LBUTTON))
+		if (KEYMANAGER->isStayKeyDown(VK_LBUTTON) )
 		{
 			_direction = BUTTONDIRECTION_DOWN;
 		}
@@ -77,7 +77,7 @@ void button::render()
 		break;
 	case BUTTONDIRECTION_COLLISION:
 		_image->frameRender(_rc.left, _rc.top,
-			_btnDownFramePoint.x, _btnDownFramePoint.y);
+			_btnCollisionPoint.x, _btnCollisionPoint.y);
 		break;
 	}
 }
