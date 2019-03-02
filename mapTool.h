@@ -28,7 +28,14 @@ static button*	_decreaseYButton;
 static button*	_mapPageAddButton;
 static button*	_mapPageSubButton;
 
+static button*	_saveButton;
+static button*	_loadButton;
+static button*	_terrainButton;
+static button*	_objectButton;
+static button*	_eraserButton;
+
 static int _mapSelect;
+static int  _buttonSelect;
 
 class mapTool : public gameNode
 {
@@ -56,6 +63,8 @@ private:
 	int _ptSPidX;
 	int _ptSPidY;
 
+
+
 public:
 	mapTool();
 	~mapTool();
@@ -70,6 +79,8 @@ public:
 	void setMap();												//클릭한 맵에다 저장한 프레임 번호를 맵타일 프레임에 넣어줌
 
 	void buttonInit();
+	void buttonUpdate();
+	void buttonRender();
 
 	void increaseX();											//콜백함수 맵 x,y축 증가
 	void increaseY();
@@ -80,11 +91,15 @@ public:
 	function<void(void)> _increaseYMap;
 	function<void(void)> _decreaseXMap;
 	function<void(void)> _decreaseYMap;
-	static void mapPageAdd();
-	static void mapPageSub();
 
-	void mapSave();
-	void mapLoad();
+	static void cbMapPageAdd();
+	static void cbMapPageSub();
+
+	static void cbMapSave();
+	static void cbMapLoad();
+	static void cbTerrainTile();
+	static void cbObjectTile();
+	static void cbEraser();
 
 	void setWindowsSize(int x, int y, int width, int height);	//윈도우 창크기 설정
 

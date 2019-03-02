@@ -23,15 +23,19 @@ HRESULT mapTool::init()
 	IMAGEMANAGER->addFrameImage("stage2", L"image/tileNode/stage2.png", 1024, 608, SAMPLETILEX, SAMPLETILEY);	
 	IMAGEMANAGER->addFrameImage("bossStage", L"image/tileNode/bossStage.png", 1024, 608, SAMPLETILEX, SAMPLETILEY);
 	IMAGEMANAGER->addImage("mapToolBackground", L"image/tileNode/mapToolBackground.png", WINSIZEX, WINSIZEY);
-	IMAGEMANAGER->addImage("build_LR", L"image/tileNode/build_LR.png", 64, 800);
-	IMAGEMANAGER->addImage("build_UD", L"image/tileNode/build_UD.png", 700, 64);
+	IMAGEMANAGER->addImage("build_LR", L"image/tileNode/build_LR.png", 64, 830);
+	IMAGEMANAGER->addImage("build_UD", L"image/tileNode/build_UD.png", 750, 64);
 	IMAGEMANAGER->addFrameImage("button", L"image/tileNode/button.png", 150, 200, 3, 4);
-	IMAGEMANAGER->addFrameImage("textXY", L"image/tileNode/textXY.png", 84, 58, 2, 1);
+	IMAGEMANAGER->addFrameImage("button2", L"image/tileNode/button_2.png", 375, 250, 3, 5);
+	IMAGEMANAGER->addFrameImage("textXY", L"image/tileNode/textXY.png", 96, 48, 2, 1);
+	IMAGEMANAGER->addImage("textMap", L"image/tileNode/textMap.png", 96, 48);
 	buttonInit();
 	setTile();
 	
 	_ptIdX = 0;
 	_ptIdY = 0;
+
+	_buttonSelect = 0;
 
 	_mapSelect = MAPNUMBER::STAGE1_1;
 
@@ -83,12 +87,7 @@ void mapTool::update()
 		CAMERA->setCameraX(CAMERA->getCameraX() + 10);
 	}
 
-	_increaseXButton->update(WINSIZEX / 2 - 100, 680);
-	_decreaseXButton->update(WINSIZEX / 2 - 100, 750);
-	_increaseYButton->update(WINSIZEX / 2 + 50, 680);
-	_decreaseYButton->update(WINSIZEX / 2 + 50, 750);
-	_mapPageAddButton->update(WINSIZEX - 200, 720);
-	_mapPageSubButton->update(WINSIZEX - 350, 720);
+	buttonUpdate();
 
 	_ptIdX = (_ptMouse.x ) / 32;
 	_ptIdY = (_ptMouse.y ) / 32; 
@@ -105,7 +104,7 @@ void mapTool::update()
 void mapTool::render()
 {
 	WCHAR str[128];
-	IMAGEMANAGER->findImage("mapToolBackground")->render(0 + CAMERA->getCameraX() , 0 + CAMERA->getCameraY(), 0.5);
+	IMAGEMANAGER->findImage("mapToolBackground")->render(0 + CAMERA->getCameraX() , 0 + CAMERA->getCameraY(), 0.3);
 
 	for (int i = 0; i < TILEY; i++)			//Å¸ÀÏ¸Ê 
 	{
@@ -150,19 +149,19 @@ void mapTool::render()
 	switch (_mapSelect)
 	{
 	case STAGE1_1:
-		IMAGEMANAGER->frameRender("stage1_1", _ptMouse.x + 10, _ptMouse.y + 10, _tempTile.frameX, _tempTile.frameY, 0.5);
+		IMAGEMANAGER->frameRender("stage1_1", _ptMouse.x - 20, _ptMouse.y - 20, _tempTile.frameX, _tempTile.frameY, 0.5);
 		break;
 	case STAGE1_2:
-		IMAGEMANAGER->frameRender("stage1_2", _ptMouse.x + 10, _ptMouse.y + 10, _tempTile.frameX, _tempTile.frameY, 0.5);
+		IMAGEMANAGER->frameRender("stage1_2", _ptMouse.x - 20, _ptMouse.y - 20, _tempTile.frameX, _tempTile.frameY, 0.5);
 		break;
 	case STAGE1_3:
-		IMAGEMANAGER->frameRender("stage1_3", _ptMouse.x + 10, _ptMouse.y + 10, _tempTile.frameX, _tempTile.frameY, 0.5);
+		IMAGEMANAGER->frameRender("stage1_3", _ptMouse.x - 20, _ptMouse.y - 20, _tempTile.frameX, _tempTile.frameY, 0.5);
 		break;
 	case STAGE2:
-		IMAGEMANAGER->frameRender("stage2", _ptMouse.x + 10, _ptMouse.y + 10, _tempTile.frameX, _tempTile.frameY, 0.5);
+		IMAGEMANAGER->frameRender("stage2", _ptMouse.x - 20, _ptMouse.y - 20, _tempTile.frameX, _tempTile.frameY, 0.5);
 		break;
 	case BOSS_STAGE:
-		IMAGEMANAGER->frameRender("bossStage", _ptMouse.x + 10, _ptMouse.y + 10, _tempTile.frameX, _tempTile.frameY, 0.5);
+		IMAGEMANAGER->frameRender("bossStage", _ptMouse.x - 20, _ptMouse.y - 20, _tempTile.frameX, _tempTile.frameY, 0.5);
 		break;
 	}
 
@@ -185,6 +184,19 @@ void mapTool::render()
 		break;
 	}
 	
+	switch (_buttonSelect)
+	{
+	case 0:
+		IMAGEMANAGER->findImage("button2")->frameRender(WINSIZEX - 500 - CAMERA->getCameraX(), 680 - CAMERA->getCameraY(), 2, 1);
+		break;
+	case 1:
+		IMAGEMANAGER->findImage("button2")->frameRender(WINSIZEX - 500 - CAMERA->getCameraX(), 750 - CAMERA->getCameraY(), 2, 0);
+		break;
+	case 2:
+		IMAGEMANAGER->findImage("button2")->frameRender(WINSIZEX - 350 - CAMERA->getCameraX(), 680 - CAMERA->getCameraY(), 2, 4);
+		break;
+	}
+
 	for (int i = 0; i < SAMPLETILEY; i++)	//»ùÇÃ¸Ê
 	{
 		for (int j = 0; j < SAMPLETILEX; j++)
@@ -196,19 +208,15 @@ void mapTool::render()
 		}
 	}
 	
-	
-	IMAGEMANAGER->findImage("build_LR")->render(670 + CAMERA->getCameraX(), 0 + CAMERA->getCameraY(), 1);
-	IMAGEMANAGER->findImage("build_UD")->render(0 + CAMERA->getCameraX(), 750 + CAMERA->getCameraY(), 1);
 
-	_increaseXButton->render();
-	_decreaseXButton->render();
-	_increaseYButton->render();
-	_decreaseYButton->render();
-	_mapPageAddButton->render();
-	_mapPageSubButton->render();
+	IMAGEMANAGER->findImage("build_UD")->render(0 + CAMERA->getCameraX(), 740 + CAMERA->getCameraY(), 1);
+	IMAGEMANAGER->findImage("build_LR")->render(700 + CAMERA->getCameraX(), 0 + CAMERA->getCameraY(), 1);
 
-	IMAGEMANAGER->findImage("textXY")->frameRender(WINSIZEX / 2 - 50 + CAMERA->getCameraX(), 680 + CAMERA->getCameraY(), 0, 0);
-	IMAGEMANAGER->findImage("textXY")->frameRender(WINSIZEX / 2 + 100 + CAMERA->getCameraX(), 680 + CAMERA->getCameraY(), 1, 0);
+	buttonRender();
+
+	IMAGEMANAGER->findImage("textXY")->frameRender(WINSIZEX / 2 - 70 + CAMERA->getCameraX(), 690 + CAMERA->getCameraY(), 0, 0);
+	IMAGEMANAGER->findImage("textXY")->frameRender(WINSIZEX / 2 + 80 + CAMERA->getCameraX(), 690 + CAMERA->getCameraY(), 1, 0);
+	IMAGEMANAGER->findImage("textMap")->render(WINSIZEX - 172 + CAMERA->getCameraX(), 695 + CAMERA->getCameraY());
 	
 	swprintf_s(str, L"cameraX : %f", CAMERA->getCameraX());
 	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 20, 20, RGB(0, 0, 0));
@@ -228,7 +236,7 @@ void mapTool::render()
 	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 200, 20, RGB(0, 0, 0));
 	swprintf_s(str, L"mouseY : %d", _tempTile.frameX);							
 	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 220, 20, RGB(0, 0, 0));
-	swprintf_s(str, L"mouseY : %d", _tempTile.frameY);							
+	swprintf_s(str, L"mouseY : %d", _buttonSelect);
 	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 240, 20, RGB(0, 0, 0));
 }
 
@@ -317,10 +325,50 @@ void mapTool::buttonInit()
 	_decreaseYButton = new button;
 	_decreaseYButton->init("button", WINSIZEX / 2 + 150, 800, PointMake(2, 1), PointMake(0, 1), PointMake(1, 1), _decreaseYMap);
 	_mapPageAddButton = new button;
-	_mapPageAddButton->init("button", WINSIZEX - 200, 750, PointMake(2, 2), PointMake(0, 2), PointMake(1, 2), mapPageAdd);
+	_mapPageAddButton->init("button", WINSIZEX - 200, 750, PointMake(2, 2), PointMake(0, 2), PointMake(1, 2), cbMapPageAdd);
 	_mapPageSubButton = new button;
-	_mapPageSubButton->init("button", WINSIZEX - 250, 750, PointMake(2, 3), PointMake(0, 3), PointMake(1, 3), mapPageSub);
+	_mapPageSubButton->init("button", WINSIZEX - 250, 750, PointMake(2, 3), PointMake(0, 3), PointMake(1, 3), cbMapPageSub);
+	_saveButton = new button;
+	_saveButton->init("button2", WINSIZEX - 650, 680, PointMake(2, 2), PointMake(0, 2), PointMake(1, 2), cbMapSave);
+	_loadButton = new button;
+	_loadButton->init("button2", WINSIZEX - 650, 750, PointMake(2, 3), PointMake(0, 3), PointMake(1, 3), cbMapLoad);
+	_terrainButton = new button;
+	_terrainButton->init("button2", WINSIZEX - 200, 750, PointMake(2, 1), PointMake(0, 1), PointMake(1, 1), cbTerrainTile);
+	_objectButton = new button;
+	_objectButton->init("button2", WINSIZEX - 200, 750, PointMake(2, 0), PointMake(0, 0), PointMake(1, 0), cbObjectTile);
+	_eraserButton = new button;
+	_eraserButton->init("button2", WINSIZEX - 200, 750, PointMake(2, 4), PointMake(0, 4), PointMake(1, 4), cbEraser);
 
+}
+
+void mapTool::buttonUpdate()
+{
+	_increaseXButton->update(WINSIZEX / 2 - 100, 680);
+	_decreaseXButton->update(WINSIZEX / 2 - 100, 750);
+	_increaseYButton->update(WINSIZEX / 2 + 50, 680);
+	_decreaseYButton->update(WINSIZEX / 2 + 50, 750);
+	_mapPageAddButton->update(WINSIZEX - 50, 720);
+	_mapPageSubButton->update(WINSIZEX - 200, 720);
+	_saveButton->update(WINSIZEX - 650, 680);
+	_loadButton->update(WINSIZEX - 650, 750);
+	_terrainButton->update(WINSIZEX - 500, 680);
+	_objectButton->update(WINSIZEX - 500, 750);
+	_eraserButton->update(WINSIZEX - 350, 680);
+}
+
+void mapTool::buttonRender()
+{
+	_increaseXButton->render();
+	_decreaseXButton->render();
+	_increaseYButton->render();
+	_decreaseYButton->render();
+	_mapPageAddButton->render();
+	_mapPageSubButton->render();
+	_saveButton->render();
+	_loadButton->render();
+	_eraserButton->render();
+	_objectButton->render();
+	_terrainButton->render();
 }
 
 void mapTool::increaseX()
@@ -409,7 +457,7 @@ DWORD mapTool::setAttribute(string imgName, UINT frameX, UINT frameY)
 	return 0;
 }
 
-void mapTool::mapPageAdd()
+void mapTool::cbMapPageAdd()
 {
 	if (_mapSelect < 4)
 	{
@@ -417,7 +465,7 @@ void mapTool::mapPageAdd()
 	}
 }
 
-void mapTool::mapPageSub()
+void mapTool::cbMapPageSub()
 {
 	if (_mapSelect > 0)
 	{
@@ -425,12 +473,27 @@ void mapTool::mapPageSub()
 	}
 }
 
-void mapTool::mapSave()
+void mapTool::cbMapSave()
 {
 }
 
-void mapTool::mapLoad()
+void mapTool::cbMapLoad()
 {
+}
+
+void mapTool::cbTerrainTile()
+{
+	_buttonSelect = 0;
+}
+
+void mapTool::cbObjectTile()
+{
+	_buttonSelect = 1;
+}
+
+void mapTool::cbEraser()
+{
+	_buttonSelect = 2;
 }
 
 void mapTool::setWindowsSize(int x, int y, int width, int height)
