@@ -95,14 +95,11 @@ LRESULT gameNode::MainProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lPara
 			_ptMouse.x = static_cast<float>(LOWORD(lParam) + CAMERA->getCameraX());
 			_ptMouse.y = static_cast<float>(HIWORD(lParam) + CAMERA->getCameraY());
 		break;
-		
-
-
 		case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
 	}
-	
+
 
 	return (DefWindowProc(hWnd, iMessage, wParam, lParam));
 }

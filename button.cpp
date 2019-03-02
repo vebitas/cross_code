@@ -50,7 +50,7 @@ void button::update(float x, float y)
 		{
 			_direction = BUTTONDIRECTION_DOWN;
 		}
-		else if (KEYMANAGER->isOnceKeyUp(VK_LBUTTON) && _direction == BUTTONDIRECTION_DOWN)
+		if (KEYMANAGER->isOnceKeyUp(VK_LBUTTON))
 		{
 			_direction = BUTTONDIRECTION_UP;
 			_callbackFunction();
@@ -59,7 +59,7 @@ void button::update(float x, float y)
 	else _direction = BUTTONDIRECTION_NULL;
 
 	_rc = { (LONG)(CAMERA->getCameraX() + x - _image->GetFrameWidth() / 2) , (LONG)(CAMERA->getCameraY() + y - _image->GetFrameHeight() / 2)
-	 , (LONG)(CAMERA->CAMERA->getCameraX() + x + _image->GetFrameWidth() / 2), (LONG)(CAMERA->getCameraY() + y + _image->GetFrameHeight() / 2) };
+	 , (LONG)(CAMERA->getCameraX() + x + _image->GetFrameWidth() / 2), (LONG)(CAMERA->getCameraY() + y + _image->GetFrameHeight() / 2) };
 
 }
 

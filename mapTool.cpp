@@ -15,24 +15,32 @@ mapTool::~mapTool()
 
 HRESULT mapTool::init()
 {
-	//setWindowsSize(0, 0, 1800, 800);
+	setWindowsSize(0, 0, 1800, 800);
 	
 	IMAGEMANAGER->addFrameImage("stage1_1", L"image/tileNode/stage1_1.png", 1024, 608, SAMPLETILEX, SAMPLETILEY);
+	IMAGEMANAGER->addFrameImage("stage1_2", L"image/tileNode/stage1_2.png", 1024, 608, SAMPLETILEX, SAMPLETILEY);
+	IMAGEMANAGER->addFrameImage("stage1_3", L"image/tileNode/stage1_3.png", 1024, 608, SAMPLETILEX, SAMPLETILEY);
+	IMAGEMANAGER->addFrameImage("stage2", L"image/tileNode/stage2.png", 1024, 608, SAMPLETILEX, SAMPLETILEY);	
+	IMAGEMANAGER->addFrameImage("bossStage", L"image/tileNode/bossStage.png", 1024, 608, SAMPLETILEX, SAMPLETILEY);
 	IMAGEMANAGER->addImage("mapToolBackground", L"image/tileNode/mapToolBackground.png", WINSIZEX, WINSIZEY);
 	IMAGEMANAGER->addImage("build_LR", L"image/tileNode/build_LR.png", 64, 800);
 	IMAGEMANAGER->addImage("build_UD", L"image/tileNode/build_UD.png", 700, 64);
-	IMAGEMANAGER->addFrameImage("button", L"image/tileNode/button.png", 100, 133, 3, 4);
+	IMAGEMANAGER->addFrameImage("button", L"image/tileNode/button.png", 150, 200, 3, 4);
+	IMAGEMANAGER->addFrameImage("textXY", L"image/tileNode/textXY.png", 84, 58, 2, 1);
+	buttonInit();
 	setTile();
-
-	_increaseXMap = std::move(bind(&mapTool::increaseX, this));
-
-	_increaseXButton = new button;
-	_increaseXButton->init("button", WINSIZEX / 2 + 200, 600, PointMake(2, 0), PointMake(0, 0), PointMake(1, 0), _increaseXMap);
-
+	
 	_ptIdX = 0;
 	_ptIdY = 0;
 
+	_mapSelect = MAPNUMBER::STAGE1_1;
+
 	CAMERA->init(800, 600, 3300, 3300);
+
+	_mouseCameraMoveRc[0] = { (float)0,(float)0, (float)730, (float)60 };
+	_mouseCameraMoveRc[1] = { (float)670,(float)0, (float)730, (float)800};
+	_mouseCameraMoveRc[2] = { (float)0,(float)750, (float)730, (float)800 };
+	_mouseCameraMoveRc[3] = { (float)0,(float)0, (float)60, (float)800 };
 
 	return S_OK;
 
@@ -46,10 +54,10 @@ void mapTool::update()
 {
 	setMap();
 	pickSampleTile();
-	_increaseXButton->update(WINSIZEX / 2 + 200, 600);
+	
 	
 
-	if (KEYMANAGER->isStayKeyDown(VK_UP))
+	if (KEYMANAGER->isStayKeyDown(VK_UP) || PtInRect(&makeRECT(_mouseCameraMoveRc[0]), makePOINT(_ptMouse)))
 	{
 		if (CAMERA->getCameraY() > 0)
 		{
@@ -58,11 +66,11 @@ void mapTool::update()
 		else CAMERA->setCameraY(0);
 
 	}
-	if (KEYMANAGER->isStayKeyDown(VK_DOWN))
+	if (KEYMANAGER->isStayKeyDown(VK_DOWN) || PtInRect(&makeRECT(_mouseCameraMoveRc[2]), makePOINT(_ptMouse)))
 	{
 		CAMERA->setCameraY(CAMERA->getCameraY() + 10);
 	}
-	if (KEYMANAGER->isStayKeyDown(VK_LEFT))
+	if (KEYMANAGER->isStayKeyDown(VK_LEFT) || PtInRect(&makeRECT(_mouseCameraMoveRc[3]), makePOINT(_ptMouse)))
 	{
 		if (CAMERA->getCameraX() > 0)
 		{
@@ -70,89 +78,28 @@ void mapTool::update()
 		}
 		else CAMERA->setCameraX(0);
 	}
-	if (KEYMANAGER->isStayKeyDown(VK_RIGHT))
+	if (KEYMANAGER->isStayKeyDown(VK_RIGHT) || PtInRect(&makeRECT(_mouseCameraMoveRc[1]), makePOINT(_ptMouse)))
 	{
 		CAMERA->setCameraX(CAMERA->getCameraX() + 10);
 	}
-	if (KEYMANAGER->isOnceKeyDown('Q'))
-	{
-		if (TILEX > 2)
-		{
-			for (int i = 0; i < TILEY; i++)
-			{
-				tagTile* delTile = _vvTile[i].back();
-				_vvTile[i].pop_back();
 
-
-				SAFE_DELETE(delTile);
-			}
-			TILEX--;
-		}
-	}
-	if (KEYMANAGER->isOnceKeyDown('W'))
-	{
-		if (TILEY > 2)
-		{
-			for (int i = TILEX - 1; i >= 0; i--)
-			{
-				delete _vvTile.back()[i];			//데이터를 메모리에서 삭제함
-				_vvTile.back()[i] = nullptr;		//포인터의 주소를 없앰
-			}
-			_vvTile.pop_back();
-			TILEY--;
-		}
-	}
-	
-	if (KEYMANAGER->isOnceKeyDown('A'))
-	{
-
-		for (int i = 0; i < TILEY; i++)
-		{
-			tagTile* tempTile = new tagTile;
-		
-			tempTile->terrainFrameX = 31;
-			tempTile->terrainFrameY = 18;
-		
-			tempTile->objFrameX = 31;
-			tempTile->objFrameY = 18;
-		
-			tempTile->terrain = TERRAIN::TR_FLOOR;
-			tempTile->obj = OBJECT::OBJ_NONE;
-		
-			_vvTile[i].push_back(tempTile);
-		}
-		TILEX++;
-
-		
-	}
-	if (KEYMANAGER->isOnceKeyDown('S'))
-	{
-		vector<tagTile*> vTile;
-		for (int i = 0; i < TILEX; ++i)
-		{
-			tagTile* tempTile = new tagTile;
-
-			tempTile->terrainFrameX = 31;
-			tempTile->terrainFrameY = 18;
-
-			tempTile->objFrameX = 31;
-			tempTile->objFrameY = 18;
-
-
-			vTile.push_back(tempTile);
-		}
-		_vvTile.push_back(vTile);
-		TILEY++;
-	}
-
-	//_ptViewMouse.x = _ptMouse.x - CAMERA->getCameraX();
-	//_ptViewMouse.y = _ptMouse.y - CAMERA->getCameraY();
+	_increaseXButton->update(WINSIZEX / 2 - 100, 680);
+	_decreaseXButton->update(WINSIZEX / 2 - 100, 750);
+	_increaseYButton->update(WINSIZEX / 2 + 50, 680);
+	_decreaseYButton->update(WINSIZEX / 2 + 50, 750);
+	_mapPageAddButton->update(WINSIZEX - 200, 720);
+	_mapPageSubButton->update(WINSIZEX - 350, 720);
 
 	_ptIdX = (_ptMouse.x ) / 32;
 	_ptIdY = (_ptMouse.y ) / 32; 
 		
 	_ptSPidX = ((_ptMouse.x - CAMERA->getCameraX()) - 776) / 32;
 	_ptSPidY =( _ptMouse.y - CAMERA->getCameraY()) / 32;
+
+	_mouseCameraMoveRc[0] = { (float)0 + CAMERA->getCameraX() ,(float)0 + CAMERA->getCameraY(), (float)730 + CAMERA->getCameraX(), (float)60 + CAMERA->getCameraY() };
+	_mouseCameraMoveRc[1] = { (float)670 + CAMERA->getCameraX(),(float)0 + CAMERA->getCameraY(), (float)730 + CAMERA->getCameraX(), (float)800 + CAMERA->getCameraY() };
+	_mouseCameraMoveRc[2] = { (float)0+ CAMERA->getCameraX(),(float)750 + CAMERA->getCameraY(), (float)730 + CAMERA->getCameraX(), (float)800 + CAMERA->getCameraY() };
+	_mouseCameraMoveRc[3] = { (float)0+ CAMERA->getCameraX(),(float)0 + CAMERA->getCameraY(), (float)60 + CAMERA->getCameraX(), (float)800 + CAMERA->getCameraY() };
 
 }
 void mapTool::render()
@@ -175,15 +122,69 @@ void mapTool::render()
 				continue;
 
 			D2DMANAGER->drawRectangle(RGB(0, 0, 0), j * TILESIZE, i * TILESIZE  ,(j + 1) * TILESIZE, (i + 1) * TILESIZE);
-			IMAGEMANAGER->frameRender("stage1_1", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->terrainFrameX, _vvTile[i][j]->terrainFrameY, 1);
+			switch (_mapSelect)
+			{
+			case STAGE1_1:
+				IMAGEMANAGER->frameRender("stage1_1", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->terrainFrameX, _vvTile[i][j]->terrainFrameY, 1);
+				break;
+			case STAGE1_2:
+				IMAGEMANAGER->frameRender("stage1_2", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->terrainFrameX, _vvTile[i][j]->terrainFrameY, 1);
+				break;
+			case STAGE1_3:
+				IMAGEMANAGER->frameRender("stage1_3", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->terrainFrameX, _vvTile[i][j]->terrainFrameY, 1);
+				break;
+			case STAGE2:
+				IMAGEMANAGER->frameRender("stage2", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->terrainFrameX, _vvTile[i][j]->terrainFrameY, 1);
+				break;
+			case BOSS_STAGE:
+				IMAGEMANAGER->frameRender("bossStage", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->terrainFrameX, _vvTile[i][j]->terrainFrameY, 1);
+				break;
+			}
+			
 			//swprintf_s(str, L"%d,%d", i, j);
 			//D2DMANAGER->drawText(str,  (i * TILESIZE) - CAMERA->getCameraX(), (5 + j * TILESIZE) - CAMERA->getCameraY(), 10, RGB(0, 0, 0));
 			
 		}
 	}
 
-	IMAGEMANAGER->findImage("stage1_1")->frameRender(_ptMouse.x + 10, _ptMouse.y + 10, _tempTile.frameX, _tempTile.frameY);
-	IMAGEMANAGER->findImage("stage1_1")->render(SAMPLE_TILE_STARTX + CAMERA->getCameraX(), 0 + CAMERA->getCameraY());
+	switch (_mapSelect)
+	{
+	case STAGE1_1:
+		IMAGEMANAGER->frameRender("stage1_1", _ptMouse.x + 10, _ptMouse.y + 10, _tempTile.frameX, _tempTile.frameY, 0.5);
+		break;
+	case STAGE1_2:
+		IMAGEMANAGER->frameRender("stage1_2", _ptMouse.x + 10, _ptMouse.y + 10, _tempTile.frameX, _tempTile.frameY, 0.5);
+		break;
+	case STAGE1_3:
+		IMAGEMANAGER->frameRender("stage1_3", _ptMouse.x + 10, _ptMouse.y + 10, _tempTile.frameX, _tempTile.frameY, 0.5);
+		break;
+	case STAGE2:
+		IMAGEMANAGER->frameRender("stage2", _ptMouse.x + 10, _ptMouse.y + 10, _tempTile.frameX, _tempTile.frameY, 0.5);
+		break;
+	case BOSS_STAGE:
+		IMAGEMANAGER->frameRender("bossStage", _ptMouse.x + 10, _ptMouse.y + 10, _tempTile.frameX, _tempTile.frameY, 0.5);
+		break;
+	}
+
+	switch (_mapSelect)
+	{
+	case STAGE1_1:
+		IMAGEMANAGER->findImage("stage1_1")->render(SAMPLE_TILE_STARTX + CAMERA->getCameraX(), 0 + CAMERA->getCameraY());
+		break;
+	case STAGE1_2:
+		IMAGEMANAGER->findImage("stage1_2")->render(SAMPLE_TILE_STARTX + CAMERA->getCameraX(), 0 + CAMERA->getCameraY());
+		break;
+	case STAGE1_3:
+		IMAGEMANAGER->findImage("stage1_3")->render(SAMPLE_TILE_STARTX + CAMERA->getCameraX(), 0 + CAMERA->getCameraY());
+		break;
+	case STAGE2:
+		IMAGEMANAGER->findImage("stage2")->render(SAMPLE_TILE_STARTX + CAMERA->getCameraX(), 0 + CAMERA->getCameraY());
+		break;
+	case BOSS_STAGE:
+		IMAGEMANAGER->findImage("bossStage")->render(SAMPLE_TILE_STARTX + CAMERA->getCameraX(), 0 + CAMERA->getCameraY());
+		break;
+	}
+	
 	for (int i = 0; i < SAMPLETILEY; i++)	//샘플맵
 	{
 		for (int j = 0; j < SAMPLETILEX; j++)
@@ -198,8 +199,16 @@ void mapTool::render()
 	
 	IMAGEMANAGER->findImage("build_LR")->render(670 + CAMERA->getCameraX(), 0 + CAMERA->getCameraY(), 1);
 	IMAGEMANAGER->findImage("build_UD")->render(0 + CAMERA->getCameraX(), 750 + CAMERA->getCameraY(), 1);
-	
+
 	_increaseXButton->render();
+	_decreaseXButton->render();
+	_increaseYButton->render();
+	_decreaseYButton->render();
+	_mapPageAddButton->render();
+	_mapPageSubButton->render();
+
+	IMAGEMANAGER->findImage("textXY")->frameRender(WINSIZEX / 2 - 50 + CAMERA->getCameraX(), 680 + CAMERA->getCameraY(), 0, 0);
+	IMAGEMANAGER->findImage("textXY")->frameRender(WINSIZEX / 2 + 100 + CAMERA->getCameraX(), 680 + CAMERA->getCameraY(), 1, 0);
 	
 	swprintf_s(str, L"cameraX : %f", CAMERA->getCameraX());
 	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 20, 20, RGB(0, 0, 0));
@@ -292,22 +301,96 @@ void mapTool::setMap()
 	}
 }
 
+void mapTool::buttonInit()
+{
+	_increaseXMap = std::move(bind(&mapTool::increaseX, this));
+	_decreaseXMap = std::move(bind(&mapTool::decreaseX, this));
+	_increaseYMap = std::move(bind(&mapTool::increaseY, this));
+	_decreaseYMap = std::move(bind(&mapTool::decreaseY, this));
+
+	_increaseXButton = new button;
+	_increaseXButton->init("button", WINSIZEX / 2, 700, PointMake(2, 0), PointMake(0, 0), PointMake(1, 0), _increaseXMap);
+	_decreaseXButton = new button;
+	_decreaseXButton->init("button", WINSIZEX / 2, 800, PointMake(2, 1), PointMake(0, 1), PointMake(1, 1), _decreaseXMap);
+	_increaseYButton = new button;
+	_increaseYButton->init("button", WINSIZEX / 2 + 150, 700, PointMake(2, 0), PointMake(0, 0), PointMake(1, 0), _increaseYMap);
+	_decreaseYButton = new button;
+	_decreaseYButton->init("button", WINSIZEX / 2 + 150, 800, PointMake(2, 1), PointMake(0, 1), PointMake(1, 1), _decreaseYMap);
+	_mapPageAddButton = new button;
+	_mapPageAddButton->init("button", WINSIZEX - 200, 750, PointMake(2, 2), PointMake(0, 2), PointMake(1, 2), mapPageAdd);
+	_mapPageSubButton = new button;
+	_mapPageSubButton->init("button", WINSIZEX - 250, 750, PointMake(2, 3), PointMake(0, 3), PointMake(1, 3), mapPageSub);
+
+}
+
 void mapTool::increaseX()
 {
+	for (int i = 0; i < TILEY; i++)
+	{
+		tagTile* tempTile = new tagTile;
 
+		tempTile->terrainFrameX = 31;
+		tempTile->terrainFrameY = 18;
+
+		tempTile->objFrameX = 31;
+		tempTile->objFrameY = 18;
+
+		tempTile->terrain = TERRAIN::TR_FLOOR;
+		tempTile->obj = OBJECT::OBJ_NONE;
+
+		_vvTile[i].push_back(tempTile);
+	}
+	TILEX++;
 }
 
 void mapTool::increaseY()
 {
+	vector<tagTile*> vTile;
+	for (int i = 0; i < TILEX; ++i)
+	{
+		tagTile* tempTile = new tagTile;
+
+		tempTile->terrainFrameX = 31;
+		tempTile->terrainFrameY = 18;
+
+		tempTile->objFrameX = 31;
+		tempTile->objFrameY = 18;
+
+
+		vTile.push_back(tempTile);
+	}
+	_vvTile.push_back(vTile);
+	TILEY++;
 }
 
 void mapTool::decreaseX()
 {
-	
+	if (TILEX > 2)
+	{
+		for (int i = 0; i < TILEY; i++)
+		{
+			tagTile* delTile = _vvTile[i].back();
+			_vvTile[i].pop_back();
+
+
+			SAFE_DELETE(delTile);
+		}
+		TILEX--;
+	}
 }
 
 void mapTool::decreaseY()
 {
+	if (TILEY > 2)
+	{
+		for (int i = TILEX - 1; i >= 0; i--)
+		{
+			delete _vvTile.back()[i];			//데이터를 메모리에서 삭제함
+			_vvTile.back()[i] = nullptr;		//포인터의 주소를 없앰
+		}
+		_vvTile.pop_back();
+		TILEY--;
+	}
 }
 
 TERRAIN mapTool::terraniSelect(int frameX, int frameY)
@@ -326,11 +409,27 @@ DWORD mapTool::setAttribute(string imgName, UINT frameX, UINT frameY)
 	return 0;
 }
 
-void mapTool::increaseMap()
+void mapTool::mapPageAdd()
+{
+	if (_mapSelect < 4)
+	{
+		_mapSelect++;
+	}
+}
+
+void mapTool::mapPageSub()
+{
+	if (_mapSelect > 0)
+	{
+		_mapSelect--;
+	}
+}
+
+void mapTool::mapSave()
 {
 }
 
-void mapTool::decreaseMap()
+void mapTool::mapLoad()
 {
 }
 

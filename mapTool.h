@@ -12,28 +12,27 @@
 #define OUTPUTSIZEX 700
 #define OUTPUTSIZEY 800
 
+enum MAPNUMBER
+{
+	STAGE1_1 = 0,
+	STAGE1_2,
+	STAGE1_3,
+	STAGE2,
+	BOSS_STAGE
+};
+
 static button*	_increaseXButton;
 static button*  _increaseYButton;
 static button*	_decreaseXButton;
 static button*	_decreaseYButton;
+static button*	_mapPageAddButton;
+static button*	_mapPageSubButton;
 
+static int _mapSelect;
 
 class mapTool : public gameNode
 {
-private:
-	//내부함수
 
-	inline RECT makeRECT(D2D1_RECT_F rc)
-	{
-		return RECT{ (LONG)rc.left, (LONG)rc.top, (LONG)rc.right, (LONG)rc.bottom };
-	}
-
-	inline POINT makePOINT(POINTF pt)
-	{
-		return POINT{ (LONG)pt.x, (LONG)pt.y };
-	}
-
-	DWORD setAttribute(string imgName, UINT frameX, UINT frameY);
 
 private:
 	vector<vector<tagTile*>> _vvTile;
@@ -48,6 +47,8 @@ private:
 	POINT _ptViewMouse;
 
 	tagSampleTile _sampleTile[SAMPLETILEY][SAMPLETILEX];
+	
+	D2D1_RECT_F _mouseCameraMoveRc[4];
 
 	int _ptIdX;
 	int _ptIdY;
@@ -68,6 +69,8 @@ public:
 	void pickSampleTile();										//클릭한 샘플타일 프레임 번호 저장
 	void setMap();												//클릭한 맵에다 저장한 프레임 번호를 맵타일 프레임에 넣어줌
 
+	void buttonInit();
+
 	void increaseX();											//콜백함수 맵 x,y축 증가
 	void increaseY();
 	void decreaseX();											//콜백함수 맵 x,y축 감소
@@ -77,13 +80,30 @@ public:
 	function<void(void)> _increaseYMap;
 	function<void(void)> _decreaseXMap;
 	function<void(void)> _decreaseYMap;
+	static void mapPageAdd();
+	static void mapPageSub();
 
-	void increaseMap();
-	void decreaseMap();
+	void mapSave();
+	void mapLoad();
 
 	void setWindowsSize(int x, int y, int width, int height);	//윈도우 창크기 설정
 
 	TERRAIN terraniSelect(int frameX, int frameY);
 	OBJECT objSelect(int frameX, int frameY);
+
+private:
+	//내부함수
+
+	inline RECT makeRECT(D2D1_RECT_F rc)
+	{
+		return RECT{ (LONG)rc.left, (LONG)rc.top, (LONG)rc.right, (LONG)rc.bottom };
+	}
+
+	inline POINT makePOINT(POINTF pt)
+	{
+		return POINT{ (LONG)pt.x, (LONG)pt.y };
+	}
+
+	DWORD setAttribute(string imgName, UINT frameX, UINT frameY);
 };
 

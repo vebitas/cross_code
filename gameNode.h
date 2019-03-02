@@ -7,7 +7,6 @@ private:
 
 	//매니저를 이닛할껀지 여부
 	bool _managerInit;
-
 public:
 	gameNode();
 	virtual ~gameNode();
