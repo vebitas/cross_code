@@ -67,6 +67,7 @@ public:
 	int objFrameX;
 	int objFrameY;
 	int selectTile;
+	int tileNum;
 	int heightTile;
 
 	

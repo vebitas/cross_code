@@ -9,7 +9,10 @@
 
 #define SAMPLE_TILE_STARTX	WINSIZEX - SAMPLE_TOTAL_SIZEX
 
-#define OUTPUTSIZEX 700
+#define CAMERASIZEX 
+#define CAMERASIZEY
+
+#define OUTPUTSIZEX 750
 #define OUTPUTSIZEY 800
 
 enum MAPNUMBER
@@ -51,11 +54,11 @@ private:
 	UINT		TILEX;					
 	UINT		TILEY;
 
-	POINT _ptViewMouse;
-
 	tagSampleTile _sampleTile[SAMPLETILEY][SAMPLETILEX];
 	
 	D2D1_RECT_F _mouseCameraMoveRc[4];
+	D2D1_RECT_F _selectTileRc;
+	D2D1_RECT_F _selectSampleTileRc;
 
 	int _ptIdX;
 	int _ptIdY;
@@ -63,7 +66,12 @@ private:
 	int _ptSPidX;
 	int _ptSPidY;
 
+	int _dragStartIdX;
+	int _dragStartIdY;
 
+	POINT _mapClippingPos;
+	
+	bool _dragMod;
 
 public:
 	mapTool();
@@ -77,6 +85,7 @@ public:
 	void setTile();												//타일 초기값
 	void pickSampleTile();										//클릭한 샘플타일 프레임 번호 저장
 	void setMap();												//클릭한 맵에다 저장한 프레임 번호를 맵타일 프레임에 넣어줌
+	void dragMod();
 
 	void buttonInit();
 	void buttonUpdate();
