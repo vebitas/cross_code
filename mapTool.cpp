@@ -42,6 +42,9 @@ HRESULT mapTool::init()
 	_buttonSelect = 0;
 
 	_dragMod = false;
+	_dragFrameSave = false;
+	_save = false;
+	_load = false;
 
 	_mapSelect = MAPNUMBER::STAGE1_1;
 
@@ -64,7 +67,7 @@ void mapTool::release()
 
 void mapTool::update()
 {
-	dragMod();
+	
 	setMap();
 	pickSampleTile();
 
@@ -94,9 +97,16 @@ void mapTool::update()
 		CAMERA->setCameraX(CAMERA->getCameraX() + 10);
 	}
 
-	
-	
+	dragMod();
 	buttonUpdate();
+	
+	if (_dragFrameSave  && (_ptSPidX <= SAMPLETILEX && _ptSPidY <= SAMPLETILEY && _ptSPidX >= 0 && _ptSPidY >= 0))
+	{
+		_selectSampleTileRc = { (float)(SAMPLE_TILE_STARTX + (_dragStartIdX * TILESIZE)) + CAMERA->getCameraX(),
+							(float)(_dragStartIdY * TILESIZE) + CAMERA->getCameraY(),
+							(float)(SAMPLE_TILE_STARTX + (_ptSPidX * TILESIZE + TILESIZE)) + CAMERA->getCameraX(),
+							(float)(_ptSPidY * TILESIZE + TILESIZE) + CAMERA->getCameraY() };
+	}
 
 	_ptIdX = (_ptMouse.x ) / 32;
 	_ptIdY = (_ptMouse.y ) / 32; 
@@ -109,10 +119,14 @@ void mapTool::update()
 	_mouseCameraMoveRc[2] = { (float)0+ CAMERA->getCameraX(),(float)750 + CAMERA->getCameraY(), (float)730 + CAMERA->getCameraX(), (float)800 + CAMERA->getCameraY() };
 	_mouseCameraMoveRc[3] = { (float)0+ CAMERA->getCameraX(),(float)0 + CAMERA->getCameraY(), (float)60 + CAMERA->getCameraX(), (float)800 + CAMERA->getCameraY() };
 
+
 	_selectTileRc = { (float)_ptIdX * TILESIZE, (float)_ptIdY * TILESIZE, (float)_ptIdX * TILESIZE + TILESIZE, (float)_ptIdY * TILESIZE + TILESIZE };
 
 	_mapClippingPos.x = (CAMERA->getCameraX() + (OUTPUTSIZEX / 2)) / 32;
 	_mapClippingPos.y = (CAMERA->getCameraY() + (OUTPUTSIZEY / 2)) / 32;
+
+	mapSave();
+	mapLoad();
 }
 void mapTool::render()
 {
@@ -129,6 +143,8 @@ void mapTool::render()
 			if (i < 0) continue;
 	
 			D2DMANAGER->drawRectangle(RGB(0, 0, 0), j * TILESIZE, i * TILESIZE  ,(j + 1) * TILESIZE, (i + 1) * TILESIZE);
+
+		
 			switch (_vvTile[i][j]->selectTile)
 			{
 			case STAGE1_1:
@@ -147,27 +163,30 @@ void mapTool::render()
 				IMAGEMANAGER->frameRender("bossStage", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->terrainFrameX, _vvTile[i][j]->terrainFrameY, 1);
 				break;
 			}
+		
+			switch (_vvTile[i][j]->selectTile)
+			{
+			case STAGE1_1:
+				IMAGEMANAGER->frameRender("stage1_1", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->objFrameX, _vvTile[i][j]->objFrameY, 1);
+				break;
+			case STAGE1_2:
+				IMAGEMANAGER->frameRender("stage1_2", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->objFrameX, _vvTile[i][j]->objFrameY, 1);
+				break;
+			case STAGE1_3:
+				IMAGEMANAGER->frameRender("stage1_3", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->objFrameX, _vvTile[i][j]->objFrameY, 1);
+				break;
+			case STAGE2:
+				IMAGEMANAGER->frameRender("stage2", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->objFrameX, _vvTile[i][j]->objFrameY, 1);
+				break;
+			case BOSS_STAGE:
+				IMAGEMANAGER->frameRender("bossStage", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->objFrameX, _vvTile[i][j]->objFrameY, 1);
+				break;
+			}
+			
 		}
 	}
-
-	switch (_mapSelect)
-	{
-	case STAGE1_1:
-		IMAGEMANAGER->frameRender("stage1_1", _ptMouse.x - 20, _ptMouse.y - 20, _tempTile.frameX, _tempTile.frameY, 0.3);
-		break;
-	case STAGE1_2:
-		IMAGEMANAGER->frameRender("stage1_2", _ptMouse.x - 20, _ptMouse.y - 20, _tempTile.frameX, _tempTile.frameY, 0.3);
-		break;
-	case STAGE1_3:
-		IMAGEMANAGER->frameRender("stage1_3", _ptMouse.x - 20, _ptMouse.y - 20, _tempTile.frameX, _tempTile.frameY, 0.3);
-		break;
-	case STAGE2:
-		IMAGEMANAGER->frameRender("stage2", _ptMouse.x - 20, _ptMouse.y - 20, _tempTile.frameX, _tempTile.frameY, 0.3);
-		break;
-	case BOSS_STAGE:
-		IMAGEMANAGER->frameRender("bossStage", _ptMouse.x - 20, _ptMouse.y - 20, _tempTile.frameX, _tempTile.frameY, 0.3);
-		break;
-	}
+	tilePreview();
+	
 
 	switch (_mapSelect)
 	{
@@ -207,12 +226,12 @@ void mapTool::render()
 
 	buttonRender();
 
-	if (_ptIdX < _mapClippingPos.x + 11 && _ptIdY < _mapClippingPos.y + 11)
+	if (_ptIdX < TILEX && _ptIdY < TILEY && _mapClippingPos.x + 11 > _ptIdX && _mapClippingPos.y + 11 > _ptIdY)
 	{
 		D2DMANAGER->drawRectangle(RGB(0, 0 ,255), _selectTileRc);
 	}
 	if ((_ptSPidX < SAMPLETILEX && _ptSPidY < SAMPLETILEY 
-		&& _ptSPidX >= 0 && _ptSPidY >= 0) && _dragMod)
+		&& _ptSPidX >= 0 && _ptSPidY >= 0) && _dragFrameSave)
 	{
 		D2DMANAGER->fillRectangle(RGB(255, 0, 255), _selectSampleTileRc);
 	}
@@ -234,14 +253,20 @@ void mapTool::render()
 	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 100, 20, RGB(0, 0, 0));
 	swprintf_s(str, L"tempY : %d", _tempTile.frameY);
 	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 120, 20, RGB(0, 0, 0));
-	swprintf_s(str, L"_ptSPidX : %d", _ptIdX);
+	swprintf_s(str, L"_ptIdX : %d", _ptIdX);
 	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 180, 20, RGB(0, 0, 0));
-	swprintf_s(str, L"_ptSPidY : %d", _ptIdY);
+	swprintf_s(str, L"_ptIdY : %d", _ptIdY);
 	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 200, 20, RGB(0, 0, 0));
-	swprintf_s(str, L"형우X : %d", _mapClippingPos.x);
+	swprintf_s(str, L"_ptSPIdX : %d", _ptSPidX);
 	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 220, 20, RGB(0, 0, 0));
-	swprintf_s(str, L"형우Y : %d", _mapClippingPos.y);
+	swprintf_s(str, L"_ptSPIdY : %d", _ptSPidY);
 	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 240, 20, RGB(0, 0, 0));
+	swprintf_s(str, L"스타트X : %d", _dragStartIdX);
+	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 260, 20, RGB(0, 0, 0));
+	swprintf_s(str, L"스타트Y : %d", _dragStartIdY);
+	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 280, 20, RGB(0, 0, 0));
+	swprintf_s(str, L"드래그 모드 : %d", _dragFrameSave);
+	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 300, 20, RGB(0, 0, 0));
 }
 
 void mapTool::setTile()
@@ -259,8 +284,8 @@ void mapTool::setTile()
 			_tile->selectTile = 0;
 			_tile->terrainFrameX = 30;
 			_tile->terrainFrameY = 19;
-			_tile->objFrameX = 0;
-			_tile->objFrameY = 0;
+			_tile->objFrameX = 30;
+			_tile->objFrameY = 19;
 			_tile->terrain = terraniSelect(_tile->terrainFrameX, _tile->terrainFrameY);
 			_tile->obj = OBJECT::OBJ_NONE;
 			vTile.push_back(_tile);
@@ -301,40 +326,255 @@ void mapTool::setMap()
 	{
 		if (KEYMANAGER->isStayKeyDown(VK_LBUTTON))
 		{
-			if (TILEY > _ptIdX)
+			if (_buttonSelect == 0)
 			{
-				_vvTile[_ptIdY][_ptIdX]->terrainFrameX = _tempTile.frameX;
+				//드래그모드가 아닐때는 클릭한 한개의 샘플좌표를 맵에 있는 해당 프레임에 대입시킨다.
+				if (!_dragMod && _ptIdX < TILEX && _ptIdY < TILEY)
+				{
+					if (TILEY > _ptIdX)
+					{
+						_vvTile[_ptIdY][_ptIdX]->terrainFrameX = _tempTile.frameX;
+					}
+					if (TILEX > _ptIdY)
+					{
+						_vvTile[_ptIdY][_ptIdX]->terrainFrameY = _tempTile.frameY;
+					}
+					_vvTile[_ptIdY][_ptIdX]->selectTile = _mapSelect;
+				}
+				//드래그 모드일때
+				else
+				{
+					for (int i = 0; i < abs(_dragchaiY) + 1; i++)
+					{
+						for (int j = 0; j < abs(_dragchaiX) + 1; j++)
+						{
+							if (abs(_dragchaiX) + _ptIdX >= TILEX) continue;
+							if (abs(_dragchaiY) + _ptIdY >= TILEY) continue;
+
+							POINT dragPoint;
+							dragPoint.x = _dragStartIdX;
+							dragPoint.y = _dragStartIdY;
+
+							if (_dragchaiX < 0)
+							{
+								dragPoint.x += _dragchaiX;
+							}
+							if (_dragchaiY < 0)
+							{
+								dragPoint.y += _dragchaiY;
+							}
+
+							_vvTile[_ptIdY + i][_ptIdX + j]->terrainFrameX = dragPoint.x + j;
+							_vvTile[_ptIdY + i][_ptIdX + j]->terrainFrameY = dragPoint.y + i;
+							_vvTile[_ptIdY + i][_ptIdX + j]->selectTile = _mapSelect;
+						}
+					}
+				}
 			}
-			if (TILEX > _ptIdY)
+			else if (_buttonSelect == 1)
 			{
-				_vvTile[_ptIdY][_ptIdX]->terrainFrameY = _tempTile.frameY;
+				//드래그모드가 아닐때는 클릭한 한개의 샘플좌표를 맵에 있는 해당 프레임에 대입시킨다.
+				if (!_dragMod && _ptIdX < TILEX && _ptIdY < TILEY)
+				{
+					if (TILEY > _ptIdX)
+					{
+						_vvTile[_ptIdY][_ptIdX]->objFrameX = _tempTile.frameX;
+					}
+					if (TILEX > _ptIdY)
+					{
+						_vvTile[_ptIdY][_ptIdX]->objFrameY = _tempTile.frameY;
+					}
+					_vvTile[_ptIdY][_ptIdX]->selectTile = _mapSelect;
+				}
+				//드래그 모드일때
+				else
+				{
+					for (int i = 0; i < abs(_dragchaiY) + 1; i++)
+					{
+						for (int j = 0; j < abs(_dragchaiX) + 1; j++)
+						{
+							if (abs(_dragchaiX) + _ptIdX >= TILEX) continue;
+							if (abs(_dragchaiY) + _ptIdY >= TILEY) continue;
+
+							POINT dragPoint;
+							dragPoint.x = _dragStartIdX;
+							dragPoint.y = _dragStartIdY;
+
+							if (_dragchaiX < 0)
+							{
+								dragPoint.x += _dragchaiX;
+							}
+							if (_dragchaiY < 0)
+							{
+								dragPoint.y += _dragchaiY;
+							}
+
+							_vvTile[_ptIdY + i][_ptIdX + j]->terrainFrameX = dragPoint.x + j;
+							_vvTile[_ptIdY + i][_ptIdX + j]->terrainFrameY = dragPoint.y + i;
+							_vvTile[_ptIdY + i][_ptIdX + j]->selectTile = _mapSelect;
+						}
+					}
+				}
 			}
-			_vvTile[_ptIdY][_ptIdX]->selectTile = _mapSelect;
+			else
+			{
+				if (!_dragMod && _ptIdX < TILEX && _ptIdY < TILEY)
+				{
+					if (TILEY > _ptIdX)
+					{
+						_vvTile[_ptIdY][_ptIdX]->objFrameX = 30;
+					}
+					if (TILEX > _ptIdY)
+					{
+						_vvTile[_ptIdY][_ptIdX]->objFrameY = 19;
+					}
+				}
+				//드래그 모드일때
+				else
+				{
+					for (int i = 0; i < abs(_dragchaiY) + 1; i++)
+					{
+						for (int j = 0; j < abs(_dragchaiX) + 1; j++)
+						{
+							if (abs(_dragchaiX) + _ptIdX >= TILEX) continue;
+							if (abs(_dragchaiY) + _ptIdY >= TILEY) continue;
+
+							_dragTerm.x = 1;
+							_dragTerm.y = 1;
+							_vvTile[_ptIdY + i][_ptIdX + j]->objFrameX = 30;
+							_vvTile[_ptIdY + i][_ptIdX + j]->objFrameY = 19;
+							_vvTile[_ptIdY + i][_ptIdX + j]->selectTile = _mapSelect;
+						}
+					}
+				}
+			}
 		}
 	}
 }
 
 void mapTool::dragMod()
 {
-	if(KEYMANAGER->isOnceKeyDown(VK_LBUTTON))
+	if(KEYMANAGER->isOnceKeyDown(VK_LBUTTON) && _ptSPidX <= SAMPLETILEX && _ptSPidY <= SAMPLETILEY
+											&& _ptSPidX >= 0 && _ptSPidY)
 	{
+		//마우스를 눌렀을때의 샘플좌표를 시작인덱스변수들에게 넣어준다.
+		_dragFrameSave = true;
 		_dragStartIdX = _ptSPidX;
 		_dragStartIdY = _ptSPidY;
-		_dragMod = true;
 	}
-	//if(KEYMANAGER->isOnceKeyUp(VK_LBUTTON))
-	//{
-	//	_dragMod = false;
-	//}
 
-	if (_dragMod)
+	if(KEYMANAGER->isOnceKeyUp(VK_LBUTTON) && _ptSPidX <= SAMPLETILEX && _ptSPidY <= SAMPLETILEY
+											&& _ptSPidX >= 0 && _ptSPidY)
 	{
-		_selectSampleTileRc = { (float)(SAMPLE_TILE_STARTX + (_dragStartIdX * TILESIZE)) + CAMERA->getCameraX(),
-							(float)(_dragStartIdY * TILESIZE) + CAMERA->getCameraY(),
-							(float)(SAMPLE_TILE_STARTX + (_ptSPidX * TILESIZE + TILESIZE)) + CAMERA->getCameraX(),
-							(float)(_ptSPidY * TILESIZE + TILESIZE) + CAMERA->getCameraY() };
+		//마우스를 뗐을때의 좌표를 앤드인덱스변수들에게 넣어준다.
+		_dragFrameSave = false;
+		_dragEndidX = _ptSPidX;
+		_dragEndidY = _ptSPidY;
+		_dragchaiX = _dragEndidX - _dragStartIdX;
+		_dragchaiY = _dragEndidY - _dragStartIdY;
+		//스타트 인덱스와 앤드 인덱스의 차이가 1이상일 경우 드래그모드를 활성화시킨다.
+		if (_dragchaiX > 0 || _dragchaiY > 0 || _dragchaiX < 0 || _dragchaiY)
+		{
+			_dragMod = true;
+		}
+		else
+		{
+			_dragMod = false;
+		}
+	}
+	
+}
+
+void mapTool::tilePreview()
+{
+	if (!(_buttonSelect == 2))
+	{
+		switch (_mapSelect)
+		{
+		case STAGE1_1:
+			if (!_dragMod)
+			{
+				IMAGEMANAGER->frameRender("stage1_1", _ptMouse.x - 20, _ptMouse.y - 20, _tempTile.frameX, _tempTile.frameY, 0.3);
+			}
+			else
+			{
+				for (int i = 0; i < _dragchaiY + 1; i++)
+				{
+					for (int j = 0; j < _dragchaiX + 1; j++)
+					{
+						IMAGEMANAGER->frameRender("stage1_1", _ptMouse.x - 20 + (TILESIZE * j), _ptMouse.y - 20 + (TILESIZE * i), _dragStartIdX + j, _dragStartIdY + i, 0.3);
+					}
+				}
+			}
+			break;
+		case STAGE1_2:
+			if (!_dragMod)
+			{
+				IMAGEMANAGER->frameRender("stage1_2", _ptMouse.x - 20, _ptMouse.y - 20, _tempTile.frameX, _tempTile.frameY, 0.3);
+			}
+			else
+			{
+				for (int i = 0; i < _dragchaiY + 1; i++)
+				{
+					for (int j = 0; j < _dragchaiX + 1; j++)
+					{
+						IMAGEMANAGER->frameRender("stage1_2", _ptMouse.x - 20 + (TILESIZE * j), _ptMouse.y - 20 + (TILESIZE * i), _dragStartIdX + j, _dragStartIdY + i, 0.3);
+					}
+				}
+			}
+			break;
+		case STAGE1_3:
+			if (!_dragMod)
+			{
+				IMAGEMANAGER->frameRender("stage1_3", _ptMouse.x - 20, _ptMouse.y - 20, _tempTile.frameX, _tempTile.frameY, 0.3);
+			}
+			else
+			{
+				for (int i = 0; i < _dragchaiY + 1; i++)
+				{
+					for (int j = 0; j < _dragchaiX + 1; j++)
+					{
+						IMAGEMANAGER->frameRender("stage1_3", _ptMouse.x - 20 + (TILESIZE * j), _ptMouse.y - 20 + (TILESIZE * i), _dragStartIdX + j, _dragStartIdY + i, 0.3);
+					}
+				}
+			}
+			break;
+		case STAGE2:
+			if (!_dragMod)
+			{
+				IMAGEMANAGER->frameRender("stage2", _ptMouse.x - 20, _ptMouse.y - 20, _tempTile.frameX, _tempTile.frameY, 0.3);
+			}
+			else
+			{
+				for (int i = 0; i < _dragchaiY + 1; i++)
+				{
+					for (int j = 0; j < _dragchaiX + 1; j++)
+					{
+						IMAGEMANAGER->frameRender("stage2", _ptMouse.x - 20 + (TILESIZE * j), _ptMouse.y - 20 + (TILESIZE * i), _dragStartIdX + j, _dragStartIdY + i, 0.3);
+					}
+				}
+			}
+			break;
+		case BOSS_STAGE:
+			if (!_dragMod)
+			{
+				IMAGEMANAGER->frameRender("bossStage", _ptMouse.x - 20, _ptMouse.y - 20, _tempTile.frameX, _tempTile.frameY, 0.3);
+			}
+			else
+			{
+				for (int i = 0; i < _dragchaiY + 1; i++)
+				{
+					for (int j = 0; j < _dragchaiX + 1; j++)
+					{
+						IMAGEMANAGER->frameRender("bossStage", _ptMouse.x - 20 + (TILESIZE * j), _ptMouse.y - 20 + (TILESIZE * i), _dragStartIdX + j, _dragStartIdY + i, 0.3);
+					}
+				}
+			}
+			break;
+		}
 	}
 }
+
 
 void mapTool::buttonInit()
 {
@@ -518,9 +758,32 @@ void mapTool::cbMapPageSub()
 
 void mapTool::cbMapSave()
 {
+	_save = true;
 }
 
 void mapTool::cbMapLoad()
+{
+
+}
+
+void mapTool::mapSave()
+{
+	if (_save)
+	{
+		HANDLE file;
+		DWORD write;
+
+		char mapSize[256];
+		sprintf_s(mapSize, "%d,%d", TILEX, TILEY);
+		file = CreateFile("저장_1.map", GENERIC_WRITE, NULL, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		WriteFile(file, mapSize, strlen(mapSize), &write, NULL);
+
+		CloseHandle(file);
+		_save = false;
+	}
+}
+
+void mapTool::mapLoad()
 {
 }
 

@@ -72,9 +72,9 @@ void playGround::render()
 	//swprintf_s(str, L"cameraY : %d", CAMERA->getCameraY());
 	//D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 100, 15, RGB(0, 0, 0));
 	swprintf_s(str, L"mouseX : %.2f", _ptMouse.x);
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 140, 15, RGB(0, 0, 0));
-	swprintf_s(str, L"mouseY : %.2f", _ptMouse.y);
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 160, 15, RGB(0, 0, 0));
+	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 140, 20, RGB(0, 0, 0));
+	swprintf_s(str, L"mouseY : %.2f", _ptMouse.y);								
+	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 160, 20, RGB(0, 0, 0));
 	//TIMEMANAGER->render();
 	// Draw 끝 - 이 코드가 빠지면 D2D 출력 X
 	D2DMANAGER->endDraw();

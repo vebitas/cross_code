@@ -74,7 +74,7 @@ void gameNode::release()
 
 void gameNode::update()
 {
-	
+	KEYMANAGER->update();
 }
 
 void gameNode::render()

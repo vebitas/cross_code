@@ -39,6 +39,8 @@ static button*	_eraserButton;
 
 static int _mapSelect;
 static int  _buttonSelect;
+static bool _save;
+static bool _load;
 
 class mapTool : public gameNode
 {
@@ -54,6 +56,8 @@ private:
 	UINT		TILEX;					
 	UINT		TILEY;
 
+	POINT _dragTerm;
+
 	tagSampleTile _sampleTile[SAMPLETILEY][SAMPLETILEX];
 	
 	D2D1_RECT_F _mouseCameraMoveRc[4];
@@ -68,9 +72,14 @@ private:
 
 	int _dragStartIdX;
 	int _dragStartIdY;
+	int _dragEndidX;
+	int _dragEndidY;
+	int _dragchaiX;
+	int _dragchaiY;
 
 	POINT _mapClippingPos;
 	
+	bool _dragFrameSave;
 	bool _dragMod;
 
 public:
@@ -82,19 +91,21 @@ public:
 	void update();
 	void render();
 	
-	void setTile();												//타일 초기값
-	void pickSampleTile();										//클릭한 샘플타일 프레임 번호 저장
-	void setMap();												//클릭한 맵에다 저장한 프레임 번호를 맵타일 프레임에 넣어줌
-	void dragMod();
+	void setTile();													//타일 초기값
+	void pickSampleTile();											//클릭한 샘플타일 프레임 번호 저장
+	void setMap();													//클릭한 맵에다 저장한 프레임 번호를 맵타일 프레임에 넣어줌
+	void dragMod();													//드래그 모드함수
+	void tilePreview();												//선택된 타일 미리보기
 
 	void buttonInit();
 	void buttonUpdate();
 	void buttonRender();
 
-	void increaseX();											//콜백함수 맵 x,y축 증가
+	void increaseX();												//콜백함수 맵 x,y축 증가
 	void increaseY();
-	void decreaseX();											//콜백함수 맵 x,y축 감소
+	void decreaseX();												//콜백함수 맵 x,y축 감소
 	void decreaseY();
+
 
 	function<void(void)> _increaseXMap;
 	function<void(void)> _increaseYMap;
@@ -106,14 +117,22 @@ public:
 
 	static void cbMapSave();
 	static void cbMapLoad();
+	void mapSave();
+	void mapLoad();
+
 	static void cbTerrainTile();
 	static void cbObjectTile();
 	static void cbEraser();
 
-	void setWindowsSize(int x, int y, int width, int height);	//윈도우 창크기 설정
+	void setWindowsSize(int x, int y, int width, int height);		//윈도우 창크기 설정
 
 	TERRAIN terraniSelect(int frameX, int frameY);
 	OBJECT objSelect(int frameX, int frameY);
+
+public:
+	
+	UINT getTileX() { return TILEX; }
+	UINT getTileY() { return TILEY; }
 
 private:
 	//내부함수
