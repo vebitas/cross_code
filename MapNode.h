@@ -67,10 +67,28 @@ public:
 	int objFrameX;
 	int objFrameY;
 	int selectTile;
-	int tileNum;
 	int heightTile;
 
-	
+public:
+	//======================== 접근자  모음 =============================
+	int getTerrainFrameX() { return terrainFrameX; }
+	int getTerrainFrameY() { return terrainFrameY; }
+	TERRAIN getTerrain() { return terrain; }
+	OBJECT getObject() { return obj; }
+	int getOBJFrameX() { return objFrameX; }
+	int getOBJFrameY() { return objFrameY; }
+	int getSelectTile() { return selectTile; }
+	int getHeightTile() { return heightTile; }
+
+	// ======================= 설정자  모음 =============================
+	void setTerrainFrameX(int trFrameX) { terrainFrameX = trFrameX; }
+	void setTerrainFrameY(int trFrameY) { terrainFrameY = trFrameY; }
+	void setTerrain(TERRAIN tr) { terrain = tr; }
+	void setObject(OBJECT object) { obj = object; }
+	void setOBJFrameX(int objX) { objFrameX = objX; }
+	void setOBJFrameY(int objY) { objFrameY = objY; }
+	void setSelectTile(int selTile) { selectTile = selTile; }
+	void setheightTile(int height) { heightTile = height; }
 };
 
 typedef class tagSampleTile

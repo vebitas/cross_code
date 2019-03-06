@@ -2,6 +2,7 @@
 #include "gameNode.h"
 #include "MapNode.h"
 #include "button.h"
+#include "player.h"
 #include <vector>
 #include <functional>
 
@@ -24,6 +25,7 @@ enum MAPNUMBER
 	BOSS_STAGE
 };
 
+//===============버튼모음=============
 static button*	_increaseXButton;
 static button*  _increaseYButton;
 static button*	_decreaseXButton;
@@ -37,10 +39,15 @@ static button*	_terrainButton;
 static button*	_objectButton;
 static button*	_eraserButton;
 
+static button* _windowSLAddButton;
+static button* _windowSLSubButton;
+static button* _windowOKButton;
+//===================================
+
 static int _mapSelect;
 static int  _buttonSelect;
-static bool _save;
-static bool _load;
+static bool _saveOn;
+static bool _loadOn;
 
 class mapTool : public gameNode
 {
@@ -48,6 +55,9 @@ class mapTool : public gameNode
 
 private:
 	vector<vector<tagTile*>> _vvTile;
+	vector<vector<tagTile*>> _vvMiniMap;
+
+	player* _player;
 
 	tagTempTile _tempTile;
 
@@ -55,6 +65,7 @@ private:
 
 	UINT		TILEX;					
 	UINT		TILEY;
+	UINT		miniX, miniY;
 
 	POINT _dragTerm;
 
@@ -69,18 +80,30 @@ private:
 
 	int _ptSPidX;
 	int _ptSPidY;
-
+	//샘플 드래그 변수들 
 	int _dragStartIdX;
 	int _dragStartIdY;
 	int _dragEndidX;
 	int _dragEndidY;
 	int _dragchaiX;
 	int _dragchaiY;
+	//맵 드래그 변수들
+	int _mapDragStartX;
+	int _mapDragStartY;
+	int _mapDragEndX;
+	int _mapDragEndY;
+	int _mapDragchaiX;
+	int _mapDragchaiY;
 
+	int _pageSL;
+
+	POINT _window;
 	POINT _mapClippingPos;
 	
 	bool _dragFrameSave;
 	bool _dragMod;
+	bool _mapDragMod;
+	bool _save, _load;
 
 public:
 	mapTool();
@@ -94,7 +117,7 @@ public:
 	void setTile();													//타일 초기값
 	void pickSampleTile();											//클릭한 샘플타일 프레임 번호 저장
 	void setMap();													//클릭한 맵에다 저장한 프레임 번호를 맵타일 프레임에 넣어줌
-	void dragMod();													//드래그 모드함수
+	void spDragMod();												//드래그 모드함수
 	void tilePreview();												//선택된 타일 미리보기
 
 	void buttonInit();
@@ -106,6 +129,10 @@ public:
 	void decreaseX();												//콜백함수 맵 x,y축 감소
 	void decreaseY();
 
+	void mapSaveLoad();
+	void windowPageAdd();
+	void windowPageSub();
+
 
 	function<void(void)> _increaseXMap;
 	function<void(void)> _increaseYMap;
@@ -115,8 +142,9 @@ public:
 	static void cbMapPageAdd();
 	static void cbMapPageSub();
 
-	static void cbMapSave();
-	static void cbMapLoad();
+	static void cbMapSaveButton();
+	static void cbMapLoadButton();
+
 	void mapSave();
 	void mapLoad();
 
@@ -130,9 +158,13 @@ public:
 	OBJECT objSelect(int frameX, int frameY);
 
 public:
-	
 	UINT getTileX() { return TILEX; }
 	UINT getTileY() { return TILEY; }
+
+	void setTileX(UINT _tileX) { TILEX = _tileX; }
+	void setTileY(UINT _tileY) { TILEY = _tileY; }
+
+
 
 private:
 	//내부함수

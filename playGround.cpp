@@ -17,14 +17,15 @@ HRESULT playGround::init()
 	_loadingScene = new loadingScene;
 	_menuScene = new menuScene;
 	_mapTool = new mapTool;
-	
+	_stage_1 = new stage_1;
 
 	SCENEMANAGER->addScene("loadingScene", _loadingScene);
 	SCENEMANAGER->addScene("menuScene", _menuScene);
 	SCENEMANAGER->addScene("uiScene", _uiScene);
 	SCENEMANAGER->addScene("mapTool", _mapTool);
+	SCENEMANAGER->addScene("stage1", _stage_1);
 
-	SCENEMANAGER->changeScene("mapTool");
+	SCENEMANAGER->changeScene("stage1");
 	
 	return S_OK;
 }
@@ -46,9 +47,13 @@ void playGround::update()
 	}
 	if (KEYMANAGER->isOnceKeyDown(VK_F2))
 	{
+		SCENEMANAGER->changeScene("stage1");
+	}
+	if (KEYMANAGER->isOnceKeyDown(VK_F3))
+	{
 		SCENEMANAGER->changeScene("menuScene");
 	}
-
+	KEYANIMANAGER->update();
 }
 void playGround::render()
 {
@@ -67,10 +72,10 @@ void playGround::render()
 	//===========================================================================
 	//				##카메라 정보 마우스 정보 시간정보 출력	##===================
 	WCHAR str[128];
-	//swprintf_s(str, L"cameraX : %d", CAMERA->getCameraX());
-	//D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 80, 15, RGB(0, 0, 0));
-	//swprintf_s(str, L"cameraY : %d", CAMERA->getCameraY());
-	//D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 100, 15, RGB(0, 0, 0));
+	swprintf_s(str, L"cameraX : %d", CAMERA->getCameraX());
+	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 80, 20, RGB(0, 0, 0));
+	swprintf_s(str, L"cameraY : %d", CAMERA->getCameraY());
+	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 100,20, RGB(0, 0, 0));
 	swprintf_s(str, L"mouseX : %.2f", _ptMouse.x);
 	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 140, 20, RGB(0, 0, 0));
 	swprintf_s(str, L"mouseY : %.2f", _ptMouse.y);								

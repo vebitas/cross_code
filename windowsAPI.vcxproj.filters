@@ -67,8 +67,11 @@
     <Filter Include="PlayGround\loading">
       <UniqueIdentifier>{bbfffc8c-da69-4b7d-85d2-769229580552}</UniqueIdentifier>
     </Filter>
-    <Filter Include="PlayGround\scene\map">
+    <Filter Include="PlayGround\scene\mapTool">
       <UniqueIdentifier>{c3bcbdb0-4598-4a5e-92ed-1705f42dc7d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PlayGround\tileMap">
+      <UniqueIdentifier>{0441a450-acb6-4a30-8e0c-6c0e8fe078f5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -154,7 +157,7 @@
       <Filter>PlayGround\camera</Filter>
     </ClInclude>
     <ClInclude Include="mapTool.h">
-      <Filter>PlayGround\scene\map</Filter>
+      <Filter>PlayGround\scene\mapTool</Filter>
     </ClInclude>
     <ClInclude Include="enemy.h">
       <Filter>PlayGround\enemy</Filter>
@@ -184,7 +187,7 @@
       <Filter>PlayGround\loading</Filter>
     </ClInclude>
     <ClInclude Include="MapNode.h">
-      <Filter>PlayGround\scene\map</Filter>
+      <Filter>PlayGround\scene\mapTool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -258,7 +261,7 @@
       <Filter>PlayGround\camera</Filter>
     </ClCompile>
     <ClCompile Include="mapTool.cpp">
-      <Filter>PlayGround\scene\map</Filter>
+      <Filter>PlayGround\scene\mapTool</Filter>
     </ClCompile>
     <ClCompile Include="enemy.cpp">
       <Filter>PlayGround\enemy</Filter>

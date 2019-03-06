@@ -4,6 +4,7 @@
 #include "menuScene.h"
 #include "uiScene.h"
 #include "mapTool.h"
+#include "stage_1.h"
 
 
 class playGround : public gameNode
@@ -13,6 +14,7 @@ private:
 	menuScene* _menuScene;
 	uiScene* _uiScene;
 	mapTool*  _mapTool;
+	stage_1* _stage_1;
 
 public:
 	playGround();
