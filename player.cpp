@@ -17,7 +17,7 @@ HRESULT player::init()
 	_player.image = IMAGEMANAGER->findImage("leaMove");
 	_player.x = GAMESIZEX / 2;
 	_player.y = GAMESIZEY / 2;
-	_player.speed = 3;
+	_player.speed = PLAYERSPEED;
 	_player.alphaValue = 1;
 	_player.direction = PLAYERDIRECTION::DOWN;
 	_player.state = PLAYERSTATE::PLAYER_IDLE;
@@ -87,6 +87,16 @@ void player::keyAniInit()
 	KEYANIMANAGER->addArrayFrameAnimation("lea", "moveDownRight", "leaMove", moveDownRight, 6, PLAYERFPS, true);
 	int moveDown[] = {67, 68, 69, 70, 71, 72 };
 	KEYANIMANAGER->addArrayFrameAnimation("lea", "moveDown", "leaMove", moveDown, 6, PLAYERFPS, true);
+	int moveBreakUp[] = {9, 10, 11};
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "moveBreakUp", "leaMove", moveBreakUp, 3, PLAYERFPS, false, cbMoveBreak, this);
+	int moveBreakUpRight[] = { 25, 26, 27 };
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "moveBreakUpRight", "leaMove", moveBreakUpRight, 3, PLAYERFPS, false, cbMoveBreak, this);
+	int moveBreakRight[] = { 41, 42, 43 };
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "moveBreakRight", "leaMove", moveBreakRight, 3, PLAYERFPS, false, cbMoveBreak, this);
+	int moveBreakDownRight[] = { 57, 58, 59 };
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "moveBreakDownRight", "leaMove", moveBreakDownRight, 3, PLAYERFPS, false, cbMoveBreak, this);
+	int moveBreakDown[] = { 73, 74, 75 };
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "moveBreakDown", "leaMove", moveBreakDown, 3, PLAYERFPS, false, cbMoveBreak, this);
 
 	_player.motion = KEYANIMANAGER->findAnimation("lea", "idleDown");
 
@@ -109,9 +119,8 @@ void player::playerKeyInput()
 		_player.direction = PLAYERDIRECTION::LEFT;
 		_player.state = PLAYERSTATE::PLAYER_MOVE;
 	}
-	if (KEYMANAGER->isOnceKeyDown('D'))
+	if (KEYMANAGER->isStayKeyDown('D'))
 	{
-		playerAniName("lea", "moveRight");
 		_player.direction = PLAYERDIRECTION::RIGHT;
 		_player.state = PLAYERSTATE::PLAYER_MOVE;
 	}
@@ -135,6 +144,26 @@ void player::playerKeyInput()
 		_player.direction = PLAYERDIRECTION::DOWN_LEFT;
 		_player.state = PLAYERSTATE::PLAYER_MOVE;
 	}
+	//if (KEYMANAGER->isOnceKeyUp('W'))
+	//{
+	//		_player.direction = PLAYERDIRECTION::UP;
+	//	_player.state = PLAYERSTATE::PLAYER_MOVE_BREAK;
+	//}
+	//if (KEYMANAGER->isOnceKeyUp('S'))
+	//{
+	//		_player.direction = PLAYERDIRECTION::DOWN;
+	//	_player.state = PLAYERSTATE::PLAYER_MOVE_BREAK;
+	//}
+	//if (KEYMANAGER->isOnceKeyUp('A'))
+	//{
+	//	_player.direction = PLAYERDIRECTION::LEFT;
+	//	_player.state = PLAYERSTATE::PLAYER_MOVE_BREAK;
+	//}
+	//if (KEYMANAGER->isOnceKeyUp('D'))
+	//{
+	//	_player.direction = PLAYERDIRECTION::RIGHT;
+	//	_player.state = PLAYERSTATE::PLAYER_MOVE_BREAK;
+	//}
 }
 
 void player::playerState()
@@ -144,87 +173,176 @@ void player::playerState()
 	case PLAYERSTATE::PLAYER_IDLE:
 		switch (_player.direction)
 		{
-		case PLAYERDIRECTION::DOWN:
-			_isRight = true;
-			playerAniName("lea", "idleDown");
-			break;
-		case PLAYERDIRECTION::DOWN_LEFT:
-			_isRight = false;
-			playerAniName("lea", "idleDownRight");
-			break;
-		case PLAYERDIRECTION::DOWN_RIGHT:
-			_isRight = true;
-			playerAniName("lea", "idleDownRight");
-			break;
-		case PLAYERDIRECTION::LEFT:
-			_isRight = false;
-			playerAniName("lea", "idleRight");
-			break;
-		case PLAYERDIRECTION::RIGHT:
-			_isRight = true;
-			playerAniName("lea", "idleRight");
-			break;
-		case PLAYERDIRECTION::UP:
-			_isRight = true;
-			playerAniName("lea", "idleUp");
-			break;
-		case PLAYERDIRECTION::UP_LEFT:
-			_isRight = false;
-			playerAniName("lea", "idleUpRight");
-			break;
-		case PLAYERDIRECTION::UP_RIGHT:
-			_isRight = true;
-			playerAniName("lea", "idleUpRight");
-			break;
+			case PLAYERDIRECTION::DOWN:
+				_isRight = true;
+				playerAniName("lea", "idleDown");
+				break;
+			case PLAYERDIRECTION::DOWN_LEFT:
+				_isRight = false;
+				playerAniName("lea", "idleDownRight");
+				break;
+			case PLAYERDIRECTION::DOWN_RIGHT:
+				_isRight = true;
+				playerAniName("lea", "idleDownRight");
+				break;
+			case PLAYERDIRECTION::LEFT:
+				_isRight = false;
+				playerAniName("lea", "idleRight");
+				break;
+			case PLAYERDIRECTION::RIGHT:
+				_isRight = true;
+				playerAniName("lea", "idleRight");
+				break;
+			case PLAYERDIRECTION::UP:
+				_isRight = true;
+				playerAniName("lea", "idleUp");
+				break;
+			case PLAYERDIRECTION::UP_LEFT:
+				_isRight = false;
+				playerAniName("lea", "idleUpRight");
+				break;
+			case PLAYERDIRECTION::UP_RIGHT:
+				_isRight = true;
+				playerAniName("lea", "idleUpRight");
+				break;
 		}
 		break;
 	case PLAYERSTATE::PLAYER_MOVE:
 		switch (_player.direction)
 		{
-		case PLAYERDIRECTION::DOWN:
-			_isRight = true;
-			_player.y += _player.speed;
-			playerAniName("lea", "moveDown");
-			break;
-		case PLAYERDIRECTION::DOWN_LEFT:
-			_isRight = false;
-			_player.x -= _player.speed;
-			_player.y += _player.speed;
-			playerAniName("lea", "moveDownRight");
-			break;
-		case PLAYERDIRECTION::DOWN_RIGHT:
-			_isRight = true;
-			_player.x += _player.speed;
-			_player.y += _player.speed;
-		
-			break;
-		case PLAYERDIRECTION::LEFT:
-			_isRight = false;
-			_player.x -= _player.speed;
-			playerAniName("lea", "moveRight");
-			break;
-		case PLAYERDIRECTION::RIGHT:
-			_isRight = true;
-			_player.x += _player.speed;
-			//playerAniName("leaMove", "moveRight");
-			break;
-		case PLAYERDIRECTION::UP:
-			_isRight = true;
-			_player.y -= _player.speed;
-			playerAniName("lea", "moveUp");
-			break;
-		case PLAYERDIRECTION::UP_LEFT:
-			_isRight = false;
-			_player.x -= _player.speed;
-			_player.y -= _player.speed;
-			playerAniName("lea", "moveUpRight");
-			break;
-		case PLAYERDIRECTION::UP_RIGHT:
-			_isRight = true;
-			_player.x += _player.speed;
-			_player.y -= _player.speed;
-			playerAniName("lea", "moveUpRight");
-			break;
+			case PLAYERDIRECTION::DOWN:
+				_isRight = true;
+				_player.speed = PLAYERSPEED;
+				_player.y += _player.speed;
+				playerAniName("lea", "moveDown");
+				break;
+			case PLAYERDIRECTION::DOWN_LEFT:
+				_isRight = false;
+				_player.speed = PLAYERSPEED;
+				_player.x -= _player.speed;
+				_player.y += _player.speed;
+				playerAniName("lea", "moveDownRight");
+				break;
+			case PLAYERDIRECTION::DOWN_RIGHT:
+				_isRight = true;
+				_player.speed = PLAYERSPEED;
+				_player.x += _player.speed;
+				_player.y += _player.speed;
+				playerAniName("lea", "moveDownRight");
+				break;
+			case PLAYERDIRECTION::LEFT:
+				_isRight = false;
+				_player.speed = PLAYERSPEED;
+				_player.x -= _player.speed;
+				playerAniName("lea", "moveRight");
+				break;
+			case PLAYERDIRECTION::RIGHT:
+				_isRight = true;
+				_player.speed = PLAYERSPEED;
+				_player.x += _player.speed;
+				playerAniName("lea", "moveRight");
+				break;
+			case PLAYERDIRECTION::UP:
+				_isRight = true;
+				_player.speed = PLAYERSPEED;
+				_player.y -= _player.speed;
+				playerAniName("lea", "moveUp");
+				break;
+			case PLAYERDIRECTION::UP_LEFT:
+				_isRight = false;
+				_player.speed = PLAYERSPEED;
+				_player.x -= _player.speed;
+				_player.y -= _player.speed;
+				playerAniName("lea", "moveUpRight");
+				break;
+			case PLAYERDIRECTION::UP_RIGHT:
+				_isRight = true;
+				_player.speed = PLAYERSPEED;
+				_player.x += _player.speed;
+				_player.y -= _player.speed;
+				playerAniName("lea", "moveUpRight");
+				break;
+		}
+		break;
+	case PLAYERSTATE::PLAYER_MOVE_BREAK:
+		switch (_player.direction)
+		{
+			case PLAYERDIRECTION::DOWN:
+				_isRight = true;
+				if (_player.speed >= 0)
+					_player.speed -= 0.3;
+				else
+					_player.speed = 0;
+				_player.y += _player.speed;
+				playerAniName("lea", "moveBreakDown");
+				break;
+			case PLAYERDIRECTION::DOWN_LEFT:
+				_isRight = false;
+				if (_player.speed >= 0)
+					_player.speed -= 0.3;
+				else
+					_player.speed = 0;
+				_player.x -= _player.speed;
+				_player.y += _player.speed;
+				playerAniName("lea", "moveBreakDownRight");
+				break;
+			case PLAYERDIRECTION::DOWN_RIGHT:
+				_isRight = true;
+				if (_player.speed >= 0)
+					_player.speed -= 0.3;
+				else
+					_player.speed = 0;
+				_player.x += _player.speed;
+				_player.y += _player.speed;
+				playerAniName("lea", "moveBreakDownRight");
+				break;
+			case PLAYERDIRECTION::LEFT:
+				_isRight = false;
+				if (_player.speed >= 0)
+					_player.speed -= 0.3;
+				else
+					_player.speed = 0;
+				_player.x -= _player.speed;
+				playerAniName("lea", "moveBreakRight");
+				break;
+			case PLAYERDIRECTION::RIGHT:
+				_isRight = true;
+				if (_player.speed >= 0)
+					_player.speed -= 0.3;
+				else
+					_player.speed = 0;
+				_player.x += _player.speed;
+				playerAniName("lea", "moveBreakRight");
+				break;
+			case PLAYERDIRECTION::UP:
+				_isRight = true;
+				if (_player.speed >= 0)
+					_player.speed -= 0.3;
+				else
+					_player.speed = 0;
+				_player.y -= _player.speed;
+				playerAniName("lea", "moveBreakUp");
+				break;
+			case PLAYERDIRECTION::UP_LEFT:
+				_isRight = false;
+				if (_player.speed >= 0)
+					_player.speed -= 0.3;
+				else
+					_player.speed = 0;
+				_player.x -= _player.speed;
+				_player.y -= _player.speed;
+				playerAniName("lea", "moveBreakUpRight");
+				break;
+			case PLAYERDIRECTION::UP_RIGHT:
+				_isRight = true;
+				if (_player.speed >= 0)
+					_player.speed -= 0.3;
+				else
+					_player.speed = 0;
+				_player.x += _player.speed;
+				_player.y -= _player.speed;
+				playerAniName("lea", "moveBreakUpRight");
+				break;
 		}
 		break;
 	}
@@ -246,4 +364,10 @@ void player::playerAniName(string playerName, string aniName)
 {
 	_player.motion = KEYANIMANAGER->findAnimation(playerName, aniName);
 	_player.motion->start();
+}
+
+void player::cbMoveBreak(void * obj)
+{
+	player* playerBreak = (player*)obj;
+	playerBreak->setPlayerState(PLAYERSTATE::PLAYER_IDLE);
 }

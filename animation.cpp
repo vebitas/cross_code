@@ -26,6 +26,9 @@ HRESULT animation::init(int totalW, int totalH, int frameW, int frameH)
 	_frameHeight = frameH;
 	int _frameNumHeight = totalH / _frameHeight;
 
+	_totalFrameX = _frameNumWidth;
+	_totalFrameY = _frameNumHeight;
+
 	_frameNum = _frameNumWidth * _frameNumHeight;
 
 	for (int i = 0; i < _frameNumHeight; ++i)
@@ -40,6 +43,10 @@ HRESULT animation::init(int totalW, int totalH, int frameW, int frameH)
 			_frameList.push_back(framePos);
 		}
 	}
+
+	_currentArr.x = 0;
+	_currentArr.y = 0;
+	_currentArrOnce = 0;
 
 	return S_OK;
 }
@@ -633,13 +640,12 @@ void animation::frameUpdate(float elapsedTime)
 
 			if (_nowPlayIndex == _playList.size())
 			{
-				if (_loop)
-				{
-					_nowPlayIndex = 0;
-					_isDoEvent = false;
-				}
+				if (_loop) _nowPlayIndex = 0;
+
 				else
 				{
+					_nowPlayIndex--;
+
 					if (_obj == NULL)
 					{
 						if (_callbackFunction != NULL) _callbackFunction();
@@ -647,22 +653,24 @@ void animation::frameUpdate(float elapsedTime)
 					else
 					{
 						_callbackFunctionParameter(_obj);
+						_nowPlayIndex = 0;
 					}
 
-
-					_nowPlayIndex--;
 					_play = FALSE;
 				}
 			}
 		}
 	}
+
+	_currentArr.x = _frameList[_playList[_nowPlayIndex]].x / _frameWidth;
+	_currentArr.y = _frameList[_playList[_nowPlayIndex]].y / _frameHeight;
+	_currentArrOnce = _currentArr.x + _currentArr.y * _totalFrameX;
 }
 
 void animation::start()
 {
 	_play = TRUE;
-	_nowPlayIndex = 0;
-	_isDoEvent = false;
+	//_nowPlayIndex = 0;
 }
 
 void animation::stop()
@@ -674,9 +682,16 @@ void animation::stop()
 void animation::pause()
 {
 	_play = FALSE;
+
 }
 
 void animation::resume()
 {
 	_play = TRUE;
+}
+
+void animation::effectStart()
+{
+	_play = TRUE;
+	_nowPlayIndex = 0;
 }

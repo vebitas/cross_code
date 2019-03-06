@@ -519,7 +519,7 @@ void mapTool::setMap()
 					{
 						if (_mapDragEndX >= TILEX) continue;
 						if (_mapDragEndY >= TILEY) continue;
-						if (_mapDragchaiX <= 0 || _mapDragchaiY <= 0) continue;
+						if (_mapDragchaiX <= 0 && _mapDragchaiY <= 0) continue;
 
 						_vvTile[_mapDragStartY + i][_mapDragStartX + j]->terrainFrameX = _tempTile.frameX;
 						_vvTile[_mapDragStartY + i][_mapDragStartX + j]->terrainFrameY = _tempTile.frameY;

@@ -29,8 +29,10 @@ private:
 	DWORD _nowPlayIndex;		//현재 플레이 인덱스
 	BOOL _play;					//애니메이션 재생여부
 
-	DWORD _eventFrameIndex;		//이벤트가 발생하는 프레임 번호
-	bool _isDoEvent;			// 이벤트 실행했는가
+	POINT _currentArr;			//현재 플레이 2차배열 인덱스
+	int _currentArrOnce;		//현재 플레이 1차배열 인덱스
+	int _totalFrameX;			//이미지 가로 프레임	갯수
+	int _totalFrameY;			//이미지 세로 프레임 갯수
 
 	void*						_obj;
 	CALLBACK_FUNCTION			_callbackFunction;
@@ -71,21 +73,14 @@ public:
 	void stop();		//정지
 	void pause();		//일시정지
 	void resume();		//다시재생
+	void effectStart(); //이펙트 재생
 
 	inline BOOL isPlay() { return _play; }
 	inline POINT getFramePos() { return _frameList[_playList[_nowPlayIndex]]; }
+	inline POINT getFramePosArr() { return _currentArr; }
+	inline int getFramePosArrOnce() { return _currentArrOnce; }
 	inline int getFrameWidth() { return _frameWidth; }
 	inline int getFrameHeight() { return _frameHeight; }
 
-	// 이벤트 프레임 번호 set/get
-	inline void setEventFrame(int frameIndex) { _eventFrameIndex = frameIndex; }
-	inline int getEventFrame() { return _eventFrameIndex; }
-
-	// 이벤트 실행 했는지 
-	void setEventDo(bool flag) { _isDoEvent = flag; }
-	bool getEventDo() {return _isDoEvent;}
-
-	// 이벤트 프레임인가
-	bool isEventFrame() { return _nowPlayIndex  == _eventFrameIndex; }
 };
 
