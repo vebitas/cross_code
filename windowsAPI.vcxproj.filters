@@ -189,6 +189,12 @@
     <ClInclude Include="MapNode.h">
       <Filter>PlayGround\scene\mapTool</Filter>
     </ClInclude>
+    <ClInclude Include="playerBullet.h">
+      <Filter>PlayGround\player</Filter>
+    </ClInclude>
+    <ClInclude Include="stageOneMap.h">
+      <Filter>PlayGround\tileMap</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -289,6 +295,21 @@
     </ClCompile>
     <ClCompile Include="loadingScene.cpp">
       <Filter>PlayGround\loading</Filter>
+    </ClCompile>
+    <ClCompile Include="playerState.cpp">
+      <Filter>PlayGround\player</Filter>
+    </ClCompile>
+    <ClCompile Include="playerAttackKey.cpp">
+      <Filter>PlayGround\player</Filter>
+    </ClCompile>
+    <ClCompile Include="playerDirectionKey.cpp">
+      <Filter>PlayGround\player</Filter>
+    </ClCompile>
+    <ClCompile Include="playerBullet.cpp">
+      <Filter>PlayGround\player</Filter>
+    </ClCompile>
+    <ClCompile Include="stageOneMap.cpp">
+      <Filter>PlayGround\tileMap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

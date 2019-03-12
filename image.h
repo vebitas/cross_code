@@ -111,6 +111,7 @@ public:
 	void loopRender(D2D1_RECT_F drawArea, int offSetX = 0, int offSetY = 0, float opacity = 1.0f);
 
 	void aniRender(int destX, int destY, animation* ani);
+	void aniRenderAngle(int destX, int destY, animation * ani, float angle);
 	void aniRenderReverseX(int destX, int destY, animation* ani);
 
 	

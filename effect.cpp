@@ -54,12 +54,12 @@ void effect::update()
 
 }
 
-void effect::render()
+void effect::render(float angle)
 {
 	//애니메이션이 재생중이 아니라면 렌더링 하지 않는다
 	if (!_isRunning) return;
 
-	_effectImage->aniRender(_x, _y, _effectAnimation);
+	_effectImage->aniRenderAngle(_x, _y, _effectAnimation, angle);
 }
 
 void effect::startEffect(int x, int y)
@@ -72,7 +72,7 @@ void effect::startEffect(int x, int y)
 
 	_isRunning = true;
 
-	_effectAnimation->start();
+	_effectAnimation->start(true);
 }
 
 void effect::killEffect()

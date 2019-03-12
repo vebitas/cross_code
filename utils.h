@@ -68,7 +68,7 @@ namespace TEAM_15DUCK_UTILL
 	float getRectHeight(RECT& rc);
 
 	//원 점 충돌
-	bool PtInEllipse(ELLIPSE& e, POINTF p);
+	bool PtInEllipse(D2D1_ELLIPSE& e, POINTF p);
 
 	//원 점 충돌
 	bool PtInEllipse(ELLIPSE& e, float x, float y);

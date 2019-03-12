@@ -1,10 +1,12 @@
 #pragma once
 #include "gameNode.h"
+#include "stageOneMap.h"
 #include "player.h"
 
 class stage_1 : public gameNode
 {
 private:
+	stageOneMap* _oneMap;
 	player* _player;
 
 public:

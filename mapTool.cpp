@@ -15,10 +15,10 @@ mapTool::~mapTool()
 
 HRESULT mapTool::init()
 {
-	setWindowsSize(0, 0, 1800, 800);
+	//setWindowsSize(0, 0, 1800, 800);
 	
-	_player = new player;
-	_player->init();
+	_cursor = LoadCursorFromFile("image/cursor/uiCursor.cur");
+	SetCursor(_cursor);
 
 	IMAGEMANAGER->addFrameImage("stage1_1", L"image/tileNode/stage1_1.png", 1024, 608, SAMPLETILEX, SAMPLETILEY);
 	IMAGEMANAGER->addFrameImage("stage1_2", L"image/tileNode/stage1_2.png", 1024, 608, SAMPLETILEX, SAMPLETILEY);
@@ -40,6 +40,7 @@ HRESULT mapTool::init()
 	IMAGEMANAGER->addImage("window", L"image/tileNode/window.png", 300, 300);
 	IMAGEMANAGER->addFrameImage("okButton", L"image/tileNode/okButton.png", 144, 48, 3, 1);
 	IMAGEMANAGER->addFrameImage("number", L"image/tileNode/number.png", 144, 48, 3, 1);
+
 	buttonInit();
 	setTile();
 	
@@ -83,7 +84,7 @@ void mapTool::release()
 
 void mapTool::update()
 {
-	_player->update();
+	SetCursor(_cursor);
 	setMap();
 	pickSampleTile();
 
@@ -166,42 +167,44 @@ void mapTool::render()
 	
 			D2DMANAGER->drawRectangle(RGB(0, 0, 0), j * TILESIZE, i * TILESIZE  ,(j + 1) * TILESIZE, (i + 1) * TILESIZE);
 
-		
-			switch (_vvTile[i][j]->selectTile)
-			{
-			case STAGE1_1:
-				IMAGEMANAGER->frameRender("stage1_1", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->terrainFrameX, _vvTile[i][j]->terrainFrameY, 1);
-				break;
-			case STAGE1_2:
-				IMAGEMANAGER->frameRender("stage1_2", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->terrainFrameX, _vvTile[i][j]->terrainFrameY, 1);
-				break;
-			case STAGE1_3:
-				IMAGEMANAGER->frameRender("stage1_3", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->terrainFrameX, _vvTile[i][j]->terrainFrameY, 1);
-				break;
-			case STAGE2:
-				IMAGEMANAGER->frameRender("stage2", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->terrainFrameX, _vvTile[i][j]->terrainFrameY, 1);
-				break;
-			case BOSS_STAGE:
-				IMAGEMANAGER->frameRender("bossStage", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->terrainFrameX, _vvTile[i][j]->terrainFrameY, 1);
-				break;
-			}
+
+			
 			
 			switch (_vvTile[i][j]->selectTile)
 			{
 			case STAGE1_1:
-				IMAGEMANAGER->frameRender("stage1_1", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->objFrameX, _vvTile[i][j]->objFrameY, 1);
+				_vvTile[i][j]->trImg->frameRender(j * TILESIZE, i * TILESIZE, _vvTile[i][j]->terrainFrameX, _vvTile[i][j]->terrainFrameY);
 				break;
 			case STAGE1_2:
-				IMAGEMANAGER->frameRender("stage1_2", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->objFrameX, _vvTile[i][j]->objFrameY, 1);
+				_vvTile[i][j]->trImg->frameRender(j * TILESIZE, i * TILESIZE, _vvTile[i][j]->terrainFrameX, _vvTile[i][j]->terrainFrameY);
 				break;
 			case STAGE1_3:
-				IMAGEMANAGER->frameRender("stage1_3", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->objFrameX, _vvTile[i][j]->objFrameY, 1);
+				_vvTile[i][j]->trImg->frameRender(j * TILESIZE, i * TILESIZE, _vvTile[i][j]->terrainFrameX, _vvTile[i][j]->terrainFrameY);
 				break;
 			case STAGE2:
-				IMAGEMANAGER->frameRender("stage2", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->objFrameX, _vvTile[i][j]->objFrameY, 1);
+				_vvTile[i][j]->trImg->frameRender(j * TILESIZE, i * TILESIZE, _vvTile[i][j]->terrainFrameX, _vvTile[i][j]->terrainFrameY);
 				break;
 			case BOSS_STAGE:
-				IMAGEMANAGER->frameRender("bossStage", j * TILESIZE, i * TILESIZE, _vvTile[i][j]->objFrameX, _vvTile[i][j]->objFrameY, 1);
+				_vvTile[i][j]->trImg->frameRender(j * TILESIZE, i * TILESIZE, _vvTile[i][j]->terrainFrameX, _vvTile[i][j]->terrainFrameY);
+				break;
+			}
+
+			switch (_vvTile[i][j]->selectOBJ)
+			{
+			case STAGE1_1:
+				_vvTile[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvTile[i][j]->objFrameX, _vvTile[i][j]->objFrameY);
+				break;
+			case STAGE1_2:
+				_vvTile[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvTile[i][j]->objFrameX, _vvTile[i][j]->objFrameY);
+				break;
+			case STAGE1_3:
+				_vvTile[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvTile[i][j]->objFrameX, _vvTile[i][j]->objFrameY);
+				break;
+			case STAGE2:
+				_vvTile[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvTile[i][j]->objFrameX, _vvTile[i][j]->objFrameY);
+				break;
+			case BOSS_STAGE:
+				_vvTile[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvTile[i][j]->objFrameX, _vvTile[i][j]->objFrameY);
 				break;
 			}
 			
@@ -226,7 +229,6 @@ void mapTool::render()
 		IMAGEMANAGER->findImage("bossStage")->render(SAMPLE_TILE_STARTX + CAMERA->getCameraX(), 0 + CAMERA->getCameraY());
 		break;
 	}
-	
 	
 
 	for (int i = 0; i < SAMPLETILEY; i++)	//샘플맵
@@ -263,32 +265,45 @@ void mapTool::render()
 	IMAGEMANAGER->findImage("textMap")->render(WINSIZEX - 172 + CAMERA->getCameraX(), 695 + CAMERA->getCameraY());
 	
 	swprintf_s(str, L"cameraX : %f", CAMERA->getCameraX());
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 20, 20, RGB(0, 0, 0));
+	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 20, 20, RGB(255, 255, 255));
 	swprintf_s(str, L"cameraY : %f", CAMERA->getCameraY());
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 40, 20, RGB(0, 0, 0));
-	swprintf_s(str, L"tileX : %d", TILEX);
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 60, 20, RGB(0, 0, 0));
-	swprintf_s(str, L"tileY : %d", TILEY);
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 80, 20, RGB(0, 0, 0));
-	swprintf_s(str, L"tempX : %d", _tempTile.frameX);
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 100, 20, RGB(0, 0, 0));
-	swprintf_s(str, L"tempY : %d", _tempTile.frameY);
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 120, 20, RGB(0, 0, 0));
-	swprintf_s(str, L"_ptIdX : %d", _ptIdX);
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 180, 20, RGB(0, 0, 0));
-	swprintf_s(str, L"_ptIdY : %d", _ptIdY);
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 200, 20, RGB(0, 0, 0));
-	swprintf_s(str, L"시작x : %d", _saveOn);
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 220, 20, RGB(0, 0, 0));
-	swprintf_s(str, L"시작y : %d", _loadOn);
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 240, 20, RGB(0, 0, 0));
-	swprintf_s(str, L"차이x : %d", _save);
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 260, 20, RGB(0, 0, 0));
-	swprintf_s(str, L"차이y : %d", _load);
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 280, 20, RGB(0, 0, 0));
-	swprintf_s(str, L"드래그 모드 : %d", _dragFrameSave);
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 300, 20, RGB(0, 0, 0));
-	_player->render();
+	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 40, 20, RGB(255, 255, 255));
+	swprintf_s(str, L"tileX : %d", TILEX);										   
+	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 60, 20, RGB(255, 255, 255));
+	swprintf_s(str, L"tileY : %d", TILEY);										 
+	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 80, 20, RGB(255, 255, 255));
+	swprintf_s(str, L"tempX : %d", _tempTile.frameX);							  
+	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 100, 20,RGB(255, 255, 255));
+	swprintf_s(str, L"tempY : %d", _tempTile.frameY);							  
+	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 120, 20,RGB(255, 255, 255));
+	swprintf_s(str, L"_ptIdX : %d", _ptIdX);									   
+	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 180, 20,RGB(255, 255, 255));
+	swprintf_s(str, L"_ptIdY : %d", _ptIdY);									  
+	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 200, 20,RGB(255, 255, 255));
+	swprintf_s(str, L"시작x : %d", _saveOn);										
+	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 220, 20,RGB(255, 255, 255));
+	swprintf_s(str, L"시작y : %d", _loadOn);										
+	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 240, 20,RGB(255, 255, 255));
+	swprintf_s(str, L"차이x : %d", _save);										
+	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 260, 20,RGB(255, 255, 255));
+	swprintf_s(str, L"차이y : %d", _mapSelect);									
+	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 280, 20,RGB(255, 255, 255));
+	swprintf_s(str, L"드래그 모드 : %d", _vvTile);								 
+	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 300, 20,RGB(255, 255, 255));
+	//for (int i = 0; i < TILEY; i++)
+	//{
+	//	for (int j = 0; j < TILEX; j++)
+	//	{
+	//		swprintf_s(str, L"%d,%d", _vvTile[i][j]->getTerrainFrameX(), _vvTile[i][j]->getTerrainFrameY());
+	//		D2DMANAGER->drawText(str, (j * TILESIZE),  (i * TILESIZE), 10, RGB(255, 255, 255));
+	//		swprintf_s(str, L"%d,%d", _vvTile[i][j]->getOBJFrameX(), _vvTile[i][j]->getOBJFrameY());
+	//		D2DMANAGER->drawText(str,(j * TILESIZE), 10 + (i * TILESIZE), 10, RGB(255, 255, 255));
+	//		swprintf_s(str, L"%d", _vvTile[i][j]->getOBJFrameY());
+	//		D2DMANAGER->drawText(str, (j * TILESIZE), 10 + (i * TILESIZE), 20, RGB(255, 255, 255));
+	//	}
+	//}
+
+	
 }
 
 void mapTool::setTile()
@@ -302,13 +317,16 @@ void mapTool::setTile()
 		for (int j = 0; j < TILEX; j++)
 		{
 			tagTile* _tile = new tagTile;
+			_tile->trImg = IMAGEMANAGER->findImage("stage1_1");
+			_tile->objImg = IMAGEMANAGER->findImage("stage1_1");
 			_tile->selectTile = 0;
+			_tile->selectOBJ = 0;
 			_tile->terrainFrameX = 30;
 			_tile->terrainFrameY = 19;
 			_tile->objFrameX = 30;
 			_tile->objFrameY = 19;
-			_tile->terrain = terraniSelect(_tile->terrainFrameX, _tile->terrainFrameY);
-			_tile->obj = OBJECT::OBJ_NONE;
+			_tile->terrain = terraniSelect(_tile->selectTile, _tile->terrainFrameX, _tile->terrainFrameY);
+			_tile->obj = objSelect(_tile->selectOBJ, _tile->objFrameX, _tile->objFrameY);
 			_tile->heightTile = 0;
 			vTile.push_back(_tile);
 		}
@@ -321,13 +339,16 @@ void mapTool::setTile()
 		for (int j = 0; j < 60; j++)
 		{
 			tagTile* _tile = new tagTile;
+			_tile->trImg = IMAGEMANAGER->findImage("stage1_1");
+			_tile->objImg = IMAGEMANAGER->findImage("stage1_1");
 			_tile->selectTile = 0;
+			_tile->selectOBJ = 0;
 			_tile->terrainFrameX = 30;
 			_tile->terrainFrameY = 19;
 			_tile->objFrameX = 30;
 			_tile->objFrameY = 19;
-			_tile->terrain = terraniSelect(_tile->terrainFrameX, _tile->terrainFrameY);
-			_tile->obj = OBJECT::OBJ_NONE;
+			_tile->terrain = terraniSelect(_tile->selectTile, _tile->terrainFrameX, _tile->terrainFrameY);
+			_tile->obj = objSelect(_tile->selectOBJ, _tile->objFrameX, _tile->objFrameY);
 			_tile->heightTile = 0;
 			vTile.push_back(_tile);
 		}
@@ -389,7 +410,9 @@ void mapTool::setMap()
 					{
 						_vvTile[_ptIdY][_ptIdX]->terrainFrameY = _tempTile.frameY;
 					}
+					imageSelect(_ptIdX, _ptIdY, _mapSelect, true);
 					_vvTile[_ptIdY][_ptIdX]->selectTile = _mapSelect;
+					_vvTile[_ptIdY][_ptIdX]->terrain = terraniSelect(_mapSelect, _tempTile.frameX, _tempTile.frameY);
 				}
 				//드래그 모드일때
 				else
@@ -416,7 +439,9 @@ void mapTool::setMap()
 
 							_vvTile[_ptIdY + i][_ptIdX + j]->terrainFrameX = dragPoint.x + j;
 							_vvTile[_ptIdY + i][_ptIdX + j]->terrainFrameY = dragPoint.y + i;
+							imageSelect(_ptIdX + j, _ptIdY + i, _mapSelect, true);
 							_vvTile[_ptIdY + i][_ptIdX + j]->selectTile = _mapSelect;
+							_vvTile[_ptIdY + i][_ptIdX + j]->terrain = terraniSelect(_mapSelect, dragPoint.x + j, dragPoint.y + i);
 						}
 					}
 				}
@@ -434,7 +459,9 @@ void mapTool::setMap()
 					{
 						_vvTile[_ptIdY][_ptIdX]->objFrameY = _tempTile.frameY;
 					}
-					_vvTile[_ptIdY][_ptIdX]->selectTile = _mapSelect;
+					imageSelect(_ptIdX, _ptIdY, _mapSelect, false);
+					_vvTile[_ptIdY][_ptIdX]->selectOBJ = _mapSelect;
+					_vvTile[_ptIdY][_ptIdX]->obj = objSelect(_mapSelect, _tempTile.frameX, _tempTile.frameY);
 				}
 				//드래그 모드일때
 				else
@@ -461,12 +488,14 @@ void mapTool::setMap()
 
 							_vvTile[_ptIdY + i][_ptIdX + j]->objFrameX = dragPoint.x + j;
 							_vvTile[_ptIdY + i][_ptIdX + j]->objFrameY = dragPoint.y + i;
-							_vvTile[_ptIdY + i][_ptIdX + j]->selectTile = _mapSelect;
+							imageSelect(_ptIdX + j, _ptIdY + i, _mapSelect, false);
+							_vvTile[_ptIdY + i][_ptIdX + j]->selectOBJ = _mapSelect;
+							_vvTile[_ptIdY + i][_ptIdX + j]->obj = objSelect(_mapSelect, dragPoint.x + j, dragPoint.y + i);
 						}
 					}
 				}
 			}
-			else
+			else if (_buttonSelect == 2)
 			{
 				if (!_dragMod && _ptIdX < TILEX && _ptIdY < TILEY)
 				{
@@ -478,24 +507,7 @@ void mapTool::setMap()
 					{
 						_vvTile[_ptIdY][_ptIdX]->objFrameY = 19;
 					}
-				}
-				//드래그 모드일때
-				else
-				{
-					for (int i = 0; i < abs(_dragchaiY) + 1; i++)
-					{
-						for (int j = 0; j < abs(_dragchaiX) + 1; j++)
-						{
-							if (abs(_dragchaiX) + _ptIdX >= TILEX) continue;
-							if (abs(_dragchaiY) + _ptIdY >= TILEY) continue;
-
-							_dragTerm.x = 1;
-							_dragTerm.y = 1;
-							_vvTile[_ptIdY + i][_ptIdX + j]->objFrameX = 30;
-							_vvTile[_ptIdY + i][_ptIdX + j]->objFrameY = 19;
-							_vvTile[_ptIdY + i][_ptIdX + j]->selectTile = _mapSelect;
-						}
-					}
+					_vvTile[_ptIdY][_ptIdX]->obj = OBJECT::OBJ_NONE;
 				}
 			}
 		}
@@ -512,18 +524,57 @@ void mapTool::setMap()
 				_mapDragchaiY = (_mapDragEndY - _mapDragStartY);
 			
 			
-			
-				for (int i = 0; i < _mapDragchaiY + 1; i++)
+				if (_buttonSelect == 0)
 				{
-					for (int j = 0; j < _mapDragchaiX + 1; j++)
+					for (int i = 0; i < _mapDragchaiY + 1; i++)
 					{
-						if (_mapDragEndX >= TILEX) continue;
-						if (_mapDragEndY >= TILEY) continue;
-						if (_mapDragchaiX <= 0 && _mapDragchaiY <= 0) continue;
+						for (int j = 0; j < _mapDragchaiX + 1; j++)
+						{
+							if (_mapDragEndX >= TILEX) continue;
+							if (_mapDragEndY >= TILEY) continue;
+							if (_mapDragchaiX <= 0 && _mapDragchaiY <= 0) continue;
 
-						_vvTile[_mapDragStartY + i][_mapDragStartX + j]->terrainFrameX = _tempTile.frameX;
-						_vvTile[_mapDragStartY + i][_mapDragStartX + j]->terrainFrameY = _tempTile.frameY;
-						_vvTile[_mapDragStartY + i][_mapDragStartX + j]->selectTile = _mapSelect;
+							_vvTile[_mapDragStartY + i][_mapDragStartX + j]->terrainFrameX = _tempTile.frameX;
+							_vvTile[_mapDragStartY + i][_mapDragStartX + j]->terrainFrameY = _tempTile.frameY;
+							imageSelect(_mapDragStartX + j, _mapDragStartY + i, _mapSelect, true);
+							_vvTile[_mapDragStartY + i][_mapDragStartX + j]->selectTile = _mapSelect;
+							_vvTile[_mapDragStartY + i][_mapDragStartX + j]->terrain = terraniSelect(_mapSelect, _tempTile.frameX, _tempTile.frameY);
+						}
+					}
+				}
+				else if (_buttonSelect == 1)
+				{
+					for (int i = 0; i < _mapDragchaiY + 1; i++)
+					{
+						for (int j = 0; j < _mapDragchaiX + 1; j++)
+						{
+							if (_mapDragEndX >= TILEX) continue;
+							if (_mapDragEndY >= TILEY) continue;
+							if (_mapDragchaiX <= 0 && _mapDragchaiY <= 0) continue;
+
+							_vvTile[_mapDragStartY + i][_mapDragStartX + j]->objFrameX = _tempTile.frameX;
+							_vvTile[_mapDragStartY + i][_mapDragStartX + j]->objFrameY = _tempTile.frameY;
+							imageSelect(_mapDragStartX + j, _mapDragStartY + i, _mapSelect, false);
+							_vvTile[_mapDragStartY + i][_mapDragStartX + j]->selectOBJ = _mapSelect;
+							_vvTile[_mapDragStartY + i][_mapDragStartX + j]->obj = objSelect(_mapSelect, _tempTile.frameX, _tempTile.frameY);
+						}
+					}
+				}
+				else
+				{
+					for (int i = 0; i < _mapDragchaiY + 1; i++)
+					{
+						for (int j = 0; j < _mapDragchaiX + 1; j++)
+						{
+							if (_mapDragEndX >= TILEX) continue;
+							if (_mapDragEndY >= TILEY) continue;
+							if (_mapDragchaiX <= 0 && _mapDragchaiY <= 0) continue;
+
+							_vvTile[_mapDragStartY + i][_mapDragStartX + j]->objFrameX = 30;
+							_vvTile[_mapDragStartY + i][_mapDragStartX + j]->objFrameY = 19;
+							imageSelect(_mapDragStartX + j, _mapDragStartY + i, _mapSelect, false);
+							_vvTile[_mapDragStartY + i][_mapDragStartX + j]->obj = OBJECT::OBJ_NONE;
+						}
 					}
 				}
 			}
@@ -757,6 +808,7 @@ void mapTool::buttonRender()
 			
 			int _tileX;
 			int _tileY;
+			
 			ReadFile(file, &_tileX, sizeof(int), &load, NULL);
 			ReadFile(file, &_tileY, sizeof(int), &load, NULL);
 			
@@ -776,10 +828,10 @@ void mapTool::buttonRender()
 			{
 				for (int j = 0; j < _tileX; j++)
 				{
-					if (i > 35) continue;
-					if (j > 60) continue;
-
-					int height;
+					if (i > 34) continue;
+					if (j > 59) continue;
+			
+					//int height;
 					OBJECT obj;
 					int objFrameX;
 					int objFrameY;
@@ -787,8 +839,9 @@ void mapTool::buttonRender()
 					TERRAIN terrain;
 					int trFrameX;
 					int trFrameY;
+					int selectOBJ;
 			
-					ReadFile(file, &height, sizeof(int), &load, NULL);
+					//ReadFile(file, &height, sizeof(int), &load, NULL);
 					ReadFile(file, &obj, sizeof(OBJECT), &load, NULL);
 					ReadFile(file, &objFrameX, sizeof(int), &load, NULL);
 					ReadFile(file, &objFrameY, sizeof(int), &load, NULL);
@@ -796,8 +849,9 @@ void mapTool::buttonRender()
 					ReadFile(file, &terrain, sizeof(TERRAIN), &load, NULL);
 					ReadFile(file, &trFrameX, sizeof(int), &load, NULL);
 					ReadFile(file, &trFrameY, sizeof(int), &load, NULL);
+					ReadFile(file, &selectOBJ, sizeof(int), &load, NULL);
 			
-					_vvMiniMap[i][j]->setheightTile(height);
+					//_vvMiniMap[i][j]->setheightTile(height);
 					_vvMiniMap[i][j]->setObject(obj);
 					_vvMiniMap[i][j]->setOBJFrameX(objFrameX);
 					_vvMiniMap[i][j]->setOBJFrameY(objFrameY);
@@ -805,10 +859,64 @@ void mapTool::buttonRender()
 					_vvMiniMap[i][j]->setTerrain(terrain);
 					_vvMiniMap[i][j]->setTerrainFrameX(trFrameX);
 					_vvMiniMap[i][j]->setTerrainFrameY(trFrameY);
+					_vvMiniMap[i][j]->setSelectOBJ(selectOBJ);
 			
-					IMAGEMANAGER->frameRender("stage1_1(mini)", (_window.x + 250 + (j * 4)) + CAMERA->getCameraX(), (_window.y + 400 + (i * 4)) + CAMERA->getCameraY(), _vvMiniMap[i][j]->terrainFrameX, _vvMiniMap[i][j]->terrainFrameY);
-					IMAGEMANAGER->frameRender("stage1_1(mini)", (_window.x + 250 + (j * 4)) + CAMERA->getCameraX(), (_window.y + 400 + (i * 4)) + CAMERA->getCameraY(), _vvMiniMap[i][j]->objFrameX, _vvMiniMap[i][j]->objFrameY);
 				
+
+					if (_vvMiniMap[i][j]->selectTile == 0)
+					{
+						_vvMiniMap[i][j]->trImg = IMAGEMANAGER->findImage("stage1_1(mini)");
+						_vvMiniMap[i][j]->trImg->frameRender((_window.x + 250 + (j * 4)) + CAMERA->getCameraX(), (_window.y + 400 + (i * 4)) + CAMERA->getCameraY(), _vvMiniMap[i][j]->terrainFrameX, _vvMiniMap[i][j]->terrainFrameY);
+						
+					}
+					else if (_vvMiniMap[i][j]->selectTile == 1)
+					{
+						_vvMiniMap[i][j]->trImg = IMAGEMANAGER->findImage("stage1_2(mini)");
+						_vvMiniMap[i][j]->trImg->frameRender((_window.x + 250 + (j * 4)) + CAMERA->getCameraX(), (_window.y + 400 + (i * 4)) + CAMERA->getCameraY(), _vvMiniMap[i][j]->terrainFrameX, _vvMiniMap[i][j]->terrainFrameY);
+			
+					}
+					else if (_vvMiniMap[i][j]->selectTile == 2)
+					{
+						_vvMiniMap[i][j]->trImg = IMAGEMANAGER->findImage("stage1_3(mini)");
+						_vvMiniMap[i][j]->trImg->frameRender((_window.x + 250 + (j * 4)) + CAMERA->getCameraX(), (_window.y + 400 + (i * 4)) + CAMERA->getCameraY(), _vvMiniMap[i][j]->terrainFrameX, _vvMiniMap[i][j]->terrainFrameY);
+						
+					}
+					else if (_vvMiniMap[i][j]->selectTile == 3)
+					{
+						_vvMiniMap[i][j]->trImg = IMAGEMANAGER->findImage("stage2(mini)");
+						_vvMiniMap[i][j]->trImg->frameRender((_window.x + 250 + (j * 4)) + CAMERA->getCameraX(), (_window.y + 400 + (i * 4)) + CAMERA->getCameraY(), _vvMiniMap[i][j]->terrainFrameX, _vvMiniMap[i][j]->terrainFrameY);
+					}
+					else if (_vvMiniMap[i][j]->selectTile == 4)
+					{
+						_vvMiniMap[i][j]->trImg = IMAGEMANAGER->findImage("bossStage(mini)");
+						_vvMiniMap[i][j]->trImg->frameRender((_window.x + 250 + (j * 4)) + CAMERA->getCameraX(), (_window.y + 400 + (i * 4)) + CAMERA->getCameraY(), _vvMiniMap[i][j]->terrainFrameX, _vvMiniMap[i][j]->terrainFrameY);
+					}		
+
+					if (_vvMiniMap[i][j]->selectOBJ == 0)
+					{
+						_vvMiniMap[i][j]->objImg = IMAGEMANAGER->findImage("stage1_1(mini)");
+						_vvMiniMap[i][j]->objImg->frameRender((_window.x + 250 + (j * 4)) + CAMERA->getCameraX(), (_window.y + 400 + (i * 4)) + CAMERA->getCameraY(), _vvMiniMap[i][j]->objFrameX, _vvMiniMap[i][j]->objFrameY);
+					}
+					else if (_vvMiniMap[i][j]->selectOBJ == 1)
+					{
+						_vvMiniMap[i][j]->objImg = IMAGEMANAGER->findImage("stage1_2(mini)");
+						_vvMiniMap[i][j]->objImg->frameRender((_window.x + 250 + (j * 4)) + CAMERA->getCameraX(), (_window.y + 400 + (i * 4)) + CAMERA->getCameraY(), _vvMiniMap[i][j]->objFrameX, _vvMiniMap[i][j]->objFrameY);
+					}
+					else if (_vvMiniMap[i][j]->selectOBJ == 2)
+					{
+						_vvMiniMap[i][j]->objImg = IMAGEMANAGER->findImage("stage1_3(mini)");
+						_vvMiniMap[i][j]->objImg->frameRender((_window.x + 250 + (j * 4)) + CAMERA->getCameraX(), (_window.y + 400 + (i * 4)) + CAMERA->getCameraY(), _vvMiniMap[i][j]->objFrameX, _vvMiniMap[i][j]->objFrameY);
+					}
+					else if (_vvMiniMap[i][j]->selectOBJ == 3)
+					{
+						_vvMiniMap[i][j]->objImg = IMAGEMANAGER->findImage("stage2(mini)");
+						_vvMiniMap[i][j]->objImg->frameRender((_window.x + 250 + (j * 4)) + CAMERA->getCameraX(), (_window.y + 400 + (i * 4)) + CAMERA->getCameraY(), _vvMiniMap[i][j]->objFrameX, _vvMiniMap[i][j]->objFrameY);
+					}
+					else if (_vvMiniMap[i][j]->selectOBJ == 4)
+					{
+						_vvMiniMap[i][j]->objImg = IMAGEMANAGER->findImage("bossStage(mini)");
+						_vvMiniMap[i][j]->objImg->frameRender((_window.x + 250 + (j * 4)) + CAMERA->getCameraX(), (_window.y + 400 + (i * 4)) + CAMERA->getCameraY(), _vvMiniMap[i][j]->objFrameX, _vvMiniMap[i][j]->objFrameY);
+					}
 				}
 			}
 			CloseHandle(file);
@@ -848,6 +956,10 @@ void mapTool::increaseX()
 		tempTile->heightTile = 0;
 		tempTile->objFrameX = 31;
 		tempTile->objFrameY = 18;
+		tempTile->selectTile = 0;
+		tempTile->selectOBJ = 0;
+		tempTile->trImg = IMAGEMANAGER->findImage("stage1_1");
+		tempTile->objImg = IMAGEMANAGER->findImage("stage1_1");
 
 		tempTile->terrain = TERRAIN::TR_FLOOR;
 		tempTile->obj = OBJECT::OBJ_NONE;
@@ -869,7 +981,10 @@ void mapTool::increaseY()
 		tempTile->heightTile = 0;
 		tempTile->objFrameX = 31;
 		tempTile->objFrameY = 18;
-
+		tempTile->selectTile = 0;
+		tempTile->selectOBJ = 0;
+		tempTile->trImg = IMAGEMANAGER->findImage("stage1_1");
+		tempTile->objImg = IMAGEMANAGER->findImage("stage1_1");
 
 		vTile.push_back(tempTile);
 	}
@@ -935,20 +1050,79 @@ void mapTool::windowPageSub()
 	}
 }
 
-TERRAIN mapTool::terraniSelect(int frameX, int frameY)
+void mapTool::imageSelect(int idX, int idY, int mapSelect, bool isTR)
 {
+	if (isTR)
+	{
+		if (mapSelect == 0)
+			_vvTile[idY][idX]->trImg = IMAGEMANAGER->findImage("stage1_1");
+		else if (mapSelect == 1)
+			_vvTile[idY][idX]->trImg = IMAGEMANAGER->findImage("stage1_2");
+		else if (mapSelect == 2)
+			_vvTile[idY][idX]->trImg = IMAGEMANAGER->findImage("stage1_3");
+		else if (mapSelect == 3)
+			_vvTile[idY][idX]->trImg = IMAGEMANAGER->findImage("stage2");
+		else if (mapSelect == 4)
+			_vvTile[idY][idX]->trImg = IMAGEMANAGER->findImage("bossStage");
+	}
+	else
+	{
+		if (mapSelect == 0)
+			_vvTile[idY][idX]->objImg = IMAGEMANAGER->findImage("stage1_1");
+		else if (mapSelect == 1)
+			_vvTile[idY][idX]->objImg = IMAGEMANAGER->findImage("stage1_2");
+		else if (mapSelect == 2)
+			_vvTile[idY][idX]->objImg = IMAGEMANAGER->findImage("stage1_3");
+		else if (mapSelect == 3)
+			_vvTile[idY][idX]->objImg = IMAGEMANAGER->findImage("stage2");
+		else if (mapSelect == 4)
+			_vvTile[idY][idX]->objImg = IMAGEMANAGER->findImage("bossStage");
+	}
 
+}
+
+TERRAIN mapTool::terraniSelect(int selectTile ,int frameX, int frameY)
+{
+	if (selectTile == 1 && ((frameX == 0 && frameY == 3) || (frameX == 0 && frameY == 4)
+		|| (frameX == 2 && frameY == 4) || (frameX == 1 && frameY == 4)
+		|| (frameX == 2 && frameY == 5) || (frameX == 1 && frameY == 5)
+		|| (frameX == 3 && frameY == 4) || (frameX == 4 && frameY == 4)
+		|| (frameX == 3 && frameY == 5) || (frameX == 4 && frameY == 5)
+		|| (frameX == 5 && frameY == 3)
+		|| (frameX == 5 && frameY == 4)))
+		return TERRAIN::TR_FOREST;
+
+				
 	return TERRAIN::TR_FLOOR;
 }
 
-OBJECT mapTool::objSelect(int frameX, int frameY)
+OBJECT mapTool::objSelect(int selectOBJ, int frameX, int frameY)
 {
+	if (selectOBJ == 0 && ((frameX == 6 && frameY == 4) || (frameX == 7 && frameY == 4) || (frameX == 8 && frameY == 4)
+		|| (frameX == 6 && frameY == 5) || (frameX == 8 && frameY == 5)
+		|| (frameX == 6 && frameY == 6) || (frameX == 7 && frameY == 6) || (frameX == 8 && frameY == 6)
+		|| (frameX == 6 && frameY == 7) || (frameX == 7 && frameY == 7) || (frameX == 8 && frameY == 7) || (frameX == 9 && frameY == 7)
+		|| (frameX == 6 && frameY == 8) || (frameX == 7 && frameY == 8) || (frameX == 8 && frameY == 8) || (frameX == 9 && frameY == 8)))
+	{
+		return OBJECT::OBJ_LINE;
+	}
+
+	if (selectOBJ == 1 && ((frameX == 13 && frameY == 2) || (frameX == 14 && frameY == 2) || (frameX == 15 && frameY == 2)
+		|| (frameX == 16 && frameY == 3) || (frameX == 17 && frameY == 3)
+		|| (frameX == 16 && frameY == 4) || (frameX == 17 && frameY == 4)))
+	{
+		return OBJECT::OBJ_LAMP;
+	}
+
 	return OBJECT::OBJ_NONE;
 }
 
-DWORD mapTool::setAttribute(string imgName, UINT frameX, UINT frameY)
+ATTRIBUTE mapTool::setAttribute(tagTile selectNum, UINT frameX, UINT frameY)
 {
-	return 0;
+	ATTRIBUTE result = ATTRIBUTE::ATTR_NONE;
+
+
+	return result;
 }
 
 void mapTool::cbMapPageAdd()
@@ -998,11 +1172,11 @@ void mapTool::mapSave()
 		{
 			file = CreateFile("saveFile/저장_1.map", GENERIC_WRITE, NULL, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		}
-		if (_pageSL == 1)
+		else if (_pageSL == 1)
 		{
 			file = CreateFile("saveFile/저장_2.map", GENERIC_WRITE, NULL, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		}
-		if (_pageSL == 2)
+		else if (_pageSL == 2)
 		{
 			file = CreateFile("saveFile/저장_3.map", GENERIC_WRITE, NULL, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		}
@@ -1015,7 +1189,7 @@ void mapTool::mapSave()
 			for (int j = 0; j < TILEX; j++)
 			{
 		
-				int height;
+				//int height;
 				OBJECT obj;
 				int objFrameX;
 				int objFrameY;
@@ -1023,8 +1197,8 @@ void mapTool::mapSave()
 				TERRAIN terrain;
 				int trFrameX;
 				int trFrameY;
+				int selectOBJ;
 
-		
 				//height = _vvTile[j][i]->getHeightTile();
 				obj = _vvTile[i][j]->getObject();
 				objFrameX = _vvTile[i][j]->getOBJFrameX();
@@ -1033,8 +1207,9 @@ void mapTool::mapSave()
 				terrain = _vvTile[i][j]->getTerrain();
 				trFrameX = _vvTile[i][j]->getTerrainFrameX();
 				trFrameY = _vvTile[i][j]->getTerrainFrameY();
+				selectOBJ = _vvTile[i][j]->getSelectOBJ();
 		
-				WriteFile(file, &height, sizeof(int), &save, NULL);
+				//WriteFile(file, &height, sizeof(int), &save, NULL);
 				WriteFile(file, &obj, sizeof(OBJECT), &save, NULL);
 				WriteFile(file, &objFrameX, sizeof(int), &save, NULL);
 				WriteFile(file, &objFrameY, sizeof(int), &save, NULL);
@@ -1042,6 +1217,7 @@ void mapTool::mapSave()
 				WriteFile(file, &terrain, sizeof(TERRAIN), &save, NULL);
 				WriteFile(file, &trFrameX, sizeof(int), &save, NULL);
 				WriteFile(file, &trFrameY, sizeof(int), &save, NULL);
+				WriteFile(file, &selectOBJ, sizeof(int), &save, NULL);
 			}
 		}
 		CloseHandle(file);
@@ -1069,11 +1245,11 @@ void mapTool::mapLoad()
 		{
 			file = CreateFile("saveFile/저장_1.map", GENERIC_READ, NULL, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		}
-		if (_pageSL == 1)
+		else if (_pageSL == 1)
 		{
 			file = CreateFile("saveFile/저장_2.map", GENERIC_READ, NULL, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		}
-		if (_pageSL == 2)
+		else if (_pageSL == 2)
 		{
 			file = CreateFile("saveFile/저장_3.map", GENERIC_READ, NULL, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		}
@@ -1103,7 +1279,7 @@ void mapTool::mapLoad()
 		{
 			for (int j = 0; j < TILEX; j++)
 			{
-				int height;
+				//int height;
 				OBJECT obj;
 				int objFrameX;
 				int objFrameY;
@@ -1111,9 +1287,9 @@ void mapTool::mapLoad()
 				TERRAIN terrain;
 				int trFrameX;
 				int trFrameY;
+				int selectOBJ;
 		
-		
-				ReadFile(file, &height, sizeof(int), &load, NULL);
+				//ReadFile(file, &height, sizeof(int), &load, NULL);
 				ReadFile(file, &obj, sizeof(OBJECT), &load, NULL);
 				ReadFile(file, &objFrameX, sizeof(int), &load, NULL);
 				ReadFile(file, &objFrameY, sizeof(int), &load, NULL);
@@ -1121,8 +1297,9 @@ void mapTool::mapLoad()
 				ReadFile(file, &terrain, sizeof(TERRAIN), &load, NULL);
 				ReadFile(file, &trFrameX, sizeof(int), &load, NULL);
 				ReadFile(file, &trFrameY, sizeof(int), &load, NULL);
+				ReadFile(file, &selectOBJ, sizeof(int), &load, NULL);
 		
-				_vvTile[i][j]->setheightTile(height);
+				//_vvTile[i][j]->setheightTile(height);
 				_vvTile[i][j]->setObject(obj);
 				_vvTile[i][j]->setOBJFrameX(objFrameX);
 				_vvTile[i][j]->setOBJFrameY(objFrameY);
@@ -1130,6 +1307,49 @@ void mapTool::mapLoad()
 				_vvTile[i][j]->setTerrain(terrain);
 				_vvTile[i][j]->setTerrainFrameX(trFrameX);
 				_vvTile[i][j]->setTerrainFrameY(trFrameY);
+				_vvTile[i][j]->setSelectOBJ(selectOBJ);
+
+				if (_vvTile[i][j]->getSelectTile() == 0)
+				{
+					_vvTile[i][j]->trImg = IMAGEMANAGER->findImage("stage1_1");
+				}
+				else if (_vvTile[i][j]->getSelectTile() == 1)
+				{
+					_vvTile[i][j]->trImg = IMAGEMANAGER->findImage("stage1_2");
+				}
+				else if (_vvTile[i][j]->getSelectTile() == 2)
+				{
+					_vvTile[i][j]->trImg = IMAGEMANAGER->findImage("stage1_3");
+				}
+				else if (_vvTile[i][j]->getSelectTile() == 3)
+				{
+					_vvTile[i][j]->trImg = IMAGEMANAGER->findImage("stage2");
+				}
+				else if (_vvTile[i][j]->getSelectTile() == 4)
+				{
+					_vvTile[i][j]->trImg = IMAGEMANAGER->findImage("bossStage");
+				}
+
+				if (_vvTile[i][j]->getSelectOBJ() == 0)
+				{
+					_vvTile[i][j]->objImg = IMAGEMANAGER->findImage("stage1_1");
+				}
+				else if (_vvTile[i][j]->getSelectOBJ() == 1)
+				{
+					_vvTile[i][j]->objImg = IMAGEMANAGER->findImage("stage1_2");
+				}
+				else if (_vvTile[i][j]->getSelectOBJ() == 2)
+				{
+					_vvTile[i][j]->objImg = IMAGEMANAGER->findImage("stage1_3");
+				}
+				else if (_vvTile[i][j]->getSelectOBJ() == 3)
+				{
+					_vvTile[i][j]->objImg = IMAGEMANAGER->findImage("stage2");
+				}
+				else if (_vvTile[i][j]->getSelectOBJ() == 4)
+				{
+					_vvTile[i][j]->objImg = IMAGEMANAGER->findImage("bossStage");
+				}				
 			}
 		}
 		CloseHandle(file);

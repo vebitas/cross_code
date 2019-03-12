@@ -57,8 +57,6 @@ private:
 	vector<vector<tagTile*>> _vvTile;
 	vector<vector<tagTile*>> _vvMiniMap;
 
-	player* _player;
-
 	tagTempTile _tempTile;
 
 	button* _saveButton;
@@ -66,6 +64,8 @@ private:
 	UINT		TILEX;					
 	UINT		TILEY;
 	UINT		miniX, miniY;
+
+	HCURSOR _cursor;
 
 	POINT _dragTerm;
 
@@ -133,6 +133,8 @@ public:
 	void windowPageAdd();
 	void windowPageSub();
 
+	void imageSelect(int idX, int idY, int mapSelect, bool isTR);
+
 
 	function<void(void)> _increaseXMap;
 	function<void(void)> _increaseYMap;
@@ -154,10 +156,11 @@ public:
 
 	void setWindowsSize(int x, int y, int width, int height);		//윈도우 창크기 설정
 
-	TERRAIN terraniSelect(int frameX, int frameY);
-	OBJECT objSelect(int frameX, int frameY);
+	TERRAIN terraniSelect(int selectTile, int frameX, int frameY);
+	OBJECT objSelect(int selectOBJ, int frameX, int frameY);
 
 public:
+
 	UINT getTileX() { return TILEX; }
 	UINT getTileY() { return TILEY; }
 
@@ -179,6 +182,6 @@ private:
 		return POINT{ (LONG)pt.x, (LONG)pt.y };
 	}
 
-	DWORD setAttribute(string imgName, UINT frameX, UINT frameY);
+	ATTRIBUTE setAttribute(tagTile selectNum, UINT frameX, UINT frameY);
 };
 

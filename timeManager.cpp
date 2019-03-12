@@ -36,7 +36,7 @@ void timeManager::update(float lockFPS)
 void timeManager::render()
 {
 	WCHAR str[128];
-
+	string frameRate;
 	//디버그 상태면
 #ifdef _DEBUG
 	{

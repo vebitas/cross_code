@@ -69,7 +69,7 @@ public:
 	//렌더링
 	void frameUpdate(float elapsedTime);
 
-	void start();		//재생
+	void start(bool isEffect);		//재생
 	void stop();		//정지
 	void pause();		//일시정지
 	void resume();		//다시재생

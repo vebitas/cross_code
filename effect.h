@@ -22,7 +22,7 @@ public:
 	virtual HRESULT init(image* effectImage, int frameW, int frameH, int fps, float elapsedTime);
 	virtual void release();
 	virtual void update();
-	virtual void render();
+	virtual void render(float angle);
 
 	void startEffect(int x, int y);
 

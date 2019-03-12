@@ -8,6 +8,14 @@
 #define SAMPLETILEX 32
 #define SAMPLETILEY 19
 
+enum class ATTRIBUTE
+{
+	 ATTR_NONE,
+	 ATTR_UNMOVE,
+	 ATTR_WALL,
+	 ATTR_WATER
+};
+
 enum class HEIGTH
 {
 	TILE_HEIGHT_ZERO,		//언무브
@@ -18,16 +26,16 @@ enum class HEIGTH
 
 enum class TERRAIN
 {
-	TR_FLOOR, TR_WATER, TR_FALL
+	TR_FLOOR, TR_WATER, TR_FALL, TR_FOREST
 };
 
 enum class OBJECT
 {
-	OBJ_WALL,
-	OBJ_GRASS,
 	OBJ_SWITCH,
 	OBJ_BOX,
 	OBJ_PIPE,
+	OBJ_LINE,
+	OBJ_LAMP,
 	OBJ_NONE
 };
 
@@ -60,14 +68,19 @@ public:
 		heightTile(NULL)
 	{};
 	~tagTile() {};
+	image* trImg;
+	image* objImg;
 	int terrainFrameX;
 	int terrainFrameY;
 	TERRAIN terrain;
 	OBJECT obj;
+	ATTRIBUTE att;
 	int objFrameX;
 	int objFrameY;
 	int selectTile;
+	int selectOBJ;
 	int heightTile;
+	bool isTR;
 
 public:
 	//======================== 접근자  모음 =============================
@@ -79,6 +92,9 @@ public:
 	int getOBJFrameY() { return objFrameY; }
 	int getSelectTile() { return selectTile; }
 	int getHeightTile() { return heightTile; }
+	int getSelectOBJ() { return selectOBJ; }
+	image* getTRimg() { return trImg; }
+	image* getOBJimg() { return objImg; }
 
 	// ======================= 설정자  모음 =============================
 	void setTerrainFrameX(int trFrameX) { terrainFrameX = trFrameX; }
@@ -89,6 +105,9 @@ public:
 	void setOBJFrameY(int objY) { objFrameY = objY; }
 	void setSelectTile(int selTile) { selectTile = selTile; }
 	void setheightTile(int height) { heightTile = height; }
+	void setSelectOBJ(int selOBJ) { selectOBJ = selOBJ; }
+	void setTRimg(image* tr) { trImg = tr; }
+	void setOBJimg(image* obj) { objImg = obj;}
 };
 
 typedef class tagSampleTile

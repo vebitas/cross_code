@@ -667,10 +667,13 @@ void animation::frameUpdate(float elapsedTime)
 	_currentArrOnce = _currentArr.x + _currentArr.y * _totalFrameX;
 }
 
-void animation::start()
+void animation::start(bool isEffect)
 {
 	_play = TRUE;
-	//_nowPlayIndex = 0;
+	if (isEffect)
+	{
+		_nowPlayIndex = 0;
+	}
 }
 
 void animation::stop()

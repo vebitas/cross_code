@@ -195,7 +195,7 @@ namespace TEAM_15DUCK_UTILL
 		float deltaY = y2 - y;
 		float distance = sqrtf(deltaX* deltaX + deltaY * deltaY);
 		angle = acosf(deltaX / distance);
-		if (deltaY < 0)
+		if (y2 < y)
 		{
 			angle = 2 * PI - angle;
 			if (angle > 2 * PI) angle -= 2 * PI;

@@ -247,7 +247,7 @@ void keyAniManager::start(string targetName, string animationKeyName)
 	if (arrAnim->find(animationKeyName) != arrAnim->end())
 	{
 		iterAnimation iter = arrAnim->find(animationKeyName);
-		iter->second->start();
+		iter->second->start(false);
 	}
 }
 

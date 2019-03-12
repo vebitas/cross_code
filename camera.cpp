@@ -177,8 +177,9 @@ void camera::linearKeepMove(float newX, float newY, float cameraMoveTime, float 
 	_distance = getDistance(_orizin.x, _orizin.y, _new.x, _new.y);
 	_angle = getAngle(_orizin.x, _orizin.y, _new.x, _new.y);
 	_worldTime = TIMEMANAGER->getWorldTime();
+	_worldTime2 = TIMEMANAGER->getWorldTime();
 	_moveTime = cameraMoveTime;
-	_stopTime = stopTime;
+	_stopTime = stopTime + cameraMoveTime;
 
 	float elapsedTime = TIMEMANAGER->getElapsedTime();
 	_moveSpeed = (elapsedTime / _moveTime) * _distance;

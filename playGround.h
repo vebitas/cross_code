@@ -15,6 +15,7 @@ private:
 	uiScene* _uiScene;
 	mapTool*  _mapTool;
 	stage_1* _stage_1;
+	HCURSOR _cursor;
 
 public:
 	playGround();
