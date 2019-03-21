@@ -18,6 +18,9 @@ enum PLAYERSTATE
 	PLAYER_ATTACK_COMBO_1,
 	PLAYER_ATTACK_COMBO_2,
 	PLAYER_ATTACK_COMBO_FINISH,
+	PLAYER_DEFENSE,
+	PLAYER_AVOID,
+	PLAYER_ATTACKED,
 	PLAYER_JUMP,
 	PLAYER_LEVELUP,
 	PLAYER_DEATH,
@@ -25,7 +28,6 @@ enum PLAYERSTATE
 	PLAYER_SKILL_2,
 	PLAYER_SKILL_3
 };
-
 enum PLAYERDIRECTION
 {
 	UP,
@@ -42,14 +44,17 @@ struct tagPlayer
 {
 	D2D1_RECT_F rc;
 	D2D1_RECT_F attackRc;
+	image* effImage;
 	image* image;
 	animation* motion;
+	animation* effAni;
 	PLAYERSTATE state;
 	PLAYERDIRECTION direction;
 	playerBullet* bullet;
 	string name;
 	float x, y;
 	float speed;
+	float avoidPower;
 	float jumpPower;
 	float gravity;
 	float angle;
@@ -89,8 +94,12 @@ private:
 	bool _isMove;
 	bool _isLea;
 	bool _isRight;
+	bool _isAvoid;
 
 	bool _nobKey[4];
+
+	int _effCount;
+
 
 	//대각선 무브브레이크 상태를 설정하기위한 필요한 변수들
 	int _oldTime[4];
@@ -103,6 +112,13 @@ private:
 	//시간차로 연속콤보를 가능하게하기위한 시간변수
 	int _attackComboTime;
 	int _attackComboCount;
+	//회피
+	int _avoidTime;
+	int _avoidFPS;
+	int _avoidEffTime;
+	int _moveEffTime;
+
+
 
 public:
 	player();
@@ -123,8 +139,6 @@ public:
 	void playerState();
 	void setType();
 
-	void tileCheck();
-
 	void attackAngle(bool stayOn);
 
 	void playerAniName(string playerName, string aniName);
@@ -132,11 +146,13 @@ public:
 	static void cbMoveBreak(void* obj);
 	static void cbThrowAim(void* obj);
 	static void cbAttack(void* obj);
+	static void cbAvoid(void* obj);
 
 public:
 	//================ 접근자 설정자 ====================
 	D2D1_RECT_F getPlayerRc() { return _player.rc; }
 	D2D1_RECT_F getPlayerAttackRc() { return _player.attackRc; }
+	playerBullet* getPlayerBullet() { return _player.bullet; }
 	PLAYERSTATE getPlayerState() { return _player.state; }
 	PLAYERDIRECTION getPlayerDirection() { return _player.direction; }
 	string getPlayerName() { return _player.name; }
@@ -149,7 +165,6 @@ public:
 	int getPlayerIdY() { return _player.idY; }
 	int getPlayerHP() { return _player.HP; }
 	int getPlayerMaxHP() { return _player.maxHP;}
-
 	bool getIsThorowAttack() { return _isThrowAttack; }
 	bool getIsAttack() { return _isAttack; }
 
@@ -157,8 +172,20 @@ public:
 
 	void setPlayerState(PLAYERSTATE playerState) { _player.state = playerState; }
 	void setPlayerDirection(PLAYERDIRECTION playerDirection) { _player.direction = playerDirection; }
+	void setPlayerRc(D2D1_RECT_F rc) { _player.rc = rc; }
+	void setPlayerAttackRc(D2D1_RECT_F rc) { _player.attackRc = rc; }
+	void setPlayerName(string name) { _player.name = name; }
+	void setPlayerPosX(float x) { _player.x = x; }
+	void setPlayerPosY(float y) { _player.y = y; }
+	void setPlayerSpeed(float speed) { _player.speed = speed; }
+	void setPlayerJumpPower(float jumpPower) { _player.jumpPower = jumpPower; }
+	void setPlayerAngle(float angle) { _player.angle = angle; }
+	void setPlayerIdX(int idX) { _player.idX = idX; }
+	void setPlayerIdY(int idY) { _player.idY = idY; }
+
 
 	void setIsThrowAttack(bool isThrowAttack) { _isThrowAttack = isThrowAttack; }
 	void setIsAttack(bool isAttack) { _isAttack = isAttack; }
+	void setIsAvoid(bool isAvoid) { _isAvoid = isAvoid; }
 };
 

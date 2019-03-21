@@ -198,8 +198,32 @@ namespace TEAM_15DUCK_UTILL
 		if (y2 < y)
 		{
 			angle = 2 * PI - angle;
-			if (angle > 2 * PI) angle -= 2 * PI;
+			if (angle >= 2 * PI) angle -= 2 * PI;
 		}
+		return angle;
+	}
+
+	float getAngle3(float x1, float y1, float x2, float y2)
+	{
+
+		float x = x2 - x1;
+		float y = y2 - y1;
+
+		float distance = sqrtf(x * x + y * y);
+
+		//¾ÆÅºÅõ
+		//float angle = -atan2f(y, x);
+
+		float angle = acosf(x / distance);
+
+		//¿¹¿ÜÃ³¸® ÇÊ¾¥
+		if (y2 > y1)
+		{
+			angle = 2 * PI - angle;
+			if (angle >= PI * 2) angle -= PI * 2;
+		}
+
+
 		return angle;
 	}
 

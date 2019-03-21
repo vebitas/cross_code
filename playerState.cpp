@@ -6,6 +6,8 @@ void player::playerState()
 	switch (_player.state)
 	{
 	case PLAYERSTATE::PLAYER_IDLE:
+		_isAttack = false;
+		_isThrowAttack = false;
 		_player.image = IMAGEMANAGER->findImage("leaMove");
 		switch (_player.direction)
 		{
@@ -44,7 +46,14 @@ void player::playerState()
 		}
 		break;
 	case PLAYERSTATE::PLAYER_MOVE:
+		_isAttack = false;
+		_isThrowAttack = false;
 		_player.image = IMAGEMANAGER->findImage("leaMove");
+		if (GetTickCount() - _moveEffTime >= 150)
+		{
+			_moveEffTime = GetTickCount();
+			EFFECTMANAGER->play("moveEff", _player.x + 30, _player.y + 35);
+		}
 		_isMove = true;
 		switch (_player.direction)
 		{
@@ -115,6 +124,8 @@ void player::playerState()
 		}
 		break;
 	case PLAYERSTATE::PLAYER_MOVE_BREAK:
+		_isAttack = false;
+		_isThrowAttack = false;
 		_player.image = IMAGEMANAGER->findImage("leaMove");
 		switch (_player.direction)
 		{
@@ -209,6 +220,8 @@ void player::playerState()
 		}
 		break;
 	case PLAYERSTATE::PLAYER_THROW_AIM:
+		_isAttack = false;
+		_isThrowAttack = false;
 		_player.image = IMAGEMANAGER->findImage("leaMove");
 		switch (_player.direction)
 		{
@@ -247,6 +260,8 @@ void player::playerState()
 		}
 		break;
 	case PLAYERSTATE::PLAYER_THROW_HOLD:
+		_isAttack = false;
+		_isThrowAttack = false;
 		_player.image = IMAGEMANAGER->findImage("leaMove");
 		switch (_player.direction)
 		{
@@ -285,6 +300,8 @@ void player::playerState()
 		}
 		break;
 	case PLAYERSTATE::PLAYER_THROW_HOLD_MOVE:
+		_isAttack = false;
+		_isThrowAttack = false;
 		_player.image = IMAGEMANAGER->findImage("leaMove");
 		switch (_player.direction)
 		{
@@ -347,6 +364,7 @@ void player::playerState()
 		}
 		break;
 	case PLAYERSTATE::PLAYER_THROW_1:
+		_isAttack = false;
 		_isThrowAttack = true;
 		_player.image = IMAGEMANAGER->findImage("leaThrow");
 		switch (_player.direction)
@@ -387,7 +405,8 @@ void player::playerState()
 		break;
 	case PLAYERSTATE::PLAYER_THROW_2:
 		_player.image = IMAGEMANAGER->findImage("leaThrow");
-		_isThrowAttack = true; 
+		_isAttack = false;
+		_isThrowAttack = true;
 		switch (_player.direction)
 		{
 		case PLAYERDIRECTION::DOWN:
@@ -426,6 +445,7 @@ void player::playerState()
 		break;
 	case PLAYERSTATE::PLAYER_ATTACK_COMBO_1:
 		_isAttack = true;
+		_isThrowAttack = false;
 		_effCopy = false;
 		_player.image = IMAGEMANAGER->findImage("leaThrow");
 		if(_effSelect == 0)
@@ -446,6 +466,7 @@ void player::playerState()
 			_effPos.x = -20;
 			_effPos.y = 0;
 			_effectAngle = 180;
+			_player.attackRc = { (float)_player.x , (float)_player.y + 40, (float)_player.x + 65, (float)_player.y + 75 };
 			playerAniName("lea", "attackDown");
 			break;
 		case PLAYERDIRECTION::DOWN_LEFT:
@@ -453,6 +474,7 @@ void player::playerState()
 			_effPos.x = -35;
 			_effPos.y = 0;
 			_effectAngle = 225;
+			_player.attackRc = { (float)_player.x - 20, (float)_player.y, (float)_player.x + 40, (float)_player.y + 75 };
 			playerAniName("lea", "attackDownRight");
 			break;
 		case PLAYERDIRECTION::DOWN_RIGHT:
@@ -460,6 +482,7 @@ void player::playerState()
 			_effPos.x = -5;
 			_effPos.y = 0;
 			_effectAngle = 135;
+			_player.attackRc = { (float)_player.x + 20, (float)_player.y, (float)_player.x + 85, (float)_player.y + 75 };
 			playerAniName("lea", "attackDownLeft");
 			break;
 		case PLAYERDIRECTION::LEFT:
@@ -467,6 +490,7 @@ void player::playerState()
 			_effPos.x = -40;
 			_effPos.y = 0;
 			_effectAngle = 270;
+			_player.attackRc = { (float)_player.x - 20, (float)_player.y, (float)_player.x + 40, (float)_player.y + 75 };
 			playerAniName("lea", "attackRight");
 			break;
 		case PLAYERDIRECTION::RIGHT:
@@ -474,6 +498,7 @@ void player::playerState()
 			_effPos.x = 0;
 			_effPos.y = 0;
 			_effectAngle = 90;
+			_player.attackRc = { (float)_player.x + 20, (float)_player.y, (float)_player.x + 85, (float)_player.y + 75 };
 			playerAniName("lea", "attackLeft");
 			break;
 		case PLAYERDIRECTION::UP:
@@ -481,6 +506,7 @@ void player::playerState()
 			_effPos.x = -20;
 			_effPos.y = -20;
 			_effectAngle = 0;
+			_player.attackRc = { (float)_player.x , (float)_player.y - 20, (float)_player.x + 65, (float)_player.y + 15 };
 			playerAniName("lea", "attackUp");
 			break;
 		case PLAYERDIRECTION::UP_LEFT:
@@ -488,6 +514,7 @@ void player::playerState()
 			_effPos.x = -30;
 			_effPos.y = -20;
 			_effectAngle = 315;
+			_player.attackRc = { (float)_player.x - 20, (float)_player.y - 20, (float)_player.x + 40, (float)_player.y + 55 };
 			playerAniName("lea", "attackUpRight");
 			break;
 		case PLAYERDIRECTION::UP_RIGHT:
@@ -495,12 +522,14 @@ void player::playerState()
 			_effPos.x = -5;
 			_effPos.y = -15;
 			_effectAngle = 45;
+			_player.attackRc = { (float)_player.x + 20, (float)_player.y - 20, (float)_player.x + 85, (float)_player.y + 55 };
 			playerAniName("lea", "attackUpLeft");
 			break;
 		}
 		break;
 	case PLAYERSTATE::PLAYER_ATTACK_COMBO_2:
 		_isAttack = true;
+		_isThrowAttack = false;
 		_effCopy = false;
 		_player.image = IMAGEMANAGER->findImage("leaThrow");
 		if (_effSelect == 0)
@@ -521,6 +550,7 @@ void player::playerState()
 			_effPos.x = -20;
 			_effPos.y = 0;
 			_effectAngle = 180;
+			_player.attackRc = { (float)_player.x , (float)_player.y + 40, (float)_player.x + 65, (float)_player.y + 75 };
 			playerAniName("lea", "attackDown");
 			break;
 		case PLAYERDIRECTION::DOWN_LEFT:
@@ -528,6 +558,7 @@ void player::playerState()
 			_effPos.x = -35;
 			_effPos.y = 0;
 			_effectAngle = 225;
+			_player.attackRc = { (float)_player.x - 20, (float)_player.y, (float)_player.x + 40, (float)_player.y + 75 };
 			playerAniName("lea", "attackDownLeft");
 			break;
 		case PLAYERDIRECTION::DOWN_RIGHT:
@@ -535,6 +566,7 @@ void player::playerState()
 			_effectAngle = 135;
 			_effPos.x = -5;
 			_effPos.y = 0;
+			_player.attackRc = { (float)_player.x + 20, (float)_player.y, (float)_player.x + 85, (float)_player.y + 75 };
 			playerAniName("lea", "attackDownRight");
 			break;
 		case PLAYERDIRECTION::LEFT:
@@ -542,6 +574,7 @@ void player::playerState()
 			_effPos.x = -40;
 			_effPos.y = 0;
 			_effectAngle = 270;
+			_player.attackRc = { (float)_player.x - 20, (float)_player.y, (float)_player.x + 40, (float)_player.y + 75 };
 			playerAniName("lea", "attackLeft");
 			break;
 		case PLAYERDIRECTION::RIGHT:
@@ -549,6 +582,7 @@ void player::playerState()
 			_effPos.x = 0;
 			_effPos.y = 0;
 			_effectAngle = 90;
+			_player.attackRc = { (float)_player.x + 20, (float)_player.y, (float)_player.x + 85, (float)_player.y + 75 };
 			playerAniName("lea", "attackRight");
 			break;
 		case PLAYERDIRECTION::UP:
@@ -556,6 +590,7 @@ void player::playerState()
 			_effPos.x = -20;
 			_effPos.y = -20;
 			_effectAngle = 0;
+			_player.attackRc = { (float)_player.x , (float)_player.y - 20, (float)_player.x + 65, (float)_player.y + 15 };
 			playerAniName("lea", "attackUp");
 			break;
 		case PLAYERDIRECTION::UP_LEFT:
@@ -563,6 +598,7 @@ void player::playerState()
 			_effPos.x = -30;
 			_effPos.y = -20;
 			_effectAngle = 315;
+			_player.attackRc = { (float)_player.x - 20, (float)_player.y - 20, (float)_player.x + 40, (float)_player.y + 55 };
 			playerAniName("lea", "attackUpLeft");
 			break;
 		case PLAYERDIRECTION::UP_RIGHT:
@@ -570,12 +606,14 @@ void player::playerState()
 			_effPos.x = -5;
 			_effPos.y = -15;
 			_effectAngle = 45;
+			_player.attackRc = { (float)_player.x + 20, (float)_player.y - 20, (float)_player.x + 85, (float)_player.y + 55 };
 			playerAniName("lea", "attackUpRight");
 			break;
 		}
 		break;
 	case PLAYERSTATE::PLAYER_ATTACK_COMBO_FINISH:
 		_isAttack = true;
+		_isThrowAttack = false;
 		_effCopy = true;
 		_player.image = IMAGEMANAGER->findImage("leaThrow");
 		if (_effSelect == 0)
@@ -600,6 +638,7 @@ void player::playerState()
 			_player.angle = (PI / 180 * 270);
 			_player.x += cosf(_player.angle) * _player.speed;
 			_player.y += -sinf(_player.angle) * _player.speed;
+			_player.attackRc = { (float)_player.x , (float)_player.y + 40, (float)_player.x + 65, (float)_player.y + 75 };
 			playerAniName("lea", "attackDownLast");
 			break;
 		case PLAYERDIRECTION::DOWN_LEFT:
@@ -611,6 +650,7 @@ void player::playerState()
 			_player.angle = (PI / 180 * 225);
 			_player.x += cosf(_player.angle) * _player.speed;
 			_player.y += -sinf(_player.angle) * _player.speed;
+			_player.attackRc = { (float)_player.x - 20, (float)_player.y, (float)_player.x + 40, (float)_player.y + 75 };
 			playerAniName("lea", "attackDownLeftLast");
 			break;
 		case PLAYERDIRECTION::DOWN_RIGHT:
@@ -622,6 +662,7 @@ void player::playerState()
 			_player.angle = (PI / 180 * 315);
 			_player.x += cosf(_player.angle) * _player.speed;
 			_player.y += -sinf(_player.angle) * _player.speed;
+			_player.attackRc = { (float)_player.x + 20, (float)_player.y, (float)_player.x + 85, (float)_player.y + 75 };
 			playerAniName("lea", "attackDownRightLast");
 			break;
 		case PLAYERDIRECTION::LEFT:
@@ -633,6 +674,7 @@ void player::playerState()
 			_player.angle = (PI / 180 * 180);
 			_player.x += cosf(_player.angle) * _player.speed;
 			_player.y += -sinf(_player.angle) * _player.speed;
+			_player.attackRc = { (float)_player.x - 20, (float)_player.y, (float)_player.x + 40, (float)_player.y + 75 };
 			playerAniName("lea", "attackLeftLast");
 			break;
 		case PLAYERDIRECTION::RIGHT:
@@ -644,6 +686,7 @@ void player::playerState()
 			_player.angle = (PI / 180 * 0);
 			_player.x += cosf(_player.angle) * _player.speed;
 			_player.y += -sinf(_player.angle) * _player.speed;
+			_player.attackRc = { (float)_player.x + 20, (float)_player.y, (float)_player.x + 85, (float)_player.y + 75 };
 			playerAniName("lea", "attackRightLast");
 			break;
 		case PLAYERDIRECTION::UP:
@@ -655,6 +698,7 @@ void player::playerState()
 			_player.angle = (PI / 180 * 90);
 			_player.x += cosf(_player.angle) * _player.speed;
 			_player.y += -sinf(_player.angle) * _player.speed;
+			_player.attackRc = { (float)_player.x , (float)_player.y - 20, (float)_player.x + 65, (float)_player.y + 15 };
 			playerAniName("lea", "attackUpLast");
 			break;
 		case PLAYERDIRECTION::UP_LEFT:
@@ -666,6 +710,7 @@ void player::playerState()
 			_player.angle = (PI / 180 * 135);
 			_player.x += cosf(_player.angle) * _player.speed;
 			_player.y += -sinf(_player.angle) * _player.speed;
+			_player.attackRc = { (float)_player.x - 20, (float)_player.y - 20, (float)_player.x + 40, (float)_player.y + 55 };
 			playerAniName("lea", "attackUpLeftLast");
 			break;
 		case PLAYERDIRECTION::UP_RIGHT:
@@ -677,7 +722,191 @@ void player::playerState()
 			_player.angle = (PI / 180 * 45);
 			_player.x += cosf(_player.angle) * _player.speed;
 			_player.y += -sinf(_player.angle) * _player.speed;
+			_player.attackRc = { (float)_player.x + 20, (float)_player.y - 20, (float)_player.x + 85, (float)_player.y + 55 };
 			playerAniName("lea", "attackUpRightLast");
+			break;
+		}
+		break;
+	case PLAYERSTATE::PLAYER_DEFENSE:
+		_player.image = IMAGEMANAGER->findImage("leaMove");
+		switch (_player.direction)
+		{
+		case PLAYERDIRECTION::DOWN:
+			_isRight = true;
+			playerAniName("lea", "guardDown");
+			_player.effAni = KEYANIMANAGER->findAnimation("eff", "guardEffDown");
+			_player.effAni->start(false);
+			break;
+		case PLAYERDIRECTION::DOWN_LEFT:
+			_isRight = false;
+			playerAniName("lea", "guardDownRight");
+			_player.effAni = KEYANIMANAGER->findAnimation("eff", "guardEffDownRight");
+			_player.effAni->start(false);
+			break;
+		case PLAYERDIRECTION::DOWN_RIGHT:
+			_isRight = true;
+			playerAniName("lea", "guardDownRight");
+			_player.effAni = KEYANIMANAGER->findAnimation("eff", "guardEffDownRight");
+			_player.effAni->start(false);
+			break;
+		case PLAYERDIRECTION::LEFT:
+			_isRight = false;
+			playerAniName("lea", "guardRight");
+			_player.effAni = KEYANIMANAGER->findAnimation("eff", "guardEffRight");
+			_player.effAni->start(false);
+			break;
+		case PLAYERDIRECTION::RIGHT:
+			_isRight = true;
+			playerAniName("lea", "guardRight");
+			_player.effAni = KEYANIMANAGER->findAnimation("eff", "guardEffRight");
+			_player.effAni->start(false);
+			break;
+		case PLAYERDIRECTION::UP:
+			_isRight = true;
+			playerAniName("lea", "guardUp");
+			_player.effAni = KEYANIMANAGER->findAnimation("eff", "guardEffUp");
+			_player.effAni->start(false);
+			break;
+		case PLAYERDIRECTION::UP_LEFT:
+			_isRight = false;
+			playerAniName("lea", "guardUpRight");
+			_player.effAni = KEYANIMANAGER->findAnimation("eff", "guardEffUpRight");
+			_player.effAni->start(false);
+			break;
+		case PLAYERDIRECTION::UP_RIGHT:
+			_isRight = true;
+			playerAniName("lea", "guardUpRight");
+			_player.effAni = KEYANIMANAGER->findAnimation("eff", "guardEffUpRight");
+			_player.effAni->start(false);
+			break;
+		}
+		break;
+	case PLAYERSTATE::PLAYER_AVOID:
+		_isAvoid = true;
+		_player.image = IMAGEMANAGER->findImage("leaThrow");
+		if (GetTickCount() - _avoidEffTime >= 70)
+		{
+			EFFECTMANAGER->play("avoidEff", _player.x + 30, _player.y + 30);
+			_avoidEffTime = GetTickCount();
+		}
+		switch (_player.direction)
+		{
+		case PLAYERDIRECTION::DOWN:
+			_isRight = true;
+			if(_player.avoidPower >= 0)
+			_player.avoidPower -= 0.25;
+			else _player.avoidPower = 0;
+			_player.angle = (PI / 180 * 270);
+			_player.x += cosf(_player.angle) * _player.avoidPower;
+			_player.y += -sinf(_player.angle) * _player.avoidPower;
+			playerAniName("lea", "avoidDown");
+			break;
+		case PLAYERDIRECTION::DOWN_LEFT:
+			_isRight = true;
+			if (_player.avoidPower >= 0)
+				_player.avoidPower -= 0.25;
+			else _player.avoidPower = 0;
+			_player.angle = (PI / 180 * 225);
+			_player.x += cosf(_player.angle) * _player.avoidPower;
+			_player.y += -sinf(_player.angle) * _player.avoidPower;
+			playerAniName("lea", "avoidDownLeft");
+			break;
+		case PLAYERDIRECTION::DOWN_RIGHT:
+			_isRight = true;
+			if (_player.avoidPower >= 0)
+				_player.avoidPower -= 0.25;
+			else _player.avoidPower = 0;
+			_player.angle = (PI / 180 * 315);
+			_player.x += cosf(_player.angle) * _player.avoidPower;
+			_player.y += -sinf(_player.angle) * _player.avoidPower;
+			playerAniName("lea", "avoidDownRight");
+			break;
+		case PLAYERDIRECTION::LEFT:
+			_isRight = true;
+			if (_player.avoidPower >= 0)
+				_player.avoidPower -= 0.25;
+			else _player.avoidPower = 0;
+			_player.angle = (PI / 180 * 180);
+			_player.x += cosf(_player.angle) * _player.avoidPower;
+			_player.y += -sinf(_player.angle) * _player.avoidPower;
+			playerAniName("lea", "avoidLeft");
+			break;
+		case PLAYERDIRECTION::RIGHT:
+			_isRight = true;
+			if (_player.avoidPower >= 0)
+				_player.avoidPower -= 0.25;
+			else _player.avoidPower = 0;
+			_player.angle = (PI / 180 * 0);
+			_player.x += cosf(_player.angle) * _player.avoidPower;
+			_player.y += -sinf(_player.angle) * _player.avoidPower;
+			playerAniName("lea", "avoidRight");
+			break;
+		case PLAYERDIRECTION::UP:
+			_isRight = true;
+			if (_player.avoidPower >= 0)
+				_player.avoidPower -= 0.25;
+			else _player.avoidPower = 0;
+			_player.angle = (PI / 180 * 90);
+			_player.x += cosf(_player.angle) * _player.avoidPower;
+			_player.y += -sinf(_player.angle) * _player.avoidPower;
+			playerAniName("lea", "avoidUp");
+			break;
+		case PLAYERDIRECTION::UP_LEFT:
+			_isRight = true;
+			if (_player.avoidPower >= 0)
+				_player.avoidPower -= 0.25;
+			else _player.avoidPower = 0;
+			_player.angle = (PI / 180 * 135);
+			_player.x += cosf(_player.angle) * _player.avoidPower;
+			_player.y += -sinf(_player.angle) * _player.avoidPower;
+			playerAniName("lea", "avoidUpLeft");
+			break;
+		case PLAYERDIRECTION::UP_RIGHT:
+			_isRight = true;
+			if (_player.avoidPower >= 0)
+				_player.avoidPower -= 0.25;
+			else _player.avoidPower = 0;
+			_player.angle = (PI / 180 * 45);
+			_player.x += cosf(_player.angle) * _player.avoidPower;
+			_player.y += -sinf(_player.angle) * _player.avoidPower;
+			playerAniName("lea", "avoidUpRight");
+			break;
+		}
+		break;
+	case PLAYERSTATE::PLAYER_ATTACKED:
+		switch (_player.direction)
+		{
+		case PLAYERDIRECTION::DOWN:
+			_isRight = true;
+			playerAniName("lea", "attackedDown");
+			break;
+		case PLAYERDIRECTION::DOWN_LEFT:
+			_isRight = false;
+			playerAniName("lea", "attackedDownLeft");
+			break;
+		case PLAYERDIRECTION::DOWN_RIGHT:
+			_isRight = true;
+			playerAniName("lea", "attackedDownRight");
+			break;
+		case PLAYERDIRECTION::LEFT:
+			_isRight = false;
+			playerAniName("lea", "attackedLeft");
+			break;
+		case PLAYERDIRECTION::RIGHT:
+			_isRight = true;
+			playerAniName("lea", "attackedRight");
+			break;
+		case PLAYERDIRECTION::UP:
+			_isRight = true;
+			playerAniName("lea", "attackedUp");
+			break;
+		case PLAYERDIRECTION::UP_LEFT:
+			_isRight = false;
+			playerAniName("lea", "attackedLeft");
+			break;
+		case PLAYERDIRECTION::UP_RIGHT:
+			_isRight = true;
+			playerAniName("lea", "attackedRight");
 			break;
 		}
 		break;

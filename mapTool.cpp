@@ -169,7 +169,6 @@ void mapTool::render()
 
 
 			
-			
 			switch (_vvTile[i][j]->selectTile)
 			{
 			case STAGE1_1:
@@ -189,6 +188,7 @@ void mapTool::render()
 				break;
 			}
 
+		
 			switch (_vvTile[i][j]->selectOBJ)
 			{
 			case STAGE1_1:
@@ -207,6 +207,7 @@ void mapTool::render()
 				_vvTile[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvTile[i][j]->objFrameX, _vvTile[i][j]->objFrameY);
 				break;
 			}
+			
 			
 		}
 	}
@@ -1107,11 +1108,32 @@ OBJECT mapTool::objSelect(int selectOBJ, int frameX, int frameY)
 		return OBJECT::OBJ_LINE;
 	}
 
-	if (selectOBJ == 1 && ((frameX == 13 && frameY == 2) || (frameX == 14 && frameY == 2) || (frameX == 15 && frameY == 2)
+	if ((selectOBJ == 1 && ((frameX == 13 && frameY == 2) || (frameX == 14 && frameY == 2) || (frameX == 15 && frameY == 2)
 		|| (frameX == 16 && frameY == 3) || (frameX == 17 && frameY == 3)
-		|| (frameX == 16 && frameY == 4) || (frameX == 17 && frameY == 4)))
+		|| (frameX == 16 && frameY == 4) || (frameX == 17 && frameY == 4) || (frameX == 17 && frameY == 4)))
+		|| (selectOBJ == 2 && ((frameX == 2 && frameY == 14) || (frameX == 3 && frameY == 14) || (frameX == 8 && frameY == 14) || (frameX == 9 && frameY == 14)
+								|| (frameX == 2 && frameY == 15) || (frameX == 3 && frameY == 15) || (frameX == 8 && frameY == 15) || (frameX == 9 && frameY == 15)
+								|| (frameX == 2 && frameY == 16) || (frameX == 3 && frameY == 16) || (frameX == 8 && frameY == 16) || (frameX == 9 && frameY == 16))))
 	{
 		return OBJECT::OBJ_LAMP;
+	}
+	
+	if(selectOBJ == 2 && ((frameX == 0 && frameY == 6) || (frameX == 1 && frameY == 6) || (frameX == 2 && frameY == 6) || (frameX == 3 && frameY == 6)
+							|| (frameX == 4 && frameY == 6) || (frameX == 5 && frameY == 6) || (frameX == 6 && frameY == 6) || (frameX == 7 && frameY == 6)
+							|| (frameX == 8 && frameY == 6) || (frameX == 9 && frameY == 6) || (frameX == 10 && frameY == 6) || (frameX == 11 && frameY == 6)
+							|| (frameX == 0 && frameY == 7) || (frameX == 1 && frameY == 7) || (frameX == 2 && frameY == 7) || (frameX == 3 && frameY == 7)
+							|| (frameX == 4 && frameY == 7) || (frameX == 5 && frameY == 7) || (frameX == 6 && frameY == 7) || (frameX == 7 && frameY == 7)
+							|| (frameX == 8 && frameY == 7) || (frameX == 9 && frameY == 7) || (frameX == 10 && frameY == 7) || (frameX == 11 && frameY == 7)
+							|| (frameX == 1 && frameY == 8) || (frameX == 2 && frameY == 8) || (frameX == 3 && frameY == 8) || (frameX == 5 && frameY == 8)
+							|| (frameX == 6 && frameY == 8) || (frameX == 8 && frameY == 8) || (frameX == 9 && frameY == 8) || (frameX == 1 && frameY == 9)
+							|| (frameX == 2 && frameY == 9) || (frameX == 3 && frameY == 9) || (frameX == 4 && frameY == 9) || (frameX == 5 && frameY == 9)
+							|| (frameX == 6 && frameY == 9) || (frameX == 7 && frameY == 9) || (frameX == 8 && frameY == 9) || (frameX == 9 && frameY == 9)
+							|| (frameX == 10 && frameY == 9) || (frameX == 2 && frameY == 10) || (frameX == 3 && frameY == 10) || (frameX == 8 && frameY == 10)
+							|| (frameX == 2 && frameY == 11) || (frameX == 3 && frameY == 11) || (frameX == 8 && frameY == 11) || (frameX == 9 && frameY == 11)
+							|| (frameX == 2 && frameY == 12) || (frameX == 3 && frameY == 12) || (frameX == 8 && frameY == 12) || (frameX == 9 && frameY == 12)
+							|| (frameX == 2 && frameY == 13) || (frameX == 3 && frameY == 13) || (frameX == 8 && frameY == 13) || (frameX == 9 && frameY == 13)))
+	{
+		return OBJECT::OBJ_GATE;
 	}
 
 	return OBJECT::OBJ_NONE;

@@ -73,6 +73,9 @@
     <Filter Include="PlayGround\tileMap">
       <UniqueIdentifier>{0441a450-acb6-4a30-8e0c-6c0e8fe078f5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PlayGround\ui">
+      <UniqueIdentifier>{158172b5-81c0-4fe7-95fb-0efeb05e8f5a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -195,6 +198,24 @@
     <ClInclude Include="stageOneMap.h">
       <Filter>PlayGround\tileMap</Filter>
     </ClInclude>
+    <ClInclude Include="boss.h">
+      <Filter>PlayGround\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="shredder.h">
+      <Filter>PlayGround\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="bossStageMap.h">
+      <Filter>PlayGround\tileMap</Filter>
+    </ClInclude>
+    <ClInclude Include="bossBullet.h">
+      <Filter>PlayGround\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="hedgehog.h">
+      <Filter>PlayGround\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="playerUI.h">
+      <Filter>PlayGround\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -310,6 +331,24 @@
     </ClCompile>
     <ClCompile Include="stageOneMap.cpp">
       <Filter>PlayGround\tileMap</Filter>
+    </ClCompile>
+    <ClCompile Include="boss.cpp">
+      <Filter>PlayGround\enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="shredder.cpp">
+      <Filter>PlayGround\enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="bossStageMap.cpp">
+      <Filter>PlayGround\tileMap</Filter>
+    </ClCompile>
+    <ClCompile Include="bossBullet.cpp">
+      <Filter>PlayGround\enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="hedgehog.cpp">
+      <Filter>PlayGround\enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="playerUI.cpp">
+      <Filter>PlayGround\ui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

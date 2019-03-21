@@ -36,6 +36,7 @@ enum class OBJECT
 	OBJ_PIPE,
 	OBJ_LINE,
 	OBJ_LAMP,
+	OBJ_GATE,
 	OBJ_NONE
 };
 

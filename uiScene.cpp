@@ -13,6 +13,7 @@ uiScene::~uiScene()
 
 HRESULT uiScene::init()
 {
+	IMAGEMANAGER->addImage("uiImage", L"image/intro/optionImage.png", 1024, 768);
 	return S_OK;
 }
 
@@ -26,4 +27,5 @@ void uiScene::update()
 
 void uiScene::render()
 {
+	IMAGEMANAGER->findImage("uiImage")->render(1);
 }

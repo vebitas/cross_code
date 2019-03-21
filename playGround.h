@@ -5,6 +5,7 @@
 #include "uiScene.h"
 #include "mapTool.h"
 #include "stage_1.h"
+#include "bossScene.h"
 
 
 class playGround : public gameNode
@@ -15,6 +16,7 @@ private:
 	uiScene* _uiScene;
 	mapTool*  _mapTool;
 	stage_1* _stage_1;
+	bossScene* _bossScene;
 	HCURSOR _cursor;
 
 public:
@@ -26,4 +28,6 @@ public:
 	virtual void update();
 	virtual void render();
 
+	void enemyImg();
+	void effImg();
 };

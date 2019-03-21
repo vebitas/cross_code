@@ -36,10 +36,15 @@ HRESULT playGround::init()
 	IMAGEMANAGER->addFrameImage("okButton", L"image/tileNode/okButton.png", 144, 48, 3, 1);
 	IMAGEMANAGER->addFrameImage("number", L"image/tileNode/number.png", 144, 48, 3, 1);
 
+	enemyImg();
+	effImg();
+
 	_loadingScene = new loadingScene;
 	_menuScene = new menuScene;
 	_mapTool = new mapTool;
 	_stage_1 = new stage_1;
+	_bossScene = new bossScene;
+	_uiScene = new uiScene;
 	_cursor = LoadCursorFromFile("image/cursor/uiCursor.cur");
 	SetCursor(_cursor);
 
@@ -48,6 +53,7 @@ HRESULT playGround::init()
 	SCENEMANAGER->addScene("uiScene", _uiScene);
 	SCENEMANAGER->addScene("mapTool", _mapTool);
 	SCENEMANAGER->addScene("stage1", _stage_1);
+	SCENEMANAGER->addScene("bossScene", _bossScene);
 
 	SCENEMANAGER->changeScene("stage1");
 	
@@ -77,6 +83,11 @@ void playGround::update()
 	{
 		SCENEMANAGER->changeScene("menuScene");
 	}
+	if (KEYMANAGER->isOnceKeyDown(VK_F4))
+	{
+		SCENEMANAGER->changeScene("uiScene");
+	}
+	
 	KEYANIMANAGER->update();
 	EFFECTMANAGER->update();
 }
@@ -105,9 +116,21 @@ void playGround::render()
 	//D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 140, 20, RGB(0, 0, 0));
 	//swprintf_s(str, L"mouseY : %.2f", _ptMouse.y);								
 	//D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 160, 20, RGB(0, 0, 0));
-	//TIMEMANAGER->render();
+	TIMEMANAGER->render();
 	// Draw 끝 - 이 코드가 빠지면 D2D 출력 X
 	D2DMANAGER->endDraw();
+}
+
+void playGround::enemyImg()
+{
+	IMAGEMANAGER->addFrameImage("hog", L"image/enemy/hedgehog.png", 800, 256, 10, 4);
+}
+
+void playGround::effImg()
+{
+	EFFECTMANAGER->addEffect("hit", "image/effect/hit.png", 512, 128, 64, 64, 5, 0.05, 30);
+	EFFECTMANAGER->addEffect("deadEff", "image/effect/deadEff.png", 252, 177, 63, 59, 5, 0.05, 30);
+	EFFECTMANAGER->addEffect("summon", "image/effect/summons.png", 280, 216, 40, 216, 5, 0.04, 30);
 }
 
 

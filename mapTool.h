@@ -124,9 +124,11 @@ public:
 	void buttonUpdate();
 	void buttonRender();
 
-	void increaseX();												//콜백함수 맵 x,y축 증가
+	//콜백함수 맵 x,y축 증가
+	void increaseX();											
 	void increaseY();
-	void decreaseX();												//콜백함수 맵 x,y축 감소
+	//콜백함수 맵 x,y축 감소
+	void decreaseX();												
 	void decreaseY();
 
 	void mapSaveLoad();

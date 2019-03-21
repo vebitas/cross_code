@@ -13,27 +13,6 @@ stageOneMap::~stageOneMap()
 
 HRESULT stageOneMap::init()
 {
-	//IMAGEMANAGER->addFrameImage("stage1_1", L"image/tileNode/stage1_1.png", 1024, 608, SAMPLETILEX, SAMPLETILEY);
-	//IMAGEMANAGER->addFrameImage("stage1_2", L"image/tileNode/stage1_2.png", 1024, 608, SAMPLETILEX, SAMPLETILEY);
-	//IMAGEMANAGER->addFrameImage("stage1_3", L"image/tileNode/stage1_3.png", 1024, 608, SAMPLETILEX, SAMPLETILEY);
-	//IMAGEMANAGER->addFrameImage("stage2", L"image/tileNode/stage2.png", 1024, 608, SAMPLETILEX, SAMPLETILEY);
-	//IMAGEMANAGER->addFrameImage("bossStage", L"image/tileNode/bossStage.png", 1024, 608, SAMPLETILEX, SAMPLETILEY);
-	//IMAGEMANAGER->addFrameImage("stage1_1(mini)", L"image/tileNode/stage1_1(mini).png", 128, 76, SAMPLETILEX, SAMPLETILEY);
-	//IMAGEMANAGER->addFrameImage("stage1_2(mini)", L"image/tileNode/stage1_2(mini).png", 128, 76, SAMPLETILEX, SAMPLETILEY);
-	//IMAGEMANAGER->addFrameImage("stage1_3(mini)", L"image/tileNode/stage1_3(mini).png", 128, 76, SAMPLETILEX, SAMPLETILEY);
-	//IMAGEMANAGER->addFrameImage("stage2(mini)", L"image/tileNode/stage2(mini).png", 128, 76, SAMPLETILEX, SAMPLETILEY);
-	//IMAGEMANAGER->addFrameImage("bossStage(mini)", L"image/tileNode/bossStage(mini).png", 128, 76, SAMPLETILEX, SAMPLETILEY);
-	//IMAGEMANAGER->addImage("mapToolBackground", L"image/tileNode/mapToolBackground.png", WINSIZEX, WINSIZEY);
-	//IMAGEMANAGER->addImage("build_LR", L"image/tileNode/build_LR.png", 64, 830);
-	//IMAGEMANAGER->addImage("build_UD", L"image/tileNode/build_UD.png", 750, 64);
-	//IMAGEMANAGER->addFrameImage("button", L"image/tileNode/button.png", 150, 200, 3, 4);
-	//IMAGEMANAGER->addFrameImage("button2", L"image/tileNode/button_2.png", 375, 250, 3, 5);
-	//IMAGEMANAGER->addFrameImage("textXY", L"image/tileNode/textXY.png", 96, 48, 2, 1);
-	//IMAGEMANAGER->addImage("textMap", L"image/tileNode/textMap.png", 96, 48);
-	//IMAGEMANAGER->addImage("window", L"image/tileNode/window.png", 300, 300);
-	//IMAGEMANAGER->addFrameImage("okButton", L"image/tileNode/okButton.png", 144, 48, 3, 1);
-	//IMAGEMANAGER->addFrameImage("number", L"image/tileNode/number.png", 144, 48, 3, 1);
-
 	load();
 	return S_OK;
 }
@@ -58,6 +37,7 @@ void stageOneMap::render()
 			if (j < 0) continue;
 			if (i < 0) continue;
 
+			
 			switch (_vvMap[i][j]->selectTile)
 			{
 			case STAGE1_1:
@@ -77,25 +57,25 @@ void stageOneMap::render()
 				break;
 			}
 
+
 			switch (_vvMap[i][j]->selectOBJ)
 			{
-			case STAGE1_1:
-				_vvMap[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvMap[i][j]->objFrameX, _vvMap[i][j]->objFrameY);
-				break;
-			case STAGE1_2:
-				_vvMap[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvMap[i][j]->objFrameX, _vvMap[i][j]->objFrameY);
-				break;
-			case STAGE1_3:
-				_vvMap[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvMap[i][j]->objFrameX, _vvMap[i][j]->objFrameY);
-				break;
-			case STAGE2:
-				_vvMap[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvMap[i][j]->objFrameX, _vvMap[i][j]->objFrameY);
-				break;
-			case BOSS_STAGE:
-				_vvMap[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvMap[i][j]->objFrameX, _vvMap[i][j]->objFrameY);
-				break;
+				case STAGE1_1:
+					_vvMap[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvMap[i][j]->objFrameX, _vvMap[i][j]->objFrameY);
+					break;
+				case STAGE1_2:
+					_vvMap[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvMap[i][j]->objFrameX, _vvMap[i][j]->objFrameY);
+					break;
+				case STAGE1_3:
+					_vvMap[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvMap[i][j]->objFrameX, _vvMap[i][j]->objFrameY);
+					break;
+				case STAGE2:
+					_vvMap[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvMap[i][j]->objFrameX, _vvMap[i][j]->objFrameY);
+					break;
+				case BOSS_STAGE:
+					_vvMap[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvMap[i][j]->objFrameX, _vvMap[i][j]->objFrameY);
+					break;
 			}
-
 		}
 	}
 }
@@ -166,6 +146,7 @@ void stageOneMap::load()
 			_vvMap[i][j]->setTerrainFrameX(trFrameX);
 			_vvMap[i][j]->setTerrainFrameY(trFrameY);
 			_vvMap[i][j]->setSelectOBJ(selectOBJ);
+
 	
 			if (selectTile == 0)
 			{
@@ -208,7 +189,103 @@ void stageOneMap::load()
 			{
 				_vvMap[i][j]->objImg = IMAGEMANAGER->findImage("bossStage");
 			}
+
+			if (_vvMap[i][j]->selectTile == 1 && ((_vvMap[i][j]->terrainFrameX == 0 && _vvMap[i][j]->terrainFrameY == 3) || (_vvMap[i][j]->terrainFrameX == 0 && _vvMap[i][j]->terrainFrameY == 4)
+				|| (_vvMap[i][j]->terrainFrameX == 2 && _vvMap[i][j]->terrainFrameY == 4) || (_vvMap[i][j]->terrainFrameX == 1 && _vvMap[i][j]->terrainFrameY == 4)
+				|| (_vvMap[i][j]->terrainFrameX == 2 && _vvMap[i][j]->terrainFrameY == 5) || (_vvMap[i][j]->terrainFrameX == 1 && _vvMap[i][j]->terrainFrameY == 5)
+				|| (_vvMap[i][j]->terrainFrameX == 3 && _vvMap[i][j]->terrainFrameY == 4) || (_vvMap[i][j]->terrainFrameX == 4 && _vvMap[i][j]->terrainFrameY == 4)
+				|| (_vvMap[i][j]->terrainFrameX == 3 && _vvMap[i][j]->terrainFrameY == 5) || (_vvMap[i][j]->terrainFrameX == 4 && _vvMap[i][j]->terrainFrameY == 5)
+				|| (_vvMap[i][j]->terrainFrameX == 5 && _vvMap[i][j]->terrainFrameY == 3)
+				|| (_vvMap[i][j]->terrainFrameX == 5 && _vvMap[i][j]->terrainFrameY == 4)))
+			{
+				_vvMap[i][j]->setTerrain(TERRAIN::TR_FOREST);
+			}
+			else
+			{
+				_vvMap[i][j]->setTerrain(TERRAIN::TR_FLOOR);
+			}
+
+
+			if (_vvMap[i][j]->selectOBJ == 0 && ((_vvMap[i][j]->objFrameX == 6 && _vvMap[i][j]->objFrameY == 4) || (_vvMap[i][j]->objFrameX == 7 && _vvMap[i][j]->objFrameY == 4) || (_vvMap[i][j]->objFrameX == 8 && _vvMap[i][j]->objFrameY == 4)
+				|| (_vvMap[i][j]->objFrameX == 6 && _vvMap[i][j]->objFrameY == 5) || (_vvMap[i][j]->objFrameX == 8 && _vvMap[i][j]->objFrameY == 5)
+				|| (_vvMap[i][j]->objFrameX == 6 && _vvMap[i][j]->objFrameY == 6) || (_vvMap[i][j]->objFrameX == 7 && _vvMap[i][j]->objFrameY == 6) || (_vvMap[i][j]->objFrameX == 8 && _vvMap[i][j]->objFrameY == 6)
+				|| (_vvMap[i][j]->objFrameX == 6 && _vvMap[i][j]->objFrameY == 7) || (_vvMap[i][j]->objFrameX == 7 && _vvMap[i][j]->objFrameY == 7) || (_vvMap[i][j]->objFrameX == 8 && _vvMap[i][j]->objFrameY == 7) || (_vvMap[i][j]->objFrameX == 9 && _vvMap[i][j]->objFrameY == 7)
+				|| (_vvMap[i][j]->objFrameX == 6 && _vvMap[i][j]->objFrameY == 8) || (_vvMap[i][j]->objFrameX == 7 && _vvMap[i][j]->objFrameY == 8) || (_vvMap[i][j]->objFrameX == 8 && _vvMap[i][j]->objFrameY == 8) || (_vvMap[i][j]->objFrameX == 9 && _vvMap[i][j]->objFrameY == 8)))
+			{
+				_vvMap[i][j]->setObject(OBJECT::OBJ_LINE);
+			}
+			else if ((_vvMap[i][j]->selectOBJ == 1 && ((_vvMap[i][j]->objFrameX == 13 && _vvMap[i][j]->objFrameY == 2) || (_vvMap[i][j]->objFrameX == 14 && _vvMap[i][j]->objFrameY == 2) || (_vvMap[i][j]->objFrameX == 15 && _vvMap[i][j]->objFrameY == 2)
+				|| (_vvMap[i][j]->objFrameX == 16 && _vvMap[i][j]->objFrameY == 3) || (_vvMap[i][j]->objFrameX == 17 && _vvMap[i][j]->objFrameY == 3)
+				|| (_vvMap[i][j]->objFrameX == 16 && _vvMap[i][j]->objFrameY == 4) || (_vvMap[i][j]->objFrameX == 17 && _vvMap[i][j]->objFrameY == 4) || (_vvMap[i][j]->objFrameX == 17 && _vvMap[i][j]->objFrameY == 4)))
+				|| (_vvMap[i][j]->selectOBJ == 2 && ((_vvMap[i][j]->objFrameX == 2 && _vvMap[i][j]->objFrameY == 14) || (_vvMap[i][j]->objFrameX == 3 && _vvMap[i][j]->objFrameY == 14) || (_vvMap[i][j]->objFrameX == 8 && _vvMap[i][j]->objFrameY == 14) || (_vvMap[i][j]->objFrameX == 9 && _vvMap[i][j]->objFrameY == 14)
+					|| (_vvMap[i][j]->objFrameX == 2 && _vvMap[i][j]->objFrameY == 15) || (_vvMap[i][j]->objFrameX == 3 && _vvMap[i][j]->objFrameY == 15) || (_vvMap[i][j]->objFrameX == 8 && _vvMap[i][j]->objFrameY == 15) || (_vvMap[i][j]->objFrameX == 9 && _vvMap[i][j]->objFrameY == 15)
+					|| (_vvMap[i][j]->objFrameX == 2 && _vvMap[i][j]->objFrameY == 16) || (_vvMap[i][j]->objFrameX == 3 && _vvMap[i][j]->objFrameY == 16) || (_vvMap[i][j]->objFrameX == 8 && _vvMap[i][j]->objFrameY == 16) || (_vvMap[i][j]->objFrameX == 9 && _vvMap[i][j]->objFrameY == 16))))
+			{
+				_vvMap[i][j]->setObject(OBJECT::OBJ_LAMP);
+			}
+			else if ((_vvMap[i][j]->selectOBJ == 2 && ((_vvMap[i][j]->objFrameX == 0 && _vvMap[i][j]->objFrameY == 6) || (_vvMap[i][j]->objFrameX == 1 && _vvMap[i][j]->objFrameY == 6) || (_vvMap[i][j]->objFrameX == 2 && _vvMap[i][j]->objFrameY == 6) || (_vvMap[i][j]->objFrameX == 3 && _vvMap[i][j]->objFrameY == 6)
+				|| (_vvMap[i][j]->objFrameX == 4 && _vvMap[i][j]->objFrameY == 6) || (_vvMap[i][j]->objFrameX == 5 && _vvMap[i][j]->objFrameY == 6) || (_vvMap[i][j]->objFrameX == 6 && _vvMap[i][j]->objFrameY == 6) || (_vvMap[i][j]->objFrameX == 7 && _vvMap[i][j]->objFrameY == 6)
+				|| (_vvMap[i][j]->objFrameX == 8 && _vvMap[i][j]->objFrameY == 6) || (_vvMap[i][j]->objFrameX == 9 && _vvMap[i][j]->objFrameY == 6) || (_vvMap[i][j]->objFrameX == 10 && _vvMap[i][j]->objFrameY == 6) || (_vvMap[i][j]->objFrameX == 11 && _vvMap[i][j]->objFrameY == 6)
+				|| (_vvMap[i][j]->objFrameX == 0 && _vvMap[i][j]->objFrameY == 7) || (_vvMap[i][j]->objFrameX == 1 && _vvMap[i][j]->objFrameY == 7) || (_vvMap[i][j]->objFrameX == 2 && _vvMap[i][j]->objFrameY == 7) || (_vvMap[i][j]->objFrameX == 3 && _vvMap[i][j]->objFrameY == 7)
+				|| (_vvMap[i][j]->objFrameX == 4 && _vvMap[i][j]->objFrameY == 7) || (_vvMap[i][j]->objFrameX == 5 && _vvMap[i][j]->objFrameY == 7) || (_vvMap[i][j]->objFrameX == 6 && _vvMap[i][j]->objFrameY == 7) || (_vvMap[i][j]->objFrameX == 7 && _vvMap[i][j]->objFrameY == 7)
+				|| (_vvMap[i][j]->objFrameX == 8 && _vvMap[i][j]->objFrameY == 7) || (_vvMap[i][j]->objFrameX == 9 && _vvMap[i][j]->objFrameY == 7) || (_vvMap[i][j]->objFrameX == 10 && _vvMap[i][j]->objFrameY == 7) || (_vvMap[i][j]->objFrameX == 11 && _vvMap[i][j]->objFrameY == 7)
+				|| (_vvMap[i][j]->objFrameX == 1 && _vvMap[i][j]->objFrameY == 8) || (_vvMap[i][j]->objFrameX == 2 && _vvMap[i][j]->objFrameY == 8) || (_vvMap[i][j]->objFrameX == 3 && _vvMap[i][j]->objFrameY == 8) || (_vvMap[i][j]->objFrameX == 5 && _vvMap[i][j]->objFrameY == 8)
+				|| (_vvMap[i][j]->objFrameX == 6 && _vvMap[i][j]->objFrameY == 8) || (_vvMap[i][j]->objFrameX == 8 && _vvMap[i][j]->objFrameY == 8) || (_vvMap[i][j]->objFrameX == 9 && _vvMap[i][j]->objFrameY == 8) || (_vvMap[i][j]->objFrameX == 1 && _vvMap[i][j]->objFrameY == 9)
+				|| (_vvMap[i][j]->objFrameX == 2 && _vvMap[i][j]->objFrameY == 9) || (_vvMap[i][j]->objFrameX == 3 && _vvMap[i][j]->objFrameY == 9) || (_vvMap[i][j]->objFrameX == 4 && _vvMap[i][j]->objFrameY == 9) || (_vvMap[i][j]->objFrameX == 5 && _vvMap[i][j]->objFrameY == 9)
+				|| (_vvMap[i][j]->objFrameX == 6 && _vvMap[i][j]->objFrameY == 9) || (_vvMap[i][j]->objFrameX == 7 && _vvMap[i][j]->objFrameY == 9) || (_vvMap[i][j]->objFrameX == 8 && _vvMap[i][j]->objFrameY == 9) || (_vvMap[i][j]->objFrameX == 9 && _vvMap[i][j]->objFrameY == 9)
+				|| (_vvMap[i][j]->objFrameX == 10 && _vvMap[i][j]->objFrameY == 9) || (_vvMap[i][j]->objFrameX == 2 && _vvMap[i][j]->objFrameY == 10) || (_vvMap[i][j]->objFrameX == 3 && _vvMap[i][j]->objFrameY == 10) || (_vvMap[i][j]->objFrameX == 8 && _vvMap[i][j]->objFrameY == 10)
+				|| (_vvMap[i][j]->objFrameX == 2 && _vvMap[i][j]->objFrameY == 11) || (_vvMap[i][j]->objFrameX == 3 && _vvMap[i][j]->objFrameY == 11) || (_vvMap[i][j]->objFrameX == 8 && _vvMap[i][j]->objFrameY == 11) || (_vvMap[i][j]->objFrameX == 9 && _vvMap[i][j]->objFrameY == 11)
+				|| (_vvMap[i][j]->objFrameX == 2 && _vvMap[i][j]->objFrameY == 12) || (_vvMap[i][j]->objFrameX == 3 && _vvMap[i][j]->objFrameY == 12) || (_vvMap[i][j]->objFrameX == 8 && _vvMap[i][j]->objFrameY == 12) || (_vvMap[i][j]->objFrameX == 9 && _vvMap[i][j]->objFrameY == 12)
+				|| (_vvMap[i][j]->objFrameX == 2 && _vvMap[i][j]->objFrameY == 13) || (_vvMap[i][j]->objFrameX == 3 && _vvMap[i][j]->objFrameY == 13) || (_vvMap[i][j]->objFrameX == 8 && _vvMap[i][j]->objFrameY == 13) || (_vvMap[i][j]->objFrameX == 9 && _vvMap[i][j]->objFrameY == 13)))
+				||(_vvMap[i][j]->selectOBJ == 1 && (_vvMap[i][j]->objFrameX == 13 && _vvMap[i][j]->objFrameY == 0) || (_vvMap[i][j]->objFrameX == 14 && _vvMap[i][j]->objFrameY == 0) || (_vvMap[i][j]->objFrameX == 15 && _vvMap[i][j]->objFrameY == 0)
+					|| (_vvMap[i][j]->objFrameX == 13 && _vvMap[i][j]->objFrameY == 1) || (_vvMap[i][j]->objFrameX == 14 && _vvMap[i][j]->objFrameY == 1) || (_vvMap[i][j]->objFrameX == 15 && _vvMap[i][j]->objFrameY == 1)
+					|| (_vvMap[i][j]->objFrameX == 16 && _vvMap[i][j]->objFrameY == 0) || (_vvMap[i][j]->objFrameX == 17 && _vvMap[i][j]->objFrameY == 0)
+					|| (_vvMap[i][j]->objFrameX == 16 && _vvMap[i][j]->objFrameY == 1) || (_vvMap[i][j]->objFrameX == 17 && _vvMap[i][j]->objFrameY == 1)
+					|| (_vvMap[i][j]->objFrameX == 16 && _vvMap[i][j]->objFrameY == 2) || (_vvMap[i][j]->objFrameX == 17 && _vvMap[i][j]->objFrameY == 2)
+					|| (_vvMap[i][j]->objFrameX == 16 && _vvMap[i][j]->objFrameY == 3) || (_vvMap[i][j]->objFrameX == 17 && _vvMap[i][j]->objFrameY == 3)))
+			{
+				_vvMap[i][j]->setObject(OBJECT::OBJ_GATE);
+			}
+			else
+			{
+				_vvMap[i][j]->setObject(OBJECT::OBJ_NONE);
+			}
 		}
 	}
 	CloseHandle(file);
+}
+
+void stageOneMap::zOrder()
+{
+	for (int i = 0; i < TILEY; i++)			//Å¸ÀÏ¸Ê 
+	{
+		for (int j = 0; j < TILEX; j++)
+		{
+			if (j >= TILEX) continue;
+			if (i >= TILEY) continue;
+			if (j < 0) continue;
+			if (i < 0) continue;
+			if (_vvMap[i][j]->obj == OBJECT::OBJ_GATE)
+			{
+				switch (_vvMap[i][j]->selectOBJ)
+				{
+				case STAGE1_1:
+					_vvMap[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvMap[i][j]->objFrameX, _vvMap[i][j]->objFrameY);
+					break;
+				case STAGE1_2:
+					_vvMap[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvMap[i][j]->objFrameX, _vvMap[i][j]->objFrameY);
+					break;
+				case STAGE1_3:
+					_vvMap[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvMap[i][j]->objFrameX, _vvMap[i][j]->objFrameY);
+					break;
+				case STAGE2:
+					_vvMap[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvMap[i][j]->objFrameX, _vvMap[i][j]->objFrameY);
+					break;
+				case BOSS_STAGE:
+					_vvMap[i][j]->objImg->frameRender(j * TILESIZE, i * TILESIZE, _vvMap[i][j]->objFrameX, _vvMap[i][j]->objFrameY);
+					break;
+				}
+			}
+		}
+	}
 }

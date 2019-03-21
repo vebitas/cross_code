@@ -15,10 +15,10 @@ HRESULT player::init()
 {
 	
 	IMAGEMANAGER->addFrameImage("leaMove", L"image/player/move.png", 1040, 1235, 16, 19);
-	IMAGEMANAGER->addFrameImage("leaThrow", L"image/player/throw.png", 520, 1105, 8, 17);
+	IMAGEMANAGER->addFrameImage("leaThrow", L"image/player/throw.png", 520, 1235, 8, 19);
 	IMAGEMANAGER->addFrameImage("attackNormal", L"image/effect/sweep_normal.png", 400, 150, 4, 2);
 	IMAGEMANAGER->addFrameImage("attackNormalR", L"image/effect/sweep_normal_R.png", 400, 150, 4, 2);
-	IMAGEMANAGER->addFrameImage("attackNormalF", L"image/effect/sweep_normal_Last.png", 240, 42, 4, 1);
+	//IMAGEMANAGER->addFrameImage("attackNormalF", L"image/effect/sweep_normal_Last.png", 240, 42, 4, 1);
 	IMAGEMANAGER->addFrameImage("attackFire", L"image/effect/sweep_fire.png", 400, 150, 4, 2);
 	IMAGEMANAGER->addFrameImage("attackFireR", L"image/effect/sweep_fire_R.png", 400, 150, 4, 2);
 	IMAGEMANAGER->addFrameImage("attackIce", L"image/effect/sweep_water.png", 400, 150, 4, 2);
@@ -29,12 +29,17 @@ HRESULT player::init()
 	IMAGEMANAGER->addFrameImage("attackWaveR", L"image/effect/sweep_wave_R.png", 400, 150, 4, 2);
 	IMAGEMANAGER->addFrameImage("bullet", L"image/effect/ball.png", 520, 320, 13, 8);
 	IMAGEMANAGER->addFrameImage("bulletN", L"image/effect/ball_N_E.png", 160, 16, 10, 1);
+	IMAGEMANAGER->addFrameImage("guard", L"image/effect/guard.png", 512, 512, 8, 8);
+	EFFECTMANAGER->addEffect("attackNormalF", "image/effect/sweep_normal_Last.png", 240, 42, 60, 42, 5, 0.05, 20);
+	EFFECTMANAGER->addEffect("avoidEff", "image/effect/player_avoid.png", 300, 51, 50, 51, 7, 0.05, 20);
 	EFFECTMANAGER->addEffect("circle", "image/effect/circle.png", 900, 300, 300, 300, 7, 0.05, 20);
+	EFFECTMANAGER->addEffect("moveEff", "image/effect/player_move.png", 150, 23, 30, 23, 6, 0.04, 20);
+	
 	
 	_player.bullet = new playerBullet;
 	_player.bullet->init("bullet", 1000, 500);
 
-
+	_player.effImage = IMAGEMANAGER->findImage("guard");
 	_player.image = IMAGEMANAGER->findImage("leaMove");
 	_player.x = GAMESIZEX / 2;
 	_player.y = GAMESIZEY / 2;
@@ -43,22 +48,25 @@ HRESULT player::init()
 	_player.alphaValue = 1;
 	_player.direction = PLAYERDIRECTION::DOWN;
 	_player.state = PLAYERSTATE::PLAYER_IDLE;
-
+	_player.avoidPower = 10;
+	_avoidFPS = 0;
 	
 	_effectPlay = false;
 	_isLea = true;
 	_isRight = false;
 	_isMove = false;
 	_isThrowAttack = false;
+	_isAvoid = false;
 
 	_effectCount = 0;
 	_effectAngle = 0;
 	_effPos.x = 0;
 	_effPos.y = 0;
 	_effSelect = 0;
+	_effCount = 0;
 
 	_player.rc = { (float)_player.x, (float)_player.y , (float)_player.x + 30, (float)_player.y + 30 };
-
+	_player.attackRc = { (float)_player.x, (float)_player.y, (float)_player.x + 30, (float)_player.y + 30 };
 	_attackRangeRc = { (float)_player.x, (float)_player.y, (float)150, (float)150 };
 	_cursorChangeEll = EllipseMake(_player.x, _player.y, 130);
 	_throwCount = 0;
@@ -73,6 +81,9 @@ HRESULT player::init()
 	_attackTimeKeyDown = GetTickCount();
 	_attackTimeKeyUp = GetTickCount();
 	_attackComboTime = GetTickCount();
+	_avoidTime = GetTickCount();
+	_avoidEffTime = GetTickCount();
+	_moveEffTime = GetTickCount();
 
 	_attackComboCount = 0;
 
@@ -118,6 +129,7 @@ void player::update()
 		_effSelect = 4;
 	}
 
+	_player.attackRc = { (float)_player.x + 20, (float)_player.y + 20, (float)_player.x + 40, (float)_player.y + 40 };
 	playerState();
 	_cursorChangeEll = EllipseMake(_player.x + 30, _player.y + 30, 150);
 	_attackRangeRc = { (float)_player.x + 30, (float) _player.y + 30, (float)150, (float)150 };
@@ -128,13 +140,25 @@ void player::update()
 void player::render()
 {
 	//D2DMANAGER->fillEllipse(RGB(255, 0, 255), _attackRangeRc);
+	if (_player.state == PLAYERSTATE::PLAYER_DEFENSE && (_player.direction == UP || _player.direction == UP_RIGHT || _player.direction == UP_LEFT))
+	{
+		if (_isRight)
+		{
+			_player.effImage->aniRender(_player.x + _effPos.x, _player.y + _effPos.y, _player.effAni, 1);
+		}
+		else
+		{
+			_player.effImage->aniRenderReverseX(_player.x + _effPos.x, _player.y + _effPos.y, _player.effAni, 1);
+		}
+
+	}
 	if (_isRight)
 	{
-		_player.image->aniRender(_player.x, _player.y, _player.motion);
+		_player.image->aniRender(_player.x, _player.y, _player.motion, 1);
 	}
 	else
 	{
-		_player.image->aniRenderReverseX(_player.x, _player.y, _player.motion);
+		_player.image->aniRenderReverseX(_player.x, _player.y, _player.motion, 1);
 	}
 	if (_effectPlay)
 	{
@@ -151,28 +175,41 @@ void player::render()
 	{
 		_player.bullet->render();
 	}
+	if (_player.state == PLAYERSTATE::PLAYER_DEFENSE && !(_player.direction == UP || _player.direction == UP_RIGHT || _player.direction == UP_LEFT))
+	{
+		if (_isRight)
+		{
+			_player.effImage->aniRender(_player.x + _effPos.x, _player.y + _effPos.y, _player.effAni, 1);
+		}
+		else
+		{
+			_player.effImage->aniRenderReverseX(_player.x + _effPos.x, _player.y + _effPos.y, _player.effAni, 1);
+		}
+
+	}
+	//D2DMANAGER->fillRectangle(RGB(255, 255, 255), _player.attackRc);
+	
 	
 	WCHAR str[128]; 
-	swprintf_s(str, L"플레이어 상태 : %d", _effectAngle);
+	swprintf_s(str, L"플레이어 상태 : %d", _player.state);
 	D2DMANAGER->drawText(str, CAMERA->getCameraX() + 200, CAMERA->getCameraY() + 20, 20, RGB(255, 255, 255));
-	swprintf_s(str, L"플레이어  : %d", _effectFrameY);
-	D2DMANAGER->drawText(str, CAMERA->getCameraX() + 200, CAMERA->getCameraY() + 40, 20, RGB(255, 255, 255));
-	swprintf_s(str, L"playerX : %f", _player.x);
-	D2DMANAGER->drawText(str, CAMERA->getCameraX() + 200, CAMERA->getCameraY() + 60, 20, RGB(255, 255, 255));
-	swprintf_s(str, L"playerY : %f", _player.y);
-	D2DMANAGER->drawText(str, CAMERA->getCameraX() + 200, CAMERA->getCameraY() + 70, 20, RGB(255, 255, 255));
-	for (int i = 0; i < 4; i++)
-	{
-		swprintf_s(str, L"%d : %d", i , _breakCheck[i]);
-		D2DMANAGER->drawText(str, CAMERA->getCameraX() + 200, CAMERA->getCameraY() + 90 + (i * 20), 20, RGB(255, 255, 255));
-	}
-	D2DMANAGER->drawRectangle(_player.rc);
-	EFFECTMANAGER->render(0);
+	//swprintf_s(str, L"플레이어  : %d", _effectFrameY);
+	//D2DMANAGER->drawText(str, CAMERA->getCameraX() + 200, CAMERA->getCameraY() + 40, 20, RGB(255, 255, 255));
+	//swprintf_s(str, L"playerX : %f", _player.x);
+	//D2DMANAGER->drawText(str, CAMERA->getCameraX() + 200, CAMERA->getCameraY() + 60, 20, RGB(255, 255, 255));
+	//swprintf_s(str, L"playerY : %f", _player.y);
+	//D2DMANAGER->drawText(str, CAMERA->getCameraX() + 200, CAMERA->getCameraY() + 70, 20, RGB(255, 255, 255));
+	//for (int i = 0; i < 4; i++)
+	//{
+	//	swprintf_s(str, L"%d : %d", i , _breakCheck[i]);
+	//	D2DMANAGER->drawText(str, CAMERA->getCameraX() + 200, CAMERA->getCameraY() + 90 + (i * 20), 20, RGB(255, 255, 255));
+	//}
+	D2DMANAGER->drawRectangle(RGB(255,0,255), _player.rc);
+	//EFFECTMANAGER->render(0);
 }
 
 void player::keyAniInit()
 {
-	KEYANIMANAGER->deleteAll();
 	//아무것도 안할때
 	int idleUp[] = { 1 };
 	KEYANIMANAGER->addArrayFrameAnimation("lea", "idleUp", "leaMove", idleUp, 1, PLAYERFPS, true);
@@ -289,7 +326,58 @@ void player::keyAniInit()
 	KEYANIMANAGER->addArrayFrameAnimation("lea", "attackDownRight", "leaThrow", attackDownRight, 5, 18, false, cbAttack, this);
 	int attackDownRightLast[] = { 4, 3, 1, 0, 7, 5, 35, 43, 51, 59};
 	KEYANIMANAGER->addArrayFrameAnimation("lea", "attackDownRightLast", "leaThrow", attackDownRightLast, 10, 18, false, cbAttack, this);
+	//가드
+	int guardUp[] = { 89, 90, 91 };
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "guardUp", "leaMove", guardUp, 3, PLAYERFPS, true);
+	int guardUpRight[] = { 105, 106, 107 };
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "guardUpRight", "leaMove", guardUpRight, 3, PLAYERFPS, true);
+	int guardRight[] = { 121, 122, 123 };
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "guardRight", "leaMove", guardRight, 3, PLAYERFPS, true);
+	int guardDownRight[] = { 137, 138, 139 };
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "guardDownRight", "leaMove", guardDownRight, 3, PLAYERFPS, true);
+	int guardDown[] = { 153, 154, 155 };
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "guardDown", "leaMove", guardDown, 3, PLAYERFPS, true);
+	//가드효과
+	int guardEffUp[] = { 0, 1, 2 };
+	KEYANIMANAGER->addArrayFrameAnimation("eff", "guardEffUp", "guard", guardEffUp, 3, PLAYERFPS, true);
+	int guardEffUpRight[] = { 8, 9, 10 };
+	KEYANIMANAGER->addArrayFrameAnimation("eff", "guardEffUpRight", "guard", guardEffUpRight, 3, PLAYERFPS, true);
+	int guardEffRight[] = { 16, 17, 18 };
+	KEYANIMANAGER->addArrayFrameAnimation("eff", "guardEffRight", "guard", guardEffRight, 3, PLAYERFPS, true);
+	int guardEffDownRight[] = { 32, 33, 34 };
+	KEYANIMANAGER->addArrayFrameAnimation("eff", "guardEffDownRight", "guard", guardEffDownRight, 3, PLAYERFPS, true);
+	int guardEffDown[] = { 40, 41, 42 };
+	KEYANIMANAGER->addArrayFrameAnimation("eff", "guardEffDown", "guard", guardEffDown, 3, PLAYERFPS, true);
+	//회피
+	int avoidLeft[] = { 5, 4, 3, 2, 1, 0, 7, 141, 140};
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "avoidLeft", "leaThrow", avoidLeft, 9, PLAYERFPS + 5 + _avoidFPS, false, cbAvoid, this);
+	int avoidUpLeft[] = { 6, 5, 4, 3, 2, 0, 6, 137, 136};
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "avoidUpLeft", "leaThrow", avoidUpLeft, 9, PLAYERFPS + 5 + _avoidFPS, false, cbAvoid, this);
+	int avoidDownLeft[] = { 4, 3, 2, 1, 0, 6, 4, 145, 144} ;
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "avoidDownLeft", "leaThrow", avoidDownLeft, 9, PLAYERFPS + 5 + _avoidFPS, false, cbAvoid, this);
+	int avoidUpRight[] = { 0, 7, 6, 5, 4, 2, 0, 134, 135};
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "avoidUpRight", "leaThrow", avoidUpRight, 9, PLAYERFPS + 5 + _avoidFPS, false, cbAvoid, this);
+	int avoidDownRight[] = {2, 1, 0, 7, 6, 4, 2, 142, 143};
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "avoidDownRight", "leaThrow", avoidDownRight, 9, PLAYERFPS + 5 + _avoidFPS, false, cbAvoid, this);
+	int avoidUp[] = { 7, 6, 5, 4, 2, 1, 7, 130, 131};
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "avoidUp", "leaThrow", avoidUp, 9, PLAYERFPS + 5 + _avoidFPS, false, cbAvoid, this);
+	int avoidRight[] = { 1, 0, 7, 6, 5, 3, 1, 138, 139};
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "avoidRight", "leaThrow", avoidRight, 9, PLAYERFPS + 5 + _avoidFPS, false, cbAvoid, this);
+	int avoidDown[] = { 3, 2, 1, 0, 6, 5, 3, 146, 147};
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "avoidDown", "leaThrow", avoidDown, 9, PLAYERFPS + 5 + _avoidFPS, false, cbAvoid, this);
+	//맞은 상태
+	int attackedUp[] = { 14, 15 };
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "attackedUp", "leaMove", attackedUp, 2, PLAYERFPS, true);
+	int attackedUpRight[] = { 30, 31 };
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "attackedUpRight", "leaMove", attackedUpRight, 2, PLAYERFPS, true);
+	int attackedRight[] = { 46, 47 };
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "attackedRight", "leaMove", attackedRight, 2, PLAYERFPS, true);
+	int attackedDownRight[] = { 62, 63 };
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "attackedDownRight", "leaMove", attackedDownRight, 2, PLAYERFPS, true);
+	int attackedDown[] = { 78, 79 };
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "attackedDown", "leaMove", attackedDown, 2, PLAYERFPS, true);
 
+	_player.effAni = KEYANIMANAGER->findAnimation("eff", "guardEffUp");
 	_player.motion = KEYANIMANAGER->findAnimation("lea", "idleDown");
 }
 
@@ -351,13 +439,6 @@ void player::setType()
 	}
 }
 
-void player::tileCheck()
-{
-	D2D1_RECT_F rcCollision;
-	D2D1_RECT_F rc;
-
-	//rcCollision
-}
 
 // 마우스 위치에 따른 방향전환
 void player::attackAngle(bool stayOn)
@@ -479,4 +560,12 @@ void player::cbAttack(void * obj)
 
 	playerAttack->setEffectPlay(false);
 	playerAttack->setPlayerState(PLAYERSTATE::PLAYER_IDLE);
+}
+
+void player::cbAvoid(void * obj)
+{
+	player* playerEvasion = (player*)obj;
+	playerEvasion->setPlayerState(PLAYERSTATE::PLAYER_IDLE);
+
+	playerEvasion->setIsAvoid(false);
 }

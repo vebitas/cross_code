@@ -46,7 +46,7 @@ void button::update(float x, float y)
 	if (PtInRect(&_rc, p))
 	{
 		_direction = BUTTONDIRECTION_COLLISION;
-		if (KEYMANAGER->isStayKeyDown(VK_LBUTTON) )
+		if (KEYMANAGER->isStayKeyDown(VK_LBUTTON))
 		{
 			_direction = BUTTONDIRECTION_DOWN;
 		}

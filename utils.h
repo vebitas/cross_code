@@ -89,6 +89,8 @@ namespace TEAM_15DUCK_UTILL
 
 	float getAngle2(float x, float y, float x2, float y2);
 
+	float getAngle3(float x1, float y1, float x2, float y2);
+
 	//원두개 박아서 각도받아오기 아크탄젠트 반환형 디그리
 	float dGetAngle(POINTF target, POINTF p);
 

@@ -95,6 +95,7 @@ public:
 
 
 	void frameRenderAngle(float destX, float destY, int currentFrameX, int currentFrameY, float angle, float alpha = 1.0f);
+	void frameRenderAngle(float destX, float destY, int showWidth, int showHeight, int currentFrameX, int currentFrameY, float angle, float alpha = 1.0f);
 
 	//변형 크기 프레임렌더 - 그려줄 x, y 좌표, 출력할 너비, 출력할 높이, 가로 방향 프레임 인덱스, 세로 방향 프레임 인덱스, 투명도
 	void frameRender(float destX, float destY, int showWidth, int showHeight, int currentFrameX, int currentFrameY, float alpha = 1.0f);
@@ -105,14 +106,19 @@ public:
 
 	//좌우반전
 	void frameRenderReverseX(float destX, float destY, int currentFrameX, int currentFrameY, float alpha = 1.0f);
-	void frameRenderReverseX(float destX, float destY, int showWidth, int showHeight, int currentFrameX, int currentFrameY, float alpha = 1.0f);
+	void frameRenderReverseX(float destX, float destY, int showWidth, int showHeight, int currentFrameX, int currentFrameY, float anglefloat, float alpha = 1.0f);
+	void frameRenderReverseAngle(float destX, float destY, int showWidth, int showHeight, int currentFrameX, int currentFrameY, float angle, float alpha = 1.0f);
+	
+
 
 	//루프 렌더 - 수정 필요
 	void loopRender(D2D1_RECT_F drawArea, int offSetX = 0, int offSetY = 0, float opacity = 1.0f);
 
 	void aniRender(int destX, int destY, animation* ani);
+	void aniRender(int destX, int destY, animation* ani, float alpha = 1.0f);
 	void aniRenderAngle(int destX, int destY, animation * ani, float angle);
 	void aniRenderReverseX(int destX, int destY, animation* ani);
+	void aniRenderReverseX(int destX, int destY, animation* ani, float alpha = 1.0f);
 
 	
 	//===================================================================

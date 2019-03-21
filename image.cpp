@@ -163,6 +163,13 @@ void image::frameRenderAngle(float destX, float destY, int currentFrameX, int cu
 	D2DMANAGER->_renderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
 }
 
+void image::frameRenderAngle(float destX, float destY, int showWidth, int showHeight, int currentFrameX, int currentFrameY, float angle, float alpha)
+{
+	D2DMANAGER->_renderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(angle, Point2F(destX - CAMERA->getCameraX() + _imageInfo->frameWidth / 2, destY - CAMERA->getCameraY() + _imageInfo->frameHeight / 2)));
+	frameRender(destX, destY, showWidth, showHeight, currentFrameX, currentFrameY, alpha);
+	D2DMANAGER->_renderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+}
+
 void image::frameRender(float destX, float destY, int showWidth, int showHeight, int currentFrameX, int currentFrameY, float alpha)
 {
 	POINTFLOAT pf = GetRenderPosition(destX, destY);
@@ -212,7 +219,14 @@ void image::frameRenderReverseX(float destX, float destY, int currentFrameX, int
 	frameRenderReverseX(destX, destY, _imageInfo->frameWidth, _imageInfo->frameHeight, currentFrameX, currentFrameY, alpha);
 }
 
-void image::frameRenderReverseX(float destX, float destY, int showWidth, int showHeight, int currentFrameX, int currentFrameY, float alpha)
+void image::frameRenderReverseAngle(float destX, float destY, int showWidth, int showHeight, int currentFrameX, int currentFrameY, float angle, float alpha)
+{
+	
+	frameRenderReverseX(destX, destY, showHeight, showHeight, currentFrameX, currentFrameY, angle, alpha);
+	D2DMANAGER->_renderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+}
+
+void image::frameRenderReverseX(float destX, float destY, int showWidth, int showHeight, int currentFrameX, int currentFrameY, float angle, float alpha)
 {
 
 	POINTFLOAT pf = GetRenderPosition(destX, destY);
@@ -221,11 +235,14 @@ void image::frameRenderReverseX(float destX, float destY, int showWidth, int sho
 	{
 		if (!IsRnderPositionInWindow(pf, showWidth, showHeight))
 			return;
-
 		D2D1_SIZE_F size;
 		size.width = -1;
 		size.height = 1;
-		D2DMANAGER->_renderTarget->SetTransform(D2D1::Matrix3x2F::Scale(size, Point2F(destX - CAMERA->getCameraX() + _imageInfo->frameWidth / 2, destY - CAMERA->getCameraY() + _imageInfo->frameHeight / 2)));
+		Matrix3x2F scaleMat = D2D1::Matrix3x2F::Scale(size, Point2F(destX - CAMERA->getCameraX() + 60 + _imageInfo->frameWidth / 2, destY - CAMERA->getCameraY() + 60 + _imageInfo->frameHeight / 2));
+		Matrix3x2F rotationMat = D2D1::Matrix3x2F::Rotation(angle, Point2F(destX - CAMERA->getCameraX() + 60 + _imageInfo->frameWidth / 2, destY - CAMERA->getCameraY() + 60 + _imageInfo->frameHeight / 2));
+		
+		D2DMANAGER->_renderTarget->SetTransform(scaleMat * rotationMat);
+		
 		D2D1_RECT_F dxArea = RectF(pf.x, pf.y, pf.x + showWidth, pf.y + showHeight);
 		D2D1_RECT_F dxArea2 = RectF(currentFrameX * _imageInfo->frameWidth
 			, currentFrameY * _imageInfo->frameHeight
@@ -237,8 +254,11 @@ void image::frameRenderReverseX(float destX, float destY, int showWidth, int sho
 			, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR
 			, dxArea2);
 		D2DMANAGER->_renderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+
 	}
 }
+
+
 
 void image::loopRender(D2D1_RECT_F drawArea, int offSetX, int offSetY, float opacity)
 {
@@ -312,9 +332,14 @@ void image::aniRender(int destX, int destY, animation * ani)
 	render(destX, destY, ani->getFramePos().x, ani->getFramePos().y, ani->getFrameWidth(), ani->getFrameHeight());
 }
 
+void image::aniRender(int destX, int destY, animation * ani, float alpha)
+{
+	render(destX, destY, ani->getFramePos().x, ani->getFramePos().y, ani->getFrameWidth(), ani->getFrameHeight(), alpha);
+}
+
 void image::aniRenderAngle(int destX, int destY, animation * ani, float angle)
 {
-	D2DMANAGER->_renderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(angle, Point2F(destX + _imageInfo->frameWidth / 2, destY + _imageInfo->frameHeight / 2)));
+	D2DMANAGER->_renderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(angle, Point2F(destX - CAMERA->getCameraX() + _imageInfo->frameWidth / 2, destY - CAMERA->getCameraY() + _imageInfo->frameHeight / 2)));
 	render(destX, destY, ani->getFramePos().x, ani->getFramePos().y, ani->getFrameWidth(), ani->getFrameHeight());
 	D2DMANAGER->_renderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
 }
@@ -327,6 +352,17 @@ void image::aniRenderReverseX(int destX, int destY, animation * ani)
 	//D2DMANAGER->_renderTarget->SetTransform(D2D1::Matrix3x2F::Scale(size, Point2F(destX + _imageInfo->frameWidth / 2, destY + _imageInfo->frameHeight / 2)));
 	D2DMANAGER->_renderTarget->SetTransform(D2D1::Matrix3x2F::Scale(size, Point2F(destX - CAMERA->getCameraX() + _imageInfo->frameWidth / 2, destY - CAMERA->getCameraY() + _imageInfo->frameHeight / 2)));
 	render(destX, destY, ani->getFramePos().x, ani->getFramePos().y, ani->getFrameWidth(), ani->getFrameHeight());
+	D2DMANAGER->_renderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+}
+
+void image::aniRenderReverseX(int destX, int destY, animation * ani, float alpha)
+{
+	D2D1_SIZE_F size;
+	size.width = -1;
+	size.height = 1;
+	//D2DMANAGER->_renderTarget->SetTransform(D2D1::Matrix3x2F::Scale(size, Point2F(destX + _imageInfo->frameWidth / 2, destY + _imageInfo->frameHeight / 2)));
+	D2DMANAGER->_renderTarget->SetTransform(D2D1::Matrix3x2F::Scale(size, Point2F(destX - CAMERA->getCameraX() + _imageInfo->frameWidth / 2, destY - CAMERA->getCameraY() + _imageInfo->frameHeight / 2)));
+	render(destX, destY, ani->getFramePos().x, ani->getFramePos().y, ani->getFrameWidth(), ani->getFrameHeight(), alpha);
 	D2DMANAGER->_renderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
 }
 
