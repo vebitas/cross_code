@@ -114,11 +114,11 @@ public:
 	void update();
 	void render();
 	
-	void setTile();													//타일 초기값
-	void pickSampleTile();											//클릭한 샘플타일 프레임 번호 저장
-	void setMap();													//클릭한 맵에다 저장한 프레임 번호를 맵타일 프레임에 넣어줌
-	void spDragMod();												//드래그 모드함수
-	void tilePreview();												//선택된 타일 미리보기
+	void setTile();										//타일 초기값
+	void pickSampleTile();								//클릭한 샘플타일 프레임 번호 저장
+	void setMap();										//클릭한 맵에다 저장한 프레임 번호를 맵타일 프레임에 넣어줌
+	void spDragMod();									//드래그 모드함수
+	void tilePreview();									//선택된 타일 미리보기
 
 	void buttonInit();
 	void buttonUpdate();
@@ -138,10 +138,10 @@ public:
 	void imageSelect(int idX, int idY, int mapSelect, bool isTR);
 
 
-	function<void(void)> _increaseXMap;
-	function<void(void)> _increaseYMap;
-	function<void(void)> _decreaseXMap;
-	function<void(void)> _decreaseYMap;
+	function<void(void)> _increaseXMap;					//x타일증가
+	function<void(void)> _increaseYMap;					//y타일증가
+	function<void(void)> _decreaseXMap;					//x타일감소
+	function<void(void)> _decreaseYMap;					//y타일감소
 
 	static void cbMapPageAdd();
 	static void cbMapPageSub();

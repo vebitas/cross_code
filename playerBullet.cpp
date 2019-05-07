@@ -18,7 +18,7 @@ HRESULT playerBullet::init(const char* imageName, float range, int bulletMax)
 	
 	_effPos.x = 0;
 	_effPos.y = 0;
-	_pang = false;
+	_explosion = false;
 
 	EFFECTMANAGER->addEffect("ballN_E", "image/effect/ball_N_E.png", 160, 32, 32, 32, 5, 0.05, 20);
 	IMAGEMANAGER->addFrameImage("ballN_E", L"image/effect/ball_N_E.png", 160, 16, 10, 1);
@@ -44,8 +44,9 @@ void playerBullet::render()
 	for (_viPlayerBullet = _vPlayerBullet.begin(); _viPlayerBullet != _vPlayerBullet.end(); _viPlayerBullet++)
 	{
 		//D2DMANAGER->fillRectangle(RGB(255, 0, 255), _viPlayerBullet->rc);
-		_viPlayerBullet->image->aniRenderAngle(_viPlayerBullet->x, _viPlayerBullet->y, _viPlayerBullet->ani, _viPlayerBullet->imgAngle);
+		_viPlayerBullet->image->aniRenderAngle(_viPlayerBullet->x, _viPlayerBullet->y, _viPlayerBullet->ani, -(_viPlayerBullet->angle * (180/ PI)) + 90);
 	}
+	
 }
 
 void playerBullet::move()
@@ -66,37 +67,54 @@ void playerBullet::move()
 		{
 			_effPos.x = _viPlayerBullet->x + 15;
 			_effPos.y = _viPlayerBullet->y + 15;
-			_pang = true;
+			_explosion = true;
 			_viPlayerBullet = _vPlayerBullet.erase(_viPlayerBullet); 
+
+		}
+		else if (_viPlayerBullet->isPowerBullet == true && _viPlayerBullet->ballCount >= 3)
+		{
+			_effPos.x = _viPlayerBullet->x + 15;
+			_effPos.y = _viPlayerBullet->y + 15;
+			SOUNDMANAGER->play("throwE_1", 1);
+			EFFECTMANAGER->play("ballN_E", _effPos.x, _effPos.y);
+			_viPlayerBullet = _vPlayerBullet.erase(_viPlayerBullet);
 		}
 		else
 		{
 			_viPlayerBullet++;
 		}	
 	}
-
-	if (_pang)
+	if (_explosion)
 	{
+		SOUNDMANAGER->play("throwE_1", 1);
 		EFFECTMANAGER->play( "ballN_E", _effPos.x, _effPos.y);
-		_pang = false;
+		_explosion = false;
 	}
 }
 
-void playerBullet::bulletFire(float x, float y, float angle, float imgAngle, float speed, bool holdShot)
+void playerBullet::bulletFire(float x, float y, float angle, float imgAngle,float speed, bool holdShot)
 {
 	if (_playerBulletMax < _vPlayerBullet.size()) return;
 
 	tagPlayerBullet bullet;
 	bullet.image = IMAGEMANAGER->findImage(_imageName);
-	if(holdShot)
+	if (holdShot)
+	{
+		bullet.isPowerBullet = true;
 		bullet.ani = KEYANIMANAGER->findAnimation("playerBullet", "bullet");
+	}
 	else
+	{
+		bullet.isPowerBullet = false;
 		bullet.ani = KEYANIMANAGER->findAnimation("playerBullet", "bulletN");
+	}
 	bullet.x = bullet.fireX = x;
 	bullet.y = bullet.fireY = y;
 	bullet.angle = angle;
 	bullet.imgAngle = imgAngle;
 	bullet.speed = speed;
+	bullet.ballCount = 0;
+	
 	bullet.radius = bullet.image->GetFrameWidth() / 2;
 	bullet.rc = { (float)x, (float)y, (float)x + bullet.image->GetFrameWidth() / 2, (float)y + bullet.image->GetFrameHeight() / 2 };
 	bullet.isCollision = false;

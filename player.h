@@ -1,5 +1,6 @@
 #pragma once
 #include "gameNode.h"
+#include "playerUI.h"
 #include "playerBullet.h"
 
 #define PLAYERFPS 13
@@ -21,12 +22,9 @@ enum PLAYERSTATE
 	PLAYER_DEFENSE,
 	PLAYER_AVOID,
 	PLAYER_ATTACKED,
-	PLAYER_JUMP,
-	PLAYER_LEVELUP,
-	PLAYER_DEATH,
-	PLAYER_SKILL_1,
-	PLAYER_SKILL_2,
-	PLAYER_SKILL_3
+	PLAYER_TELEPORT, 
+	PLAYER_CHARGE,
+	PLAYER_SKILL_FIRE,
 };
 enum PLAYERDIRECTION
 {
@@ -65,7 +63,7 @@ struct tagPlayer
 	int maxMP;
 	int damage;
 	int money;
-	int alphaValue;
+	float alphaValue;
 	int level;
 	int exp;
 	int maxExp;
@@ -78,7 +76,9 @@ private:
 	D2D1_ELLIPSE _attackRangeRc;
 	ELLIPSE _cursorChangeEll;
 	image* _effect;
+	playerUI* _playerUI;
 	HCURSOR _cursor;
+	HCURSOR _cursor2;
 
 	POINT _effPos;
 	int _effectFrameX, _effectFrameY;
@@ -89,12 +89,21 @@ private:
 	bool _effCopy;
 	bool _effectPlay;
 
+	int _playerAlphaCount;
+	float _effSpeed;
+
 	bool _isAttack;
 	bool _isThrowAttack;
 	bool _isMove;
 	bool _isLea;
 	bool _isRight;
 	bool _isAvoid;
+	bool _isAttacked;
+	bool _isCharge;
+	bool _isSkill;
+	bool _effSkillStart;
+
+	int _effOldTime;
 
 	bool _nobKey[4];
 
@@ -117,7 +126,12 @@ private:
 	int _avoidFPS;
 	int _avoidEffTime;
 	int _moveEffTime;
+	
+	int _attackedOldTime;
 
+	POINTF _skillStartPos;
+	bool _skillMove;
+	bool _skillEff;
 
 
 public:
@@ -127,7 +141,7 @@ public:
 	HRESULT init();
 	void release();
 	void update();
-	void render();
+	void render(bool uiRender);
 
 	void keyAniInit();
 	void effectInit();
@@ -147,6 +161,7 @@ public:
 	static void cbThrowAim(void* obj);
 	static void cbAttack(void* obj);
 	static void cbAvoid(void* obj);
+	static void cbSkillFire(void* obj);
 
 public:
 	//================ 접근자 설정자 ====================
@@ -167,6 +182,8 @@ public:
 	int getPlayerMaxHP() { return _player.maxHP;}
 	bool getIsThorowAttack() { return _isThrowAttack; }
 	bool getIsAttack() { return _isAttack; }
+	bool getIsAttacked() { return _isAttacked; }
+	bool getIsSkill() { return _isSkill; }
 
 	void setEffectPlay(bool effectPlay) { _effectPlay = effectPlay; }
 
@@ -182,10 +199,14 @@ public:
 	void setPlayerAngle(float angle) { _player.angle = angle; }
 	void setPlayerIdX(int idX) { _player.idX = idX; }
 	void setPlayerIdY(int idY) { _player.idY = idY; }
-
+	void setPlayerHP(int hp) { _player.HP = hp; }
+	void setEffSpeed(float speed) { _effSpeed = speed; }
 
 	void setIsThrowAttack(bool isThrowAttack) { _isThrowAttack = isThrowAttack; }
 	void setIsAttack(bool isAttack) { _isAttack = isAttack; }
 	void setIsAvoid(bool isAvoid) { _isAvoid = isAvoid; }
+	void setIsSkill(bool isSkill) { _isSkill = isSkill; }
+	void setIsSkillMove(bool isSkillMove) { _skillMove = isSkillMove; }
+	void setSkillEff(bool skillEff) { _skillEff = skillEff; }
 };
 

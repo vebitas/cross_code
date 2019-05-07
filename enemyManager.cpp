@@ -12,53 +12,69 @@ enemyManager::~enemyManager()
 
 HRESULT enemyManager::init()
 {
-	
+	_turretBullet = new turretBullet;
+	_turretBullet->init("turretBullet", 600, 200);
 	_hogDirctionPatten = _hogStatePatten = _hogOldTime = _randNum = 0;
+	
+	_botOldTime[0] = _botDirctionPatten = _botStatePatten = 0;
+	_botOldTime[1] = _botOldTime[2] = 0;
 	_hogAttack = false;
-	setHedgehog();
+
+	_tretRandNum = 0;
+
 	return S_OK;
 }
 
 void enemyManager::release()
 {
-	for (_viShredder = _vShredder.begin(); _viShredder != _vShredder.end(); _viShredder++)
+	for (_viTurret = _vTurret.begin(); _viTurret != _vTurret.end(); _viTurret++)
 	{
-		SAFE_DELETE((*_viShredder));
+		SAFE_DELETE((*_viTurret));
 	}
 	for (_viHedgehog = _vHedgehog.begin(); _viHedgehog != _vHedgehog.end(); _viHedgehog++)
 	{
 		SAFE_DELETE((*_viHedgehog));
 	}
+	for (_viEasyBot = _vEasyBot.begin(); _viEasyBot != _vEasyBot.end(); _viEasyBot++)
+	{
+		SAFE_DELETE((*_viEasyBot));
+	}
+	SAFE_DELETE(_turretBullet);
 }
 
-void enemyManager::update()
+void enemyManager::update(float playerX, float playerY)
 {
-	for (_viShredder = _vShredder.begin(); _viShredder != _vShredder.end(); _viShredder++)
+	for (_viTurret = _vTurret.begin(); _viTurret != _vTurret.end(); _viTurret++)
 	{
-		(*_viShredder)->update();
+		(*_viTurret)->update(playerX, playerY);
 	}
 	for (_viHedgehog = _vHedgehog.begin(); _viHedgehog != _vHedgehog.end(); _viHedgehog++)
 	{
 		(*_viHedgehog)->update();
-
+	}
+	for (_viEasyBot = _vEasyBot.begin(); _viEasyBot != _vEasyBot.end(); _viEasyBot++)
+	{
+		(*_viEasyBot)->update();
 	}
 	enemyDeath();
+	_turretBullet->update();
 }
 
 void enemyManager::render(float alpha)
 {
-	for (_viShredder = _vShredder.begin(); _viShredder != _vShredder.end(); _viShredder++)
+	for (_viTurret = _vTurret.begin(); _viTurret != _vTurret.end(); _viTurret++)
 	{
-		(*_viShredder)->render();
+		(*_viTurret)->render(alpha);
 	}
 	for (_viHedgehog = _vHedgehog.begin(); _viHedgehog != _vHedgehog.end(); _viHedgehog++)
 	{
 		(*_viHedgehog)->render(alpha);
-		WCHAR str[128];
-		swprintf_s(str, L"Á×À½»óÅÂ : %d", (*_viHedgehog)->getEnemyDeath());
-		D2DMANAGER->drawText(str, CAMERA->getCameraX() + 100, CAMERA->getCameraY() + 200, 20, RGB(0, 0, 0));
-	
 	}
+	for (_viEasyBot = _vEasyBot.begin(); _viEasyBot != _vEasyBot.end(); _viEasyBot++)
+	{
+		(*_viEasyBot)->render(alpha);
+	}
+	_turretBullet->render();
 }
 
 void enemyManager::setHedgehog()
@@ -73,6 +89,54 @@ void enemyManager::setHedgehog()
 			hog->init("hog", "hog", 475 + (j * 400), 250 + (i * 100), 0, 0);
 			_vHedgehog.push_back(hog);
 		}
+	}
+}
+
+void enemyManager::setEasyBot()
+{
+	easyBot* bot;
+	bot = new easyBot;
+
+	bot->init("easyBot", "easyBot", 200 , 200, 0, 0);
+	_vEasyBot.push_back(bot);
+	
+	easyBot* bot2;
+	bot2 = new easyBot;
+
+	bot2->init("easyBot", "easyBot", 350, 800, 0, 0);
+	_vEasyBot.push_back(bot2);
+
+	easyBot* bot3;
+	bot3 = new easyBot;
+
+	bot3->init("easyBot", "easyBot", 600, 500, 0, 0);
+	_vEasyBot.push_back(bot3);
+
+}
+
+void enemyManager::setTurret()
+{
+	for (int i = 0; i < 3; i++)
+	{
+		turret* tret;
+		tret = new turret;
+		tret->init("turret", "turret", 860 + (i * 150), 250, 0, 0);
+		_vTurret.push_back(tret);
+	}
+	
+	for (int i = 0; i < 2; i++)
+	{
+		turret* tret;
+		tret = new turret;
+		tret->init("turret", "turret", 1200 + (i * 150), 650, 0, 0);
+		_vTurret.push_back(tret);
+	}
+	for (int i = 0; i < 2; i++)
+	{
+		turret* tret;
+		tret = new turret;
+		tret->init("turret", "turret", 850 + (i * 150), 850, 0, 0);
+		_vTurret.push_back(tret);
 	}
 }
 
@@ -229,14 +293,176 @@ void enemyManager::hogAI(float playerX, float playerY)
 	}
 }
 
+void enemyManager::esayBotAI(float playerX, float playerY, D2D1_RECT_F playerRc)
+{
+	
+	for (int i = 0; i < _vEasyBot.size(); i++)
+	{
+		RECT rc;
+		if(IntersectRect(&rc, &makeRECT(_vEasyBot[i]->getEnemyRangeRc()), &makeRECT(playerRc)))
+		{
+			if (!(_vEasyBot[i]->getEnemyState() == ENEMYSTATE::BOT_ATTACKED))
+			{
+				_vEasyBot[i]->setEnemyState(ENEMYSTATE::BOT_RED_MODE);
+				if (GetTickCount() - _botAttackTime[i] >= 1 * 300)
+				{
+					_vEasyBot[i]->setEnemyState(ENEMYSTATE::BOT_ATTACK);
+					_vEasyBot[i]->setEnemyAngle(getAngle2(_vEasyBot[i]->getEnemyPosX(), _vEasyBot[i]->getEnemyPosY(), playerX, playerY));
+				}
+			}
+		}
+		else 
+		{
+			if (GetTickCount() - _botOldTime[i] >= 1 * 500)
+			{
+				if (!(_vEasyBot[i]->getEnemyState() == ENEMYSTATE::BOT_ATTACKED))
+				{
+					_botStatePatten = RND->getFromIntTo(0, 3);
+					_botDirctionPatten = RND->getFromIntTo(0, 6);
+					_botOldTime[i] = GetTickCount();
+
+					if (_vEasyBot[i]->getEnemyIsAttack() == false)
+					{
+						switch (_botStatePatten)
+						{
+						case 0:
+							_vEasyBot[i]->setEnemyState(ENEMYSTATE::BOT_IDLE);
+							switch (_botDirctionPatten)
+							{
+							case 0:
+								_vEasyBot[i]->setEnemyDirection(ENEMYDIRECTION::BOT_UP_RIGHT);
+								break;
+							case 1:
+								_vEasyBot[i]->setEnemyDirection(ENEMYDIRECTION::BOT_RIGHT);
+								break;
+							case 2:
+								_vEasyBot[i]->setEnemyDirection(ENEMYDIRECTION::BOT_DOWN_RIGHT);
+								break;
+							case 3:
+								_vEasyBot[i]->setEnemyDirection(ENEMYDIRECTION::BOT_UP_LEFT);
+								break;
+							case 4:
+								_vEasyBot[i]->setEnemyDirection(ENEMYDIRECTION::BOT_LEFT);
+								break;
+							case 5:
+								_vEasyBot[i]->setEnemyDirection(ENEMYDIRECTION::BOT_DOWN_LEFT);
+								break;
+							}
+							break;
+						case 1:
+							_vEasyBot[i]->setEnemyState(ENEMYSTATE::BOT_MOVE);
+							switch (_botDirctionPatten)
+							{
+							case 0:
+								_vEasyBot[i]->setEnemyDirection(ENEMYDIRECTION::BOT_UP_RIGHT);
+								break;
+							case 1:
+								_vEasyBot[i]->setEnemyDirection(ENEMYDIRECTION::BOT_RIGHT);
+								break;
+							case 2:
+								_vEasyBot[i]->setEnemyDirection(ENEMYDIRECTION::BOT_DOWN_RIGHT);
+								break;
+							case 3:
+								_vEasyBot[i]->setEnemyDirection(ENEMYDIRECTION::BOT_UP_LEFT);
+								break;
+							case 4:
+								_vEasyBot[i]->setEnemyDirection(ENEMYDIRECTION::BOT_LEFT);
+								break;
+							case 5:
+								_vEasyBot[i]->setEnemyDirection(ENEMYDIRECTION::BOT_DOWN_LEFT);
+								break;
+							}
+							break;
+						}
+					}
+					
+				}
+			}
+			_botAttackTime[i] = GetTickCount();
+		}
+		if (GetTickCount() - _botAttatedTime >= 300)
+		{
+			if (_vEasyBot[i]->getEnemyState() == ENEMYSTATE::BOT_ATTACKED)
+			{
+				_vEasyBot[i]->setEnemyState(ENEMYSTATE::BOT_IDLE);
+				_botAttatedTime = GetTickCount();
+				_botAttackTime[i] = GetTickCount();
+			}
+		}
+	}
+	
+}
+
+void enemyManager::turretAI(float playerX, float playerY, D2D1_RECT_F playerRc)
+{
+	RECT rc;
+	for (int i = 0; i < _vTurret.size(); i++)
+	{
+		if (IntersectRect(&rc, &makeRECT(_vTurret[i]->getEnemyRangeRc()), &makeRECT(playerRc)))
+		{
+			_tretRandNum = RND->getFromIntTo(0, 3);
+			if (GetTickCount() - _tretAttackTime[i] >= 500)
+			{
+				_tretAttackTime[i] = GetTickCount();
+				if (!(_tretRandNum == 0))
+				{
+					if (!(_vTurret[i]->getEnemyState() == ENEMYSTATE::TURRET_ATTACK))
+					{
+						_vTurret[i]->setEnemyState(ENEMYSTATE::TURRET_ATTACK);
+						_turretBullet->bulletFire(_vTurret[i]->getEnemyRc().left + 2, _vTurret[i]->getEnemyRc().top + 2, getAngle2(playerX, playerY, _vTurret[i]->getEnemyPosX(), _vTurret[i]->getEnemyPosY()), 10.0f);
+					}
+					else
+					{
+						_vTurret[i]->setEnemyState(ENEMYSTATE::TURRET_IDLE);
+					}
+				}
+			}
+		}
+		else
+		{
+			_vTurret[i]->setEnemyState(ENEMYSTATE::TURRET_IDLE);
+		}
+	}
+	
+}
+
+
 void enemyManager::enemyDeath()
 {
+	for (int i = 0; i < _vTurret.size();)
+	{
+		if (_vTurret[i]->getEnemyHP() <= 0)
+		{
+			EFFECTMANAGER->play("deadEff", _vTurret[i]->getEnemyPosX() + 30, _vTurret[i]->getEnemyPosY() + 10);
+			SOUNDMANAGER->play("enemyDeath", 1);
+			_vTurret.erase(_vTurret.begin() + i);
+		}
+		else
+		{
+			i++;
+		}
+	}
 	for (int i = 0; i < _vHedgehog.size();)
 	{
 		if (_vHedgehog[i]->getEnemyHP() <= 0)
 		{
 			EFFECTMANAGER->play("deadEff", _vHedgehog[i]->getEnemyPosX() + 30, _vHedgehog[i]->getEnemyPosY() + 10);
+			SOUNDMANAGER->play("enemyDeath", 1);
 			_vHedgehog.erase(_vHedgehog.begin() + i);
+		}
+		else
+		{
+			i++;
+		}
+	}
+
+	for (int i = 0; i < _vEasyBot.size();)
+	{
+		if (_vEasyBot[i]->getEnemyHP() <= 0)
+		{
+			SOUNDMANAGER->play("enemyDeath", 1);
+			EFFECTMANAGER->play("deadEff", _vEasyBot[i]->getEnemyPosX() + 30, _vEasyBot[i]->getEnemyPosY() + 10);
+			_vEasyBot.erase(_vEasyBot.begin() + i);
 		}
 		else
 		{

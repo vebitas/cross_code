@@ -162,9 +162,6 @@
     <ClInclude Include="mapTool.h">
       <Filter>PlayGround\scene\mapTool</Filter>
     </ClInclude>
-    <ClInclude Include="enemy.h">
-      <Filter>PlayGround\enemy</Filter>
-    </ClInclude>
     <ClInclude Include="enemyManager.h">
       <Filter>PlayGround\enemy</Filter>
     </ClInclude>
@@ -215,6 +212,21 @@
     </ClInclude>
     <ClInclude Include="playerUI.h">
       <Filter>PlayGround\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="stageTwoMap.h">
+      <Filter>PlayGround\tileMap</Filter>
+    </ClInclude>
+    <ClInclude Include="easyBot.h">
+      <Filter>PlayGround\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="enemy.h">
+      <Filter>PlayGround\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="turret.h">
+      <Filter>PlayGround\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="turretBullet.h">
+      <Filter>PlayGround\enemy</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -349,6 +361,18 @@
     </ClCompile>
     <ClCompile Include="playerUI.cpp">
       <Filter>PlayGround\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="stageTwoMap.cpp">
+      <Filter>PlayGround\tileMap</Filter>
+    </ClCompile>
+    <ClCompile Include="easyBot.cpp">
+      <Filter>PlayGround\enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="turret.cpp">
+      <Filter>PlayGround\enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="turretBullet.cpp">
+      <Filter>PlayGround\enemy</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

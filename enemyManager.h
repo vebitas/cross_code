@@ -3,6 +3,9 @@
 #include "boss.h"
 #include "shredder.h"
 #include "hedgehog.h"
+#include "easyBot.h"
+#include "turret.h"
+#include "turretBullet.h"
 
 class enemyManager : public gameNode
 {
@@ -10,16 +13,29 @@ private:
 	//º¸½º
 	boss* _boss;
 	//°©¿Ê¸ó½ºÅÍ
-	vector<shredder*> _vShredder;
-	vector<shredder*>::iterator _viShredder;
+	vector<turret*> _vTurret;
+	vector<turret*>::iterator _viTurret;
 	//°í½¿µµÄ¡
 	vector<hedgehog*> _vHedgehog;
 	vector<hedgehog*>::iterator _viHedgehog;
+	//ÀÌÁöº¿
+	vector<easyBot*> _vEasyBot;
+	vector<easyBot*>::iterator _viEasyBot;
 
+	turretBullet* _turretBullet;
+	//°í½¿µµÄ¡ AI º¯¼ö
 	int _hogOldTime, _hogDirctionPatten, _hogStatePatten;
 	int _randNum;
 	int _hogAttackTime;
 	int _hogAttatedTime;
+	//º¿ AI º¯¼ö
+	int _botOldTime[3], _botDirctionPatten, _botStatePatten;
+	int _botAttackTime[3];
+	int _botAttatedTime;
+	//ÅÍ·¿ AI º¯¼ö
+	int _tretRandNum;
+	int _tretAttackTime[8];
+
 	bool _hogAttack;
 
 public:
@@ -28,11 +44,15 @@ public:
 
 	HRESULT init();
 	void release();
-	void update();
+	void update(float playerX, float playerY);
 	void render(float alpha);
 
 	void setHedgehog();
+	void setEasyBot();
+	void setTurret();
 	void hogAI(float playerX, float playerY);
+	void esayBotAI(float playerX, float playerY, D2D1_RECT_F playerRc);
+	void turretAI(float playerX, float playerY, D2D1_RECT_F playerRc);
 	void enemyDeath();
 
 public:
@@ -40,7 +60,17 @@ public:
 	vector<hedgehog*> getVHog() { return _vHedgehog; }
 	vector<hedgehog*>* setVHog() { return &_vHedgehog; }
 
+	vector<easyBot*> getVBot() { return _vEasyBot; }
+	vector<easyBot*>* setVBot() { return &_vEasyBot; }
+
+	vector<turret*> getVTurret() { return _vTurret; }
+	vector<turret*>* setVTurret() { return &_vTurret; }
+
+	turretBullet* getTurretBullet() { return _turretBullet; }
+
 	void setHogAttack(bool attack) { _hogAttack = attack; }
+
+
 
 private:
 	//³»ºÎÇÔ¼ö

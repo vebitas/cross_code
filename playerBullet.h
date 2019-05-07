@@ -15,7 +15,10 @@ struct tagPlayerBullet
 	float imgAngle;
 	float radius;
 	float speed;
+	int idX, idY;
+	int ballCount;
 	bool isCollision;
+	bool isPowerBullet;
 };
 
 class playerBullet
@@ -29,7 +32,7 @@ private:
 	float _range;
 	int _playerBulletMax;
 	POINTF _effPos;
-	bool _pang;
+	bool _explosion;
 	
 
 public:

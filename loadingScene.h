@@ -1,7 +1,8 @@
 #pragma once
 #include "gameNode.h"
+#include "mapTool.h"
 
-#define LOADINGMAX 300
+#define LOADINGMAX 3000
 
 class loadingScene : public gameNode
 {
@@ -13,7 +14,6 @@ private:
 	image* _progressBarTop;
 	image* _progressBarBottom;
 
-
 public:
 	loadingScene();
 	~loadingScene();
@@ -24,6 +24,10 @@ public:
 	void release();
 	void update();
 	void render();
+
+	void imgAdd();
+	void soundAdd();
+	void setWindowsSize(int x, int y, int width, int height);
 
 };
 

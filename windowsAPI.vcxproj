@@ -156,6 +156,7 @@
     <ClInclude Include="button.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="d2dManager.h" />
+    <ClInclude Include="easyBot.h" />
     <ClInclude Include="effect.h" />
     <ClInclude Include="effectManager.h" />
     <ClInclude Include="enemy.h" />
@@ -184,12 +185,15 @@
     <ClInclude Include="singletonBase.h" />
     <ClInclude Include="soundManager.h" />
     <ClInclude Include="stageOneMap.h" />
+    <ClInclude Include="stageTwoMap.h" />
     <ClInclude Include="stage_1.h" />
     <ClInclude Include="stage_2.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="timeManager.h" />
     <ClInclude Include="timer.h" />
+    <ClInclude Include="turret.h" />
+    <ClInclude Include="turretBullet.h" />
     <ClInclude Include="txtData.h" />
     <ClInclude Include="uiScene.h" />
     <ClInclude Include="utils.h" />
@@ -204,6 +208,7 @@
     <ClCompile Include="button.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="d2dManager.cpp" />
+    <ClCompile Include="easyBot.cpp" />
     <ClCompile Include="effect.cpp" />
     <ClCompile Include="effectManager.cpp" />
     <ClCompile Include="enemy.cpp" />
@@ -230,6 +235,7 @@
     <ClCompile Include="shredder.cpp" />
     <ClCompile Include="soundManager.cpp" />
     <ClCompile Include="stageOneMap.cpp" />
+    <ClCompile Include="stageTwoMap.cpp" />
     <ClCompile Include="stage_1.cpp" />
     <ClCompile Include="stage_2.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -240,6 +246,8 @@
     </ClCompile>
     <ClCompile Include="timeManager.cpp" />
     <ClCompile Include="timer.cpp" />
+    <ClCompile Include="turret.cpp" />
+    <ClCompile Include="turretBullet.cpp" />
     <ClCompile Include="txtData.cpp" />
     <ClCompile Include="uiScene.cpp" />
     <ClCompile Include="utils.cpp" />

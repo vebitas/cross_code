@@ -53,8 +53,8 @@ void timeManager::render()
 	//릴리즈 상태면
 	{
 
-		swprintf_s(str, L"framePerSec(FPS) : %d", _timer->getFrameRate(), (float)(MAPSIZEX - WINSIZEX));
-		D2DMANAGER->drawText(str, CAMERA->getPosX(), CAMERA->getPosY());
+		swprintf_s(str, L"framePerSec(FPS) : %d", _timer->getFrameRate(), (float)(0));
+		D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY());
 	}
 #endif
 }

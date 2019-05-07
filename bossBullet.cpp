@@ -16,8 +16,8 @@ HRESULT bossBullet::init(const char* imageName, float range, int bulletMax)
 	_imageName = imageName;
 	_range = range;
 	_bossBulletMax = bulletMax;
-	int bulletN[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
-	KEYANIMANAGER->addArrayFrameAnimation("bossBulletN", "bulletN", _imageName, bulletN, 13, 10, true);
+	int bulletN[] = { 0, 1, 2, 3, 4, 5, 6, 7};
+	KEYANIMANAGER->addArrayFrameAnimation("bossBulletN", "bulletN", _imageName, bulletN, 8, 15, true);
 	return S_OK;
 }
 
@@ -27,6 +27,7 @@ void bossBullet::release()
 
 void bossBullet::update()
 {
+	move();
 }
 
 void bossBullet::render()
@@ -34,22 +35,26 @@ void bossBullet::render()
 	for (_viBossBullet = _vBossBullet.begin(); _viBossBullet != _vBossBullet.end(); _viBossBullet++)
 	{
 		_viBossBullet->image->aniRender(_viBossBullet->x, _viBossBullet->y, _viBossBullet->ani, 1);
+		//D2DMANAGER->drawRectangle(_viBossBullet->rc);
 	}
 }
 
 void bossBullet::move()
 {
-	for (_viBossBullet = _vBossBullet.begin(); _viBossBullet != _vBossBullet.end(); _viBossBullet++)
+	for (_viBossBullet = _vBossBullet.begin(); _viBossBullet != _vBossBullet.end();)
 	{
 		_viBossBullet->x += cosf(_viBossBullet->angle) * _viBossBullet->speed;
 		_viBossBullet->y += -sinf(_viBossBullet->angle) * _viBossBullet->speed;
 
-		_viBossBullet->rc = { (float)_viBossBullet->x, (float)_viBossBullet->y,
-		(float)_viBossBullet->x + _viBossBullet->image->GetFrameWidth() / 2,
-		(float)_viBossBullet->x + _viBossBullet->image->GetFrameHeight() / 2 };
+		_viBossBullet->ani->start(false);
+
+		_viBossBullet->rc = { (float)_viBossBullet->x + 30, (float)_viBossBullet->y + 30,
+		(float)_viBossBullet->x + _viBossBullet->image->GetFrameWidth() / 2 + 30,
+		(float)_viBossBullet->y + _viBossBullet->image->GetFrameHeight() / 2 + 30 };
 
 		if (_range < getDistance(_viBossBullet->x, _viBossBullet->y, _viBossBullet->fireX, _viBossBullet->fireY))
 		{
+			EFFECTMANAGER->play("effect3", _viBossBullet->x + 50, _viBossBullet->y + 50);
 			_viBossBullet = _vBossBullet.erase(_viBossBullet);
 		}
 		else _viBossBullet++;

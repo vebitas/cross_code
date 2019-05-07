@@ -17,7 +17,7 @@ HRESULT hedgehog::init(string enemyName, const char * imageName, float x, float 
 
 	_enemy.name = enemyName;
 	_enemy.state = ENEMYSTATE::HOG_IDLE;
-	_enemy.direction = ENEMYDIRECTION::SDER_DOWN_RIGHT;
+	_enemy.direction = ENEMYDIRECTION::HOG_DOWN_RIGHT;
 	_enemy.alpha = 1;
 	_enemy.speed = 1.0f;
 	_enemy.isAttack = false;
@@ -83,9 +83,9 @@ void hedgehog::render(float alpha)
 
 
 	//D2DMANAGER->drawRectangle(_enemy.rc);
-	WCHAR str[128];
-	swprintf_s(str, L"에너미 체력 : %d", _enemy.HP);
-	D2DMANAGER->drawText(str, CAMERA->getCameraX() + 300, CAMERA->getCameraY() + 20, 20, RGB(255, 255, 255));
+	//WCHAR str[128];
+	//swprintf_s(str, L"에너미 체력 : %d", _enemy.HP);
+	//D2DMANAGER->drawText(str, CAMERA->getCameraX() + 300, CAMERA->getCameraY() + 20, 20, RGB(255, 255, 255));
 }
 
 void hedgehog::hogState()
@@ -251,23 +251,6 @@ void hedgehog::hogState()
 		_enemy.x += cos(_enemy.angle) * (_enemy.speed - 0.5f);
 		_enemy.y += -sin(_enemy.angle) * (_enemy.speed - 0.5f);
 		_enemy.ani->start(false);
-		break;
-	case ENEMYSTATE::HOG_DEATH:
-		switch (_enemy.direction)
-		{
-		case ENEMYDIRECTION::HOG_UP_RIGHT:
-			break;
-		case ENEMYDIRECTION::HOG_RIGHT:
-			break;
-		case ENEMYDIRECTION::HOG_DOWN_RIGHT:
-			break;
-		case ENEMYDIRECTION::HOG_UP_LEFT:
-			break;
-		case ENEMYDIRECTION::HOG_LEFT:
-			break;
-		case ENEMYDIRECTION::HOG_DOWN_LEFT:
-			break;
-		}
 		break;
 	}
 }

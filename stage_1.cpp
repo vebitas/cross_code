@@ -13,22 +13,31 @@ stage_1::~stage_1()
 
 HRESULT stage_1::init()
 {
-	//setWindowsSize(0, 0, GAMESIZEX, GAMESIZEY);
-	IMAGEMANAGER->addImage("testMap", L"image/map/testMap.png", GAMESIZEX, GAMESIZEY);
-	IMAGEMANAGER->addFrameImage("barricade", L"image/object/barricade.png", 180, 113, 9, 1);
-	CAMERA->init(WINSIZEX, WINSIZEY, 47 * TILESIZE, 45 * TILESIZE);
+	KEYANIMANAGER->deleteAll();
+	setWindowsSize(0, 0, GAMESIZEX, GAMESIZEY);
+	//IMAGEMANAGER->addImage("testMap", L"image/map/testMap.png", GAMESIZEX, GAMESIZEY);
+	
+;
+	CAMERA->init(GAMESIZEX, GAMESIZEY, 47 * TILESIZE, 45 * TILESIZE);
 	_oneMap = new stageOneMap;
 	_player = new player;
 	_enemyManager = new enemyManager;
 	_oneMap->init();
 	_player->init();
-	_player->setPlayerPosX(WINSIZEX / 2 + 160);
-	_player->setPlayerPosY(WINSIZEY + 500);
+	_player->setPlayerPosX(GAMESIZEX / 2 + 160);
+	_player->setPlayerPosY(GAMESIZEY + 500);
 	_enemyManager->init();
+	_enemyManager->setHedgehog();
+
+	_teleportRc = { (float)1390, (float)490, (float)1400, (float)500 };
 
 	_briFrameX = _briFrameY = _count = 0;
 	_briAlpha = 0;
+	_sceneChangeAlpha = 0;
+	_teleportFrameX = 0;
+	_hogAttack = false;
 
+	SOUNDMANAGER->play("awakened", 0.8);
 	return S_OK;
 }
 
@@ -48,13 +57,12 @@ void stage_1::update()
 	if (_briAlpha == 1)
 	{
 		_enemyManager->hogAI(_player->getPlayerPosX(), _player->getPlayerPosY());
-		_enemyManager->update();
+		_enemyManager->update(_player->getPlayerPosX(), _player->getPlayerPosY());
 	}
-	enemyCollision();
-
 	_count++;
 	if (_enemyManager->getVHog().empty() == false)
 	{
+		enemyCollision();
 		if (_count % 5 == 0)
 		{
 			if (_briFrameX < 8)
@@ -81,12 +89,14 @@ void stage_1::update()
 					EFFECTMANAGER->play("summon", 920, 380);
 					EFFECTMANAGER->play("summon", 920, 280);
 					EFFECTMANAGER->play("summon", 920, 180);
+					SOUNDMANAGER->stop("awakened");
+					SOUNDMANAGER->play("fierceBattle", 1);
 				}
 			}
 			else
 			{
 				_briAlpha = 1;
-				CAMERA->linearKeepMove(_player->getPlayerPosX(), _player->getPlayerPosY(), 0.5, 0);
+				CAMERA->linearKeepMove(_player->getPlayerPosX(), _player->getPlayerPosY(), 0.2, 0.1);
 			}
 		}
 	}
@@ -95,7 +105,10 @@ void stage_1::update()
 		if (_briAlpha > 0)
 			_briAlpha -= 0.02f;
 		else
+		{
 			_briAlpha = 0;
+			_teleportFrameX = 1;
+		}
 	}
 
 
@@ -119,11 +132,25 @@ void stage_1::update()
 		}
 	}
 
+	playerCollision();
+	
+	teleportRcCollision();
 	enemyTileCheck();
 	tileCheck();
-	_briRc = { (float)360, (float)243, (float)1050, (float)730 };
 	
 	CAMERA->update(_player->getPlayerPosX(), _player->getPlayerPosY());
+	_briRc = { (float)360, (float)243, (float)1050, (float)730 };
+
+	if (_player->getPlayerState() == PLAYERSTATE::PLAYER_TELEPORT)
+	{
+
+		if (_sceneChangeAlpha < 1)
+			_sceneChangeAlpha += 0.01;
+		else
+		{
+			SCENEMANAGER->changeScene("stage2");
+		}
+	}
 }
 
 void stage_1::render()
@@ -136,8 +163,9 @@ void stage_1::render()
 		IMAGEMANAGER->findImage("barricade")->frameRender(350 + (i * 20), 130 , _briFrameX, 0, _briAlpha);
 	}
 	_enemyManager->render(_briAlpha);
+	IMAGEMANAGER->findImage("teleport")->frameRender(1360, 460, _teleportFrameX, 0);
 	EFFECTMANAGER->render(0);
-	_player->render();
+	_player->render(false);
 	//바리게이트 랜더
 	for (int i = 0; i < 36; i++)
 	{
@@ -151,18 +179,21 @@ void stage_1::render()
 	{
 		IMAGEMANAGER->findImage("barricade")->frameRender(1050, 130 + (i * 20), _briFrameX, 0, _briAlpha);
 	}
+
 	//D2DMANAGER->fillRectangle(RGB(255, 0, 255), _briRc);
 	_oneMap->zOrder();
+	_player->render(true);
+	//D2DMANAGER->drawRectangle(RGB(255,0,255), _teleportRc);
 
-	D2DMANAGER->drawRectangle(RGB(255,0,255),rc[0]);
+	IMAGEMANAGER->findImage("sceneChange")->render(0 + CAMERA->getCameraX() , 0 + CAMERA->getCameraY(), _sceneChangeAlpha);
 
-	WCHAR str[128];
-	swprintf_s(str, L"%d, %d", _tileIndex[0].x, _tileIndex[0].y);
-	D2DMANAGER->drawText(str, CAMERA->getCameraX() + 100, CAMERA->getCameraY() + 20, 20, RGB(0, 0, 0));
-	swprintf_s(str, L"플레이어 : %f, %f", _player->getPlayerPosX(), _player->getPlayerPosY());
-	D2DMANAGER->drawText(str, CAMERA->getCameraX() + 100, CAMERA->getCameraY() + 40, 20, RGB(0, 0, 0));
-	swprintf_s(str, L"플레이어 : %d, %d", _player->getPlayerIdX(), _player->getPlayerIdY());
-	D2DMANAGER->drawText(str, CAMERA->getCameraX() + 100, CAMERA->getCameraY() + 60, 20, RGB(0, 0, 0));
+	//WCHAR str[128];
+	//swprintf_s(str, L"플레이어 상태 : %d", _player->getPlayerState());
+	//D2DMANAGER->drawText(str, CAMERA->getCameraX() + 200, CAMERA->getCameraY() + 20, 20, RGB(255, 255, 255));
+	//swprintf_s(str, L"플레이어 : %f, %f", _player->getPlayerPosX(), _player->getPlayerPosY());
+	//D2DMANAGER->drawText(str, CAMERA->getCameraX() + 100, CAMERA->getCameraY() + 40, 20, RGB(0, 0, 0));
+	//swprintf_s(str, L"플레이어 : %d, %d", _player->getPlayerIdX(), _player->getPlayerIdY());
+	//D2DMANAGER->drawText(str, CAMERA->getCameraX() + 100, CAMERA->getCameraY() + 60, 20, RGB(0, 0, 0));
 	//swprintf_s(str, L"플레이어Y : %f", _player->getPlayerPosY());
 	//D2DMANAGER->drawText(str, CAMERA->getCameraX() + 100, CAMERA->getCameraY() + 80, 20, RGB(0, 0, 0));
 }
@@ -213,7 +244,6 @@ void stage_1::tileCheck()
 			_player->setPlayerPosX(_player->getPlayerPosX() - _player->getPlayerSpeed());
 		}
 	}
-
 	if (KEYMANAGER->isStayKeyDown('W'))
 	{
 		_tileIndex[0].x = _player->getPlayerIdX() + 1;
@@ -293,37 +323,56 @@ void stage_1::enemyTileCheck()
 
 void stage_1::playerCollision()
 {
-	RECT rc;
-	for (int i = 0; i < _enemyManager->getVHog().size();)
-	{
-		if ((*_enemyManager->setVHog())[i]->getEnemyState() == ENEMYSTATE::HOG_ATTACK)
-		{
+	RECT rc3;
+	//몬스터 공격 vs 플레이어 충돌
 
+	//if()
+
+	for (int k = 0; k < _enemyManager->getVHog().size();)
+	{
+		if (((*_enemyManager->setVHog())[k]->getEnemyState() == ENEMYSTATE::HOG_ATTACK &&
+			IntersectRect(&rc3, &makeRECT(_enemyManager->getVHog()[k]->getEnemyRc()), &makeRECT(_player->getPlayerRc())))
+			&& !(_player->getPlayerState() == PLAYERSTATE::PLAYER_ATTACKED) && !(_player->getPlayerState() == PLAYERSTATE::PLAYER_SKILL_FIRE))
+		{
+			if (_player->getPlayerState() == PLAYERSTATE::PLAYER_DEFENSE)
+			{ 
+				_player->setPlayerHP(_player->getPlayerHP() - 2);
+			}
+			else
+			{
+				_player->setPlayerState(PLAYERSTATE::PLAYER_ATTACKED);
+				_player->setPlayerHP(_player->getPlayerHP() - 10);
+				SOUNDMANAGER->play("playerAttacked", 1);
+			}
 		}
+		else k++;
 	}
 }
 
 void stage_1::enemyCollision()
 {
 	RECT rc;
+	//몬스터 vs 플레이어 근접 공격 충돌
 	for (int i = 0; i < _enemyManager->getVHog().size();)
 	{
 		if (IntersectRect(&rc, &makeRECT(_enemyManager->getVHog()[i]->getEnemyRc()), &makeRECT(_player->getPlayerAttackRc()))
 			&& !((*_enemyManager->setVHog())[i]->getEnemyState() == ENEMYSTATE::HOG_ATTACKED) && _player->getIsAttack() == true)
 		{
-			(*_enemyManager->setVHog())[i]->setEnemyHP((*_enemyManager->setVHog())[i]->getEnemyHP() - 10);
+			(*_enemyManager->setVHog())[i]->setEnemyHP((*_enemyManager->setVHog())[i]->getEnemyHP() - 20);
 			(*_enemyManager->setVHog())[i]->setEnemyState(ENEMYSTATE::HOG_ATTACKED);
 			EFFECTMANAGER->play("hit", (*_enemyManager->setVHog())[i]->getEnemyPosX() + 35, (*_enemyManager->setVHog())[i]->getEnemyPosY() + 23);
 		}
 		else i++;
 	}
 	RECT rc2;
-	for (int i = 0; i < _enemyManager->getVHog().size();)
+	//몬스터 vs 플레이어 총알 충돌
+	for (int i = 0; i < _enemyManager->getVHog().size();)	
 	{
 		for(int j = 0; j < _player->getPlayerBullet()->getVPlayerBullet().size();)
 		{ 
 			if (IntersectRect(&rc2, &makeRECT(_enemyManager->getVHog()[i]->getEnemyRc()), &makeRECT(_player->getPlayerBullet()->getVPlayerBullet()[j].rc)))
 			{
+				SOUNDMANAGER->play("throwE_1", 1);
 				(*_enemyManager->setVHog())[i]->setEnemyHP((*_enemyManager->setVHog())[i]->getEnemyHP() - 10);
 				(*_enemyManager->setVHog())[i]->setEnemyState(ENEMYSTATE::HOG_ATTACKED);
 				_player->getPlayerBullet()->setVPlayerBullet()->erase(_player->getPlayerBullet()->setVPlayerBullet()->begin() + j);
@@ -335,17 +384,27 @@ void stage_1::enemyCollision()
 	}
 }
 
+void stage_1::teleportRcCollision()
+{
+	RECT rc;
+	if (IntersectRect(&rc, &makeRECT(_teleportRc), &makeRECT(_player->getPlayerRc())) && !(_player->getPlayerState() == PLAYERSTATE::PLAYER_TELEPORT))
+	{
+		_player->setPlayerState(PLAYERSTATE::PLAYER_TELEPORT);
+	
+	}
+}
 
 void stage_1::setWindowsSize(int x, int y, int width, int height)
 {
-	SAFE_RELEASE2(D2DMANAGER->_renderTarget);
+	//SAFE_RELEASE2(D2DMANAGER->_renderTarget);
+	D2DMANAGER->_renderTarget->Resize(SizeU(width, height));
 
 	//---------------------------------------------------------------------------
 	//   Hwnd Render Target 생성
 	//---------------------------------------------------------------------------
-	D2DMANAGER->_d2dFactory->CreateHwndRenderTarget(RenderTargetProperties(),
-		HwndRenderTargetProperties(_hWnd, SizeU(width, height)),
-		&D2DMANAGER->_renderTarget);
+	//D2DMANAGER->_d2dFactory->CreateHwndRenderTarget(RenderTargetProperties(),
+	//	HwndRenderTargetProperties(_hWnd, SizeU(width, height)),
+	//	&D2DMANAGER->_renderTarget);
 
 	RECT winRect;
 
@@ -362,4 +421,5 @@ void stage_1::setWindowsSize(int x, int y, int width, int height)
 		(winRect.bottom - winRect.top),
 		SWP_NOZORDER | SWP_NOMOVE);
 }
+
 

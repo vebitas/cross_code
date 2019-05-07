@@ -13,21 +13,8 @@ boss::~boss()
 
 HRESULT boss::init()
 {
-	IMAGEMANAGER->addFrameImage("boss_head", L"image/enemy/boss/boss_head.png", 640, 156, 4, 1);
-	IMAGEMANAGER->addFrameImage("boss_body1", L"image/enemy/boss/boss_body.png", 484, 194, 4, 1);
-	IMAGEMANAGER->addFrameImage("boss_body2", L"image/enemy/boss/boss_body_2.png", 404, 169, 4, 1);
-	IMAGEMANAGER->addFrameImage("boss_body3", L"image/enemy/boss/boss_body_3.png", 316, 128, 4, 1);
-	IMAGEMANAGER->addImage("boss_body4", L"image/enemy/boss/boss_body_4.png", 68, 91);
-	IMAGEMANAGER->addImage("boss_body5", L"image/enemy/boss/boss_body_5.png", 64, 64);
-	IMAGEMANAGER->addFrameImage("boss_tail", L"image/enemy/boss/boss_tail.png", 330, 70, 4, 1);
-	IMAGEMANAGER->addFrameImage("boss_diving2", L"image/enemy/boss/diving2.png", 8000, 800, 10, 1);
-	EFFECTMANAGER->addEffect("effect1", "image/enemy/boss/effect_1.png", 505, 106, 63, 53, 3, 0.1, 50);
-	EFFECTMANAGER->addEffect("effect2", "image/enemy/boss/effect_2.png", 210, 70, 35, 35, 3, 0.1, 50);
-	EFFECTMANAGER->addEffect("effect3", "image/enemy/boss/effect_3.png", 400, 240, 80, 80, 3, 0.1, 50);
-	EFFECTMANAGER->addEffect("effect4", "image/enemy/boss/effect_4.png", 1200, 600, 300, 300, 3, 0.08, 50);
-	EFFECTMANAGER->addEffect("effect5", "image/enemy/boss/effect_5.png", 600, 360, 120, 120, 3, 0.1, 200);
-	EFFECTMANAGER->addEffect("effect6", "image/enemy/boss/effect_6.png", 600, 150, 150, 150, 3, 0.1, 50);
-	EFFECTMANAGER->addEffect("effect7", "image/enemy/boss/effect_7.png", 2100, 389, 300, 389, 7, 0.06, 50);
+	_bossBullet = new bossBullet;
+	_bossBullet->init("bossBullet", 500, 1000);
 	
 	
 	int diving[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
@@ -35,9 +22,9 @@ HRESULT boss::init()
 
 	_boss.divingImg = IMAGEMANAGER->findImage("boss_diving2");
 	_boss.ani = KEYANIMANAGER->findAnimation("boss", "diving");
-
-	_boss.x = GAMESIZEX / 2;
-	_boss.y = GAMESIZEY / 2;
+	_effectTime = 300;
+	_boss.x = WINSIZEX / 2;
+	_boss.y = WINSIZEY / 2;
 	_boss.headImg = IMAGEMANAGER->findImage("boss_head");
 	_boss.bodyImg = IMAGEMANAGER->findImage("boss_body1");
 	_boss.body2Img = IMAGEMANAGER->findImage("boss_body2");
@@ -48,10 +35,12 @@ HRESULT boss::init()
 	//_boss.divingImg = IMAGEMANAGER->findImage("boss_diving");
 	_boss.angle = 0;
 	_boss.direction = BOSSDIRECTION::BOSS_LEFT;
-	_boss.state = BOSSSTATE::BOSS_IDLE;
+	_boss.state = BOSSSTATE::BOSS_MOVE;
 	_boss.speed = 5;
 	_boss.jumpPower = 5;
 	_boss.alpha = 1;
+	_boss.maxHP = 500;
+	_boss.HP = 500;
 	_curFrameX = 0;
 	_count = 0;
 	_bodyCount = 0;
@@ -63,12 +52,19 @@ HRESULT boss::init()
 	_oldTime = GetTickCount();
 	
 	_groggyPos = false;
+	_turn = false;
 
 	_isLeft = true;
 	for (int i = 0; i < 6; i++)
 	{
 		_bodyMoveCount[i] = 0;
 
+	}
+
+	for (int i = 0; i < 4; i++)
+	{
+		_keyOnceDown[i] = false;
+		_keyUp[i] = false;
 	}
 
 	_rushOn = false;
@@ -115,6 +111,7 @@ void boss::update()
 	{
 		_boss.direction = BOSS_UP;
 		_boss.state = BOSS_MOVE;
+		_boss.y -= 3.0f;
 	}
 	if (KEYMANAGER->isOnceKeyUp(VK_UP))
 	{
@@ -125,6 +122,7 @@ void boss::update()
 	{
 		_boss.direction = BOSS_DOWN;
 		_boss.state = BOSS_MOVE;
+		_boss.y += 3.0f;
 	}
 	if (KEYMANAGER->isOnceKeyUp(VK_DOWN))
 	{
@@ -135,6 +133,7 @@ void boss::update()
 	{
 		_boss.direction = BOSS_LEFT;
 		_boss.state = BOSS_MOVE;
+		_boss.x -= 3.0f;
 	}
 	if (KEYMANAGER->isOnceKeyUp(VK_LEFT))
 	{
@@ -145,6 +144,7 @@ void boss::update()
 	{
 		_boss.direction = BOSS_RIGHT;
 		_boss.state = BOSS_MOVE;
+		_boss.x += 3.0f;
 	}
 	if (KEYMANAGER->isOnceKeyUp(VK_RIGHT))
 	{
@@ -155,7 +155,7 @@ void boss::update()
 
 	if (KEYMANAGER->isOnceKeyDown('1'))
 	{
-		_boss.speed = 0;
+	
 	}
 	if (KEYMANAGER->isStayKeyDown('1'))
 	{
@@ -177,6 +177,10 @@ void boss::update()
 		_body.body5_y = 0;
 		_body.tailY = 0;
 		_boss.state = BOSSSTATE::BOSS_IDLE;
+	}
+	if (KEYMANAGER->isOnceKeyDown('2'))
+	{
+		SOUNDMANAGER->play("whale_1", 1);
 	}
 	if (KEYMANAGER->isStayKeyDown('2'))
 	{
@@ -203,30 +207,36 @@ void boss::update()
 		_body.tailX = 0;
 		_body.tailY = 0;
 	}
-
-
+	
+	
 	if (KEYMANAGER->isOnceKeyDown('3'))
 	{
+		SOUNDMANAGER->play("whale_2", 1);
 		_boss.jumpPower = 13;
 		_angleSpeed = 0;
 		_boss.jumpStartX = _boss.x;
 		_boss.jumpStartY = _boss.y;
 		_boss.state = BOSS_DIVING;
+	
 	}
-
-
+	
+	
 	if (KEYMANAGER->isOnceKeyDown('4'))
 	{
 		EFFECTMANAGER->play("effect4", _boss.x, _boss.y);
 	}
-	
+
 	rush();
 	idle();
 	bossState();
+	_bossBullet->update();
+
+	_boss.rc = { (float)_boss.x, (float)_boss.y , (float)_boss.x + 700, (float)_boss.y + 300 };
 }
 
 void boss::render()
 {
+	_bossBullet->render();
 	//EFFECTMANAGER->render(0);
 	if (!(_boss.state == BOSS_DIVING))
 	{
@@ -263,8 +273,10 @@ void boss::render()
 		}
 	}
 
-	
-	
+	//WCHAR str[128];
+	//swprintf_s(str, L"%f", _boss.speed);
+	//D2DMANAGER->drawText(str, CAMERA->getCameraX() + 400, CAMERA->getCameraY() + 20, 20, RGB(255, 255, 255));
+	//D2DMANAGER->drawRectangle(_boss.rc);
 }
 
 void boss::bossState()
@@ -285,37 +297,34 @@ void boss::bossState()
 			break;
 		}
 		break;
+	case BOSSSTATE::BOSS_SHADOW:
+		_boss.alpha = 0;
+		break;
 	case BOSSSTATE::BOSS_MOVE:
+		for (int i = 0; i < 4; i++)
+		{
+			_keyOnceDown[i] = true;
+		}
+
 		_groggyPos = false;
-		if(_boss.alpha > 0) 
-			_boss.alpha -= 0.04;
-		_boss.speed = 5;
-		if (GetTickCount() - _oldTime >= 300)
+		_boss.alpha = 0;
+		_boss.speed = 3.5f;
+		if (GetTickCount() - _oldTime >= _effectTime)
 		{
 			EFFECTMANAGER->play("effect4", _boss.x + 300, _boss.y + 150);
 			_oldTime = GetTickCount();
 		}
-
-		switch (_boss.direction)
-		{
-		case BOSSDIRECTION::BOSS_UP:
-			_boss.y -= _boss.speed;
-			break;
-		case BOSSDIRECTION::BOSS_DOWN:
-			_boss.y += _boss.speed;
-			break;
-		case BOSSDIRECTION::BOSS_LEFT:
-			_isLeft = true;
-			_boss.x -= _boss.speed;
-			break;
-		case BOSSDIRECTION::BOSS_RIGHT:
-			_isLeft = false;
-			_boss.x += _boss.speed;
-			break;
-		}
-
 		break;
 	case BOSSSTATE::BOSS_RUSH:
+
+		if (_keyOnceDown[0])
+		{
+			SOUNDMANAGER->play("whale_3", 1);
+			_turn = false;
+			_boss.speed = 0;
+			_keyOnceDown[0] = false;
+		}
+
 		_groggyPos = false;
 		if (_boss.alpha < 1)
 			_boss.alpha += 0.04;
@@ -346,8 +355,17 @@ void boss::bossState()
 			}
 			_isLeft = true;
 			_eyeFrame = 3;
-			if(_boss.speed < 12)
-			_boss.speed += 0.4f;
+			
+			if (_boss.speed > -6 && !_turn)
+			{
+				_boss.speed -= 0.2f; 
+				_boss.y -= 2;
+			}
+			else if (_boss.speed < 12)
+			{
+				_turn = true;
+				_boss.speed += 0.4f;
+			}
 			_boss.x -= _boss.speed;
 			break;
 		case BOSSDIRECTION::BOSS_RIGHT:
@@ -374,8 +392,16 @@ void boss::bossState()
 				_oldTime = GetTickCount();
 			}
 			_eyeFrame = 3;
-			if (_boss.speed < 12)
+			if (_boss.speed > -6 && !_turn)
+			{
+				_boss.speed -= 0.2f;
+				_boss.y -= 2;
+			}
+			else if (_boss.speed < 12)
+			{
+				_turn = true;
 				_boss.speed += 0.4f;
+			}
 			_boss.x += _boss.speed;
 			break;
 		}
@@ -401,38 +427,64 @@ void boss::bossState()
 		switch (_boss.direction)
 		{
 		case BOSSDIRECTION::BOSS_LEFT:
+
+			if (_keyOnceDown[1])
+			{
+				SOUNDMANAGER->play("whale_2", 1);
+				_boss.jumpPower = 10;
+				_angleSpeed = 0;
+				_boss.x -= 200;
+				_boss.jumpStartX = _boss.x;
+				_boss.jumpStartY = _boss.y;
+				_keyOnceDown[1] = false;
+			}
+
 			_isLeft = true;
 			_boss.ani = KEYANIMANAGER->findAnimation("boss", "diving");
 			_boss.ani->start(false);
-			if(_boss.jumpPower > 2)
-			_boss.jumpPower -= 0.25;
+			if(_boss.jumpPower > 6)
+			_boss.jumpPower -= 0.5f;
 			else if (_boss.jumpPower > 5)
 			{
-				_boss.jumpPower -= 0.1;
+				_boss.jumpPower -= 0.045f;
 			}
 			else
 			{
-				_boss.jumpPower -= 0.7;
+				_boss.jumpPower -= 0.7f;
 				_boss.x -= 2;
 			}
-			if (_boss.jumpStartY >= _boss.y)
+			if (_boss.jumpStartY + 150 >= _boss.y)
 			_boss.y -= _boss.jumpPower;
 			_boss.x -= 2;
 			break;
 		case BOSSDIRECTION::BOSS_RIGHT:
+			if (_keyOnceDown[1])
+			{
+				SOUNDMANAGER->play("whale_2", 1);
+				_boss.jumpPower = 8;
+				_angleSpeed = 0;
+				_boss.jumpStartX = _boss.x;
+				_boss.jumpStartY = _boss.y;
+				_keyOnceDown[1] = false;
+			}
 			_isLeft = false;
 			_boss.ani = KEYANIMANAGER->findAnimation("boss", "diving");
 			_boss.ani->start(false);
-			if (_boss.jumpPower > 5)
-				_boss.jumpPower -= 0.25;
+			if (_boss.jumpPower > 6)
+				_boss.jumpPower -= 0.5f;
+			else if (_boss.jumpPower > 5)
+			{
+				_boss.jumpPower -= 0.045f;
+			}
 			else
 			{
-				_boss.jumpPower -= 0.7;
+				_boss.jumpPower -= 0.7f;
 				_boss.x += 2;
 			}
-			if(_boss.jumpStartY >= _boss.y)
+			if(_boss.jumpStartY + 150 >= _boss.y)
 			_boss.y -= _boss.jumpPower;
-		
+			_boss.x += 2;
+
 			break;
 		}
 		break;
@@ -625,7 +677,7 @@ void boss::idle()
 void boss::cbDiving(void * obj)
 {
 	boss* diving = (boss*)obj;
-	diving->setBossState(BOSSSTATE::BOSS_MOVE);
+	diving->setBossState(BOSSSTATE::BOSS_IDLE);
 
 	if (diving->getBossDirection() == BOSS_LEFT)
 	{

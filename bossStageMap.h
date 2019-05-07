@@ -22,6 +22,8 @@ public:
 
 	void load();
 
+	void zOrder();
+
 	UINT getTileX() { return TILEX; }
 	UINT getTileY() { return TILEY; }
 

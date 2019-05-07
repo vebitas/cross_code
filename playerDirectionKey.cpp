@@ -3,7 +3,7 @@
 
 void player::playerKeyInput()
 {
-	if (!(_isThrowAttack) && !(_isAttack)
+	if (!(_isThrowAttack) && !(_isAttack) && !(_isSkill) && !(_isCharge)
 		&& !(_player.state == PLAYERSTATE::PLAYER_THROW_AIM) && !(_player.state == PLAYERSTATE::PLAYER_THROW_HOLD_MOVE) && !(_isAvoid))
 	{
 		//(누른방향과 반대방향으로 못가게 막기위한 예외처리)

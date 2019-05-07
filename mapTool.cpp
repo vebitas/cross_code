@@ -15,31 +15,12 @@ mapTool::~mapTool()
 
 HRESULT mapTool::init()
 {
-	//setWindowsSize(0, 0, 1800, 800);
+	setWindowsSize(0, 0, 1800, 800);
 	
 	_cursor = LoadCursorFromFile("image/cursor/uiCursor.cur");
 	SetCursor(_cursor);
 
-	IMAGEMANAGER->addFrameImage("stage1_1", L"image/tileNode/stage1_1.png", 1024, 608, SAMPLETILEX, SAMPLETILEY);
-	IMAGEMANAGER->addFrameImage("stage1_2", L"image/tileNode/stage1_2.png", 1024, 608, SAMPLETILEX, SAMPLETILEY);
-	IMAGEMANAGER->addFrameImage("stage1_3", L"image/tileNode/stage1_3.png", 1024, 608, SAMPLETILEX, SAMPLETILEY);
-	IMAGEMANAGER->addFrameImage("stage2", L"image/tileNode/stage2.png", 1024, 608, SAMPLETILEX, SAMPLETILEY);	
-	IMAGEMANAGER->addFrameImage("bossStage", L"image/tileNode/bossStage.png", 1024, 608, SAMPLETILEX, SAMPLETILEY);
-	IMAGEMANAGER->addFrameImage("stage1_1(mini)", L"image/tileNode/stage1_1(mini).png", 128, 76, SAMPLETILEX, SAMPLETILEY);
-	IMAGEMANAGER->addFrameImage("stage1_2(mini)", L"image/tileNode/stage1_2(mini).png", 128, 76, SAMPLETILEX, SAMPLETILEY);
-	IMAGEMANAGER->addFrameImage("stage1_3(mini)", L"image/tileNode/stage1_3(mini).png", 128, 76, SAMPLETILEX, SAMPLETILEY);
-	IMAGEMANAGER->addFrameImage("stage2(mini)", L"image/tileNode/stage2(mini).png", 128, 76, SAMPLETILEX, SAMPLETILEY);
-	IMAGEMANAGER->addFrameImage("bossStage(mini)", L"image/tileNode/bossStage(mini).png", 128, 76, SAMPLETILEX, SAMPLETILEY);
-	IMAGEMANAGER->addImage("mapToolBackground", L"image/tileNode/mapToolBackground.png", WINSIZEX, WINSIZEY);
-	IMAGEMANAGER->addImage("build_LR", L"image/tileNode/build_LR.png", 64, 830);
-	IMAGEMANAGER->addImage("build_UD", L"image/tileNode/build_UD.png", 750, 64);
-	IMAGEMANAGER->addFrameImage("button", L"image/tileNode/button.png", 150, 200, 3, 4);
-	IMAGEMANAGER->addFrameImage("button2", L"image/tileNode/button_2.png", 375, 250, 3, 5);
-	IMAGEMANAGER->addFrameImage("textXY", L"image/tileNode/textXY.png", 96, 48, 2, 1);
-	IMAGEMANAGER->addImage("textMap", L"image/tileNode/textMap.png", 96, 48);
-	IMAGEMANAGER->addImage("window", L"image/tileNode/window.png", 300, 300);
-	IMAGEMANAGER->addFrameImage("okButton", L"image/tileNode/okButton.png", 144, 48, 3, 1);
-	IMAGEMANAGER->addFrameImage("number", L"image/tileNode/number.png", 144, 48, 3, 1);
+	
 
 	buttonInit();
 	setTile();
@@ -265,32 +246,32 @@ void mapTool::render()
 	IMAGEMANAGER->findImage("textXY")->frameRender(WINSIZEX / 2 + 80 + CAMERA->getCameraX(), 690 + CAMERA->getCameraY(), 1, 0);
 	IMAGEMANAGER->findImage("textMap")->render(WINSIZEX - 172 + CAMERA->getCameraX(), 695 + CAMERA->getCameraY());
 	
-	swprintf_s(str, L"cameraX : %f", CAMERA->getCameraX());
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 20, 20, RGB(255, 255, 255));
-	swprintf_s(str, L"cameraY : %f", CAMERA->getCameraY());
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 40, 20, RGB(255, 255, 255));
+	//swprintf_s(str, L"cameraX : %f", CAMERA->getCameraX());
+	//D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 20, 20, RGB(255, 255, 255));
+	//swprintf_s(str, L"cameraY : %f", CAMERA->getCameraY());
+	//D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 40, 20, RGB(255, 255, 255));
 	swprintf_s(str, L"tileX : %d", TILEX);										   
 	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 60, 20, RGB(255, 255, 255));
 	swprintf_s(str, L"tileY : %d", TILEY);										 
 	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 80, 20, RGB(255, 255, 255));
-	swprintf_s(str, L"tempX : %d", _tempTile.frameX);							  
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 100, 20,RGB(255, 255, 255));
-	swprintf_s(str, L"tempY : %d", _tempTile.frameY);							  
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 120, 20,RGB(255, 255, 255));
-	swprintf_s(str, L"_ptIdX : %d", _ptIdX);									   
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 180, 20,RGB(255, 255, 255));
-	swprintf_s(str, L"_ptIdY : %d", _ptIdY);									  
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 200, 20,RGB(255, 255, 255));
-	swprintf_s(str, L"시작x : %d", _saveOn);										
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 220, 20,RGB(255, 255, 255));
-	swprintf_s(str, L"시작y : %d", _loadOn);										
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 240, 20,RGB(255, 255, 255));
-	swprintf_s(str, L"차이x : %d", _save);										
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 260, 20,RGB(255, 255, 255));
-	swprintf_s(str, L"차이y : %d", _mapSelect);									
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 280, 20,RGB(255, 255, 255));
-	swprintf_s(str, L"드래그 모드 : %d", _vvTile);								 
-	D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 300, 20,RGB(255, 255, 255));
+	//swprintf_s(str, L"tempX : %d", _tempTile.frameX);							  
+	//D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 100, 20,RGB(255, 255, 255));
+	//swprintf_s(str, L"tempY : %d", _tempTile.frameY);							  
+	//D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 120, 20,RGB(255, 255, 255));
+	//swprintf_s(str, L"_ptIdX : %d", _ptIdX);									   
+	//D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 180, 20,RGB(255, 255, 255));
+	//swprintf_s(str, L"_ptIdY : %d", _ptIdY);									  
+	//D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 200, 20,RGB(255, 255, 255));
+	//swprintf_s(str, L"시작x : %d", _saveOn);										
+	//D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 220, 20,RGB(255, 255, 255));
+	//swprintf_s(str, L"시작y : %d", _loadOn);										
+	//D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 240, 20,RGB(255, 255, 255));
+	//swprintf_s(str, L"차이x : %d", _save);										
+	//D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 260, 20,RGB(255, 255, 255));
+	//swprintf_s(str, L"차이y : %d", _mapSelect);									
+	//D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 280, 20,RGB(255, 255, 255));
+	//swprintf_s(str, L"드래그 모드 : %d", _vvTile);								 
+	//D2DMANAGER->drawText(str, CAMERA->getCameraX(), CAMERA->getCameraY() + 300, 20,RGB(255, 255, 255));
 	//for (int i = 0; i < TILEY; i++)
 	//{
 	//	for (int j = 0; j < TILEX; j++)
@@ -1396,14 +1377,15 @@ void mapTool::cbEraser()
 
 void mapTool::setWindowsSize(int x, int y, int width, int height)
 {
-	SAFE_RELEASE2(D2DMANAGER->_renderTarget);
+	//SAFE_RELEASE2(D2DMANAGER->_renderTarget);
+	D2DMANAGER->_renderTarget->Resize(SizeU(width, height));
 
 	//---------------------------------------------------------------------------
 	//   Hwnd Render Target 생성
 	//---------------------------------------------------------------------------
-	D2DMANAGER->_d2dFactory->CreateHwndRenderTarget(RenderTargetProperties(),
-		HwndRenderTargetProperties(_hWnd, SizeU(width, height)),
-		&D2DMANAGER->_renderTarget);
+	//D2DMANAGER->_d2dFactory->CreateHwndRenderTarget(RenderTargetProperties(),
+	//	HwndRenderTargetProperties(_hWnd, SizeU(width, height)),
+	//	&D2DMANAGER->_renderTarget);
 
 	RECT winRect;
 

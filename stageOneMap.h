@@ -1,15 +1,12 @@
 #pragma once
 #include "gameNode.h"
 #include "mapTool.h"
-#include "player.h"
 
 class stageOneMap : public gameNode
 {
 private:
 	UINT TILEX;
 	UINT TILEY;
-
-	player* _player;
 
 	vector<vector<tagTile*>> _vvMap;
 

@@ -144,7 +144,7 @@ void soundManager::play(string keyName, float volume)// 0.0 ~ 1.0f -> 0 ~ 255
 			else								// effect soundgroup
 				_channel[count]->setChannelGroup(_effectGroup);
 
-			_system->playSound(FMOD_CHANNEL_FREE, sound, false, &_channel[count]);
+			_system->playSound(FMOD_CHANNEL_REUSE, sound, false, &_channel[count]);
 			_channel[count]->setVolume(volume);
 			
 			break;

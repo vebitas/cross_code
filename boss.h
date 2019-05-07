@@ -16,6 +16,7 @@ enum BOSSSTATE
 {
 	//보스 상태
 	BOSS_IDLE,
+	BOSS_SHADOW,
 	BOSS_MOVE,
 	BOSS_RUSH,
 	BOSS_DIVING,
@@ -42,6 +43,7 @@ struct tagBoss
 	string name;
 	float x, y;
 	float speed;
+	float moveAngle;
 	float angle;
 	float alpha;
 	int HP;
@@ -103,9 +105,15 @@ private:
 
 	int _oldTime;
 
+	int _effectTime;
+
+	bool _keyOnceDown[4];
+	bool _keyUp[4];
+
 	bool _groggyPos;
 	bool _rushOn;
 	bool _once;
+	bool _turn;
 
 public:
 	boss();
@@ -126,13 +134,26 @@ public:
 	//접근 설정 모음
 	float getBossPosX() { return _boss.x; }
 	float getBossPosY() { return _boss.y; }
+	float getMoveAngle() { return _boss.moveAngle; }
+	float getBossSpeed() { return _boss.speed; }
 	BOSSSTATE getBossState() { return _boss.state; }
 	BOSSDIRECTION getBossDirection() { return _boss.direction; }
+	int getBossHP() { return _boss.HP; }
+	int getBossMaxHP() { return _boss.maxHP; }
+	float getBossAlpha() { return _boss.alpha; }
+	D2D1_RECT_F getBossAttackRc() { return _boss.attackRc; }
+	D2D1_RECT_F getBossRc() { return _boss.rc; }
 
 	void setBossPosX(float x) { _boss.x = x; }
 	void setBossPosY(float y) { _boss.y = y; }
+	void setBossSpeed(float speed) { _boss.speed = speed; }
+	void setBossMoveAngle(float angle) { _boss.moveAngle = angle; }
+	void setEffectTime(int time) { _effectTime = time; }
 	void setBossState(BOSSSTATE state) { _boss.state = state; }
 	void setBossDirection(BOSSDIRECTION direction) { _boss.direction = direction; }
+	void setBossEyeFrame(int eyeFrameX) { _eyeFrame = eyeFrameX; }
+	void setBossHP(int HP) { _boss.HP = HP; }
+	void setBossAlpha(float alpha) { _boss.alpha = alpha; }
 
 };
 

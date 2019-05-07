@@ -13,43 +13,26 @@ player::~player()
 
 HRESULT player::init()
 {
-	
-	IMAGEMANAGER->addFrameImage("leaMove", L"image/player/move.png", 1040, 1235, 16, 19);
-	IMAGEMANAGER->addFrameImage("leaThrow", L"image/player/throw.png", 520, 1235, 8, 19);
-	IMAGEMANAGER->addFrameImage("attackNormal", L"image/effect/sweep_normal.png", 400, 150, 4, 2);
-	IMAGEMANAGER->addFrameImage("attackNormalR", L"image/effect/sweep_normal_R.png", 400, 150, 4, 2);
-	//IMAGEMANAGER->addFrameImage("attackNormalF", L"image/effect/sweep_normal_Last.png", 240, 42, 4, 1);
-	IMAGEMANAGER->addFrameImage("attackFire", L"image/effect/sweep_fire.png", 400, 150, 4, 2);
-	IMAGEMANAGER->addFrameImage("attackFireR", L"image/effect/sweep_fire_R.png", 400, 150, 4, 2);
-	IMAGEMANAGER->addFrameImage("attackIce", L"image/effect/sweep_water.png", 400, 150, 4, 2);
-	IMAGEMANAGER->addFrameImage("attackIceR", L"image/effect/sweep_water_R.png", 400, 150, 4, 2);
-	IMAGEMANAGER->addFrameImage("attackSpake", L"image/effect/sweep_spake.png", 400, 150, 4, 2);
-	IMAGEMANAGER->addFrameImage("attackSpakeR", L"image/effect/sweep_spake_R.png", 400, 150, 4, 2);
-	IMAGEMANAGER->addFrameImage("attackWave", L"image/effect/sweep_wave.png", 400, 150, 4, 2);
-	IMAGEMANAGER->addFrameImage("attackWaveR", L"image/effect/sweep_wave_R.png", 400, 150, 4, 2);
-	IMAGEMANAGER->addFrameImage("bullet", L"image/effect/ball.png", 520, 320, 13, 8);
-	IMAGEMANAGER->addFrameImage("bulletN", L"image/effect/ball_N_E.png", 160, 16, 10, 1);
-	IMAGEMANAGER->addFrameImage("guard", L"image/effect/guard.png", 512, 512, 8, 8);
-	EFFECTMANAGER->addEffect("attackNormalF", "image/effect/sweep_normal_Last.png", 240, 42, 60, 42, 5, 0.05, 20);
-	EFFECTMANAGER->addEffect("avoidEff", "image/effect/player_avoid.png", 300, 51, 50, 51, 7, 0.05, 20);
-	EFFECTMANAGER->addEffect("circle", "image/effect/circle.png", 900, 300, 300, 300, 7, 0.05, 20);
-	EFFECTMANAGER->addEffect("moveEff", "image/effect/player_move.png", 150, 23, 30, 23, 6, 0.04, 20);
-	
-	
 	_player.bullet = new playerBullet;
 	_player.bullet->init("bullet", 1000, 500);
+	_playerUI = new playerUI;
+	_playerUI->init();
 
 	_player.effImage = IMAGEMANAGER->findImage("guard");
 	_player.image = IMAGEMANAGER->findImage("leaMove");
-	_player.x = GAMESIZEX / 2;
-	_player.y = GAMESIZEY / 2;
+	_player.x = WINSIZEX / 2;
+	_player.y = WINSIZEY / 2;
 	_player.speed = PLAYERSPEED;
 	_player.angle = PI / 180;
 	_player.alphaValue = 1;
+	_player.level = 1;
+	_player.HP = 230;
+	_player.maxHP = 230;
 	_player.direction = PLAYERDIRECTION::DOWN;
 	_player.state = PLAYERSTATE::PLAYER_IDLE;
 	_player.avoidPower = 10;
 	_avoidFPS = 0;
+	_playerAlphaCount = 0;
 	
 	_effectPlay = false;
 	_isLea = true;
@@ -57,6 +40,12 @@ HRESULT player::init()
 	_isMove = false;
 	_isThrowAttack = false;
 	_isAvoid = false;
+	_isAttacked = false;
+	_isCharge = false;
+	_isSkill = false;
+	_skillMove = false;
+	_skillEff = false;
+	_effSkillStart = false;
 
 	_effectCount = 0;
 	_effectAngle = 0;
@@ -64,6 +53,10 @@ HRESULT player::init()
 	_effPos.y = 0;
 	_effSelect = 0;
 	_effCount = 0;
+	_effSpeed = 10;
+	_skillStartPos.x = _player.x;
+	_skillStartPos.y = _player.y;
+	_effOldTime = GetTickCount();
 
 	_player.rc = { (float)_player.x, (float)_player.y , (float)_player.x + 30, (float)_player.y + 30 };
 	_player.attackRc = { (float)_player.x, (float)_player.y, (float)_player.x + 30, (float)_player.y + 30 };
@@ -84,6 +77,7 @@ HRESULT player::init()
 	_avoidTime = GetTickCount();
 	_avoidEffTime = GetTickCount();
 	_moveEffTime = GetTickCount();
+	_attackedOldTime = GetTickCount();
 
 	_attackComboCount = 0;
 
@@ -91,6 +85,7 @@ HRESULT player::init()
 	effectInit();
 
 	_cursor = LoadCursorFromFile("image/cursor/throwAttack.cur");
+	_cursor2 = LoadCursorFromFile("image/cursor/attackCursor.cur");
 	SetCursor(_cursor);
 
 	return S_OK;
@@ -103,30 +98,51 @@ void player::release()
 
 void player::update()
 {
-	_player.bullet->update();
-	setType();
-	playerKeyInput();
-	aimKeyInput();
-	
-	if (KEYMANAGER->isOnceKeyDown('1'))
+	_playerUI->update();
+	_player.bullet->update();	//플레이어 총알 업뎃
+	setType();					//플레이어 이미지네임 타입
+
+	if ((!(_player.state == PLAYERSTATE::PLAYER_ATTACKED) && !(_player.state == PLAYERSTATE::PLAYER_TELEPORT)) 
+		|| _isAttacked == false)
 	{
+		if (_playerUI->getPlayerUIMode() == false)
+		{
+			playerKeyInput();		//방향키 입력
+			aimKeyInput();			//공격키 입력
+			_attackedOldTime = GetTickCount();
+			_player.alphaValue = 1;
+		}
+	}
+	else
+	{
+		if (GetTickCount() - _attackedOldTime >= 500)
+		{
+			if (!(_player.state == PLAYERSTATE::PLAYER_TELEPORT))
+				_player.state = PLAYERSTATE::PLAYER_IDLE;
+		}
+		if (GetTickCount() - _attackedOldTime >= 300)
+		{
+			_isAttacked = false;
+		}
+	}
+
+	switch (_playerUI->getPlayerAttribute())
+	{
+	case 0:
 		_effSelect = 0;
-	}
-	if (KEYMANAGER->isOnceKeyDown('2'))
-	{
+		break;
+	case 1:
 		_effSelect = 1;
-	}
-	if (KEYMANAGER->isOnceKeyDown('3'))
-	{
+		break;
+	case 2:
 		_effSelect = 2;
-	}
-	if (KEYMANAGER->isOnceKeyDown('4'))
-	{
+		break;
+	case 3:
 		_effSelect = 3;
-	}
-	if (KEYMANAGER->isOnceKeyDown('5'))
-	{
+		break;
+	case 4:
 		_effSelect = 4;
+		break;
 	}
 
 	_player.attackRc = { (float)_player.x + 20, (float)_player.y + 20, (float)_player.x + 40, (float)_player.y + 40 };
@@ -134,65 +150,76 @@ void player::update()
 	_cursorChangeEll = EllipseMake(_player.x + 30, _player.y + 30, 150);
 	_attackRangeRc = { (float)_player.x + 30, (float) _player.y + 30, (float)150, (float)150 };
 	_player.rc = { (float)_player.x + 15, (float)_player.y + 30 , (float)_player.x + 45, (float)_player.y + 60 };
-
 }
 
-void player::render()
+void player::render(bool uiRender)
 {
 	//D2DMANAGER->fillEllipse(RGB(255, 0, 255), _attackRangeRc);
-	if (_player.state == PLAYERSTATE::PLAYER_DEFENSE && (_player.direction == UP || _player.direction == UP_RIGHT || _player.direction == UP_LEFT))
+	_playerUI->render(_player.HP, _player.maxHP, _player.level);
+	if (!uiRender)
 	{
+		if (_player.state == PLAYERSTATE::PLAYER_DEFENSE && (_player.direction == UP || _player.direction == UP_RIGHT || _player.direction == UP_LEFT))
+		{
+			if (_isRight)
+			{
+				_player.effImage->aniRender(_player.x + _effPos.x, _player.y + _effPos.y, _player.effAni, 1);
+			}
+			else
+			{
+				_player.effImage->aniRenderReverseX(_player.x + _effPos.x, _player.y + _effPos.y, _player.effAni, 1);
+			}
+
+		}
 		if (_isRight)
+		{
+			_player.image->aniRender(_player.x, _player.y, _player.motion, _player.alphaValue);
+		}
+		else
+		{
+			_player.image->aniRenderReverseX(_player.x, _player.y, _player.motion, _player.alphaValue);
+		}
+		if (_effectPlay)
+		{
+			if (!_effCopy)
+			{
+				_effect->frameRenderAngle(_player.x + _effPos.x, _player.y + _effPos.y, _effectFrameX, _effectFrameY, _effectAngle);
+			}
+			else
+			{
+				_effect->frameRenderAngle(_player.x + _effPos.x, _player.y + _effPos.y, _effectFrameX, _effectFrameY, _effectAngle);
+			}
+		}
+		for (int i = 0; i < _player.bullet->getVPlayerBullet().size(); i++)
+		{
+			_player.bullet->render();
+		}
+		if (_player.state == PLAYERSTATE::PLAYER_DEFENSE && !(_player.direction == UP || _player.direction == UP_RIGHT || _player.direction == UP_LEFT))
+		{
+			if (_isRight)
+			{
+				_player.effImage->aniRender(_player.x + _effPos.x, _player.y + _effPos.y, _player.effAni, 1);
+			}
+			else
+			{
+				_player.effImage->aniRenderReverseX(_player.x + _effPos.x, _player.y + _effPos.y, _player.effAni, 1);
+			}
+
+		}
+		//if (_player.state == PLAYERSTATE::PLAYER_TELEPORT)
+		//{
+		//	_player.effImage->aniRender(_player.x + _effPos.x, _player.y + _effPos.y, _player.effAni, 1);
+		//}
+		else if (_player.state == PLAYERSTATE::PLAYER_SKILL_FIRE && _skillEff)
 		{
 			_player.effImage->aniRender(_player.x + _effPos.x, _player.y + _effPos.y, _player.effAni, 1);
 		}
-		else
-		{
-			_player.effImage->aniRenderReverseX(_player.x + _effPos.x, _player.y + _effPos.y, _player.effAni, 1);
-		}
-
-	}
-	if (_isRight)
-	{
-		_player.image->aniRender(_player.x, _player.y, _player.motion, 1);
-	}
-	else
-	{
-		_player.image->aniRenderReverseX(_player.x, _player.y, _player.motion, 1);
-	}
-	if (_effectPlay)
-	{
-		if (!_effCopy)
-		{
-			_effect->frameRenderAngle(_player.x + _effPos.x, _player.y + _effPos.y, _effectFrameX, _effectFrameY, _effectAngle);
-		}
-		else
-		{
-			_effect->frameRenderAngle(_player.x + _effPos.x, _player.y + _effPos.y, _effectFrameX, _effectFrameY, _effectAngle);
-		}
-	}
-	for (int i = 0; i < _player.bullet->getVPlayerBullet().size(); i++)
-	{
-		_player.bullet->render();
-	}
-	if (_player.state == PLAYERSTATE::PLAYER_DEFENSE && !(_player.direction == UP || _player.direction == UP_RIGHT || _player.direction == UP_LEFT))
-	{
-		if (_isRight)
-		{
-			_player.effImage->aniRender(_player.x + _effPos.x, _player.y + _effPos.y, _player.effAni, 1);
-		}
-		else
-		{
-			_player.effImage->aniRenderReverseX(_player.x + _effPos.x, _player.y + _effPos.y, _player.effAni, 1);
-		}
-
 	}
 	//D2DMANAGER->fillRectangle(RGB(255, 255, 255), _player.attackRc);
 	
 	
-	WCHAR str[128]; 
-	swprintf_s(str, L"플레이어 상태 : %d", _player.state);
-	D2DMANAGER->drawText(str, CAMERA->getCameraX() + 200, CAMERA->getCameraY() + 20, 20, RGB(255, 255, 255));
+	//WCHAR str[128]; 
+	//swprintf_s(str, L"플레이어 상태 : %f", _effSpeed);
+	//D2DMANAGER->drawText(str, CAMERA->getCameraX() + 400, CAMERA->getCameraY() + 20, 20, RGB(255, 255, 255));
 	//swprintf_s(str, L"플레이어  : %d", _effectFrameY);
 	//D2DMANAGER->drawText(str, CAMERA->getCameraX() + 200, CAMERA->getCameraY() + 40, 20, RGB(255, 255, 255));
 	//swprintf_s(str, L"playerX : %f", _player.x);
@@ -204,7 +231,7 @@ void player::render()
 	//	swprintf_s(str, L"%d : %d", i , _breakCheck[i]);
 	//	D2DMANAGER->drawText(str, CAMERA->getCameraX() + 200, CAMERA->getCameraY() + 90 + (i * 20), 20, RGB(255, 255, 255));
 	//}
-	D2DMANAGER->drawRectangle(RGB(255,0,255), _player.rc);
+	//D2DMANAGER->drawRectangle(RGB(255,0,255), _player.rc);
 	//EFFECTMANAGER->render(0);
 }
 
@@ -245,15 +272,15 @@ void player::keyAniInit()
 	KEYANIMANAGER->addArrayFrameAnimation("lea", "moveBreakDown", "leaMove", moveBreakDown, 2, PLAYERFPS, false, cbMoveBreak, this);
 	//원거리공격조준
 	int throwAimUp[] = { 12, 13 };
-	KEYANIMANAGER->addArrayFrameAnimation("lea", "throwAimUp", "leaMove", throwAimUp, 2, 8, false, cbThrowAim, this);
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "throwAimUp", "leaMove", throwAimUp, 2, 6, false, cbThrowAim, this);
 	int throwAimUpRight[] = { 28, 29 };
-	KEYANIMANAGER->addArrayFrameAnimation("lea", "throwAimUpRight", "leaMove", throwAimUpRight, 2, 8, false, cbThrowAim, this);
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "throwAimUpRight", "leaMove", throwAimUpRight, 2, 6, false, cbThrowAim, this);
 	int throwAimRight[] = { 44, 45 };
-	KEYANIMANAGER->addArrayFrameAnimation("lea", "throwAimRight", "leaMove", throwAimRight, 2, 8, false, cbThrowAim, this);
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "throwAimRight", "leaMove", throwAimRight, 2, 6, false, cbThrowAim, this);
 	int throwAimDownRight[] = { 60, 61 };
-	KEYANIMANAGER->addArrayFrameAnimation("lea", "throwAimDownRight", "leaMove", throwAimDownRight, 2, 8, false, cbThrowAim, this);
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "throwAimDownRight", "leaMove", throwAimDownRight, 2, 6, false, cbThrowAim, this);
 	int throwAimDown[] = { 76, 77 };
-	KEYANIMANAGER->addArrayFrameAnimation("lea", "throwAimDown", "leaMove", throwAimDown, 2, 8, false, cbThrowAim, this);
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "throwAimDown", "leaMove", throwAimDown, 2, 6, false, cbThrowAim, this);
 	//원거리공격차지
 	int throwHoldUp[] = { 80, 81, 82, 83 };
 	KEYANIMANAGER->addArrayFrameAnimation("lea", "throwHoldUp", "leaMove", throwHoldUp, 4, 10, true);
@@ -376,6 +403,32 @@ void player::keyAniInit()
 	KEYANIMANAGER->addArrayFrameAnimation("lea", "attackedDownRight", "leaMove", attackedDownRight, 2, PLAYERFPS, true);
 	int attackedDown[] = { 78, 79 };
 	KEYANIMANAGER->addArrayFrameAnimation("lea", "attackedDown", "leaMove", attackedDown, 2, PLAYERFPS, true);
+	//텔레포트 상태
+	int teleportDown[] = { 206, 207, 220, 221 };
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "teleportDown", "leaMove", teleportDown, 4, PLAYERFPS, true);
+	//텔포 효과
+	int teleportEff[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	KEYANIMANAGER->addArrayFrameAnimation("eff", "teleportEff", "teleportEff", teleportEff, 11, PLAYERFPS, true);
+	//차지
+	int chargeUp[] = { 162, 163, 164, 165};
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "chargeUp", "leaMove", chargeUp, 4, PLAYERFPS, true);
+	int chargeUpRight[] = { 178, 179, 180, 181 };
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "chargeUpRight", "leaMove", chargeUpRight, 4, PLAYERFPS, true);
+	int chargeRight[] = { 194, 195, 196, 197 };
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "chargeRight", "leaMove", chargeRight, 4, PLAYERFPS, true);
+	int chargeDownRight[] = { 210, 211, 212, 213};
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "chargeDownRight", "leaMove", chargeDownRight, 4, PLAYERFPS, true);
+	int chargeDown[] = { 226, 227, 228, 229 };
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "chargeDown", "leaMove", chargeDown, 4, PLAYERFPS, true);
+	//스킬모션
+	int skillMotion[] = { 104, 105, 106, 107, 108, 150, 151, 152, 153, 154, 123, 109, 110, 111, 111, 111,
+						112, 113, 114, 104, 105, 106, 107, 108, 151, 155, 152, 153, 156, 152, 153, 154, 157,
+						150, 151, 154, 157, 150, 115, 116, 119, 119, 120, 121, 122, 122, 122, 122,
+						122, 122, 122, 122, 122, 122, 122, 123, 124, 125, 126, 127, 128, 129, 129, 129, 129, 129, 129 };
+	KEYANIMANAGER->addArrayFrameAnimation("lea", "skillMotion", "leaThrow", skillMotion, 67, PLAYERFPS, false, cbSkillFire, this);
+	//파이어스킬효과
+	int fireEff[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+	KEYANIMANAGER->addArrayFrameAnimation("eff", "fireEff", "fire2", fireEff, 8, PLAYERFPS + 5, true);
 
 	_player.effAni = KEYANIMANAGER->findAnimation("eff", "guardEffUp");
 	_player.motion = KEYANIMANAGER->findAnimation("lea", "idleDown");
@@ -568,4 +621,14 @@ void player::cbAvoid(void * obj)
 	playerEvasion->setPlayerState(PLAYERSTATE::PLAYER_IDLE);
 
 	playerEvasion->setIsAvoid(false);
+}
+
+void player::cbSkillFire(void * obj)
+{
+	player* playerSkillFire = (player*)obj;
+	playerSkillFire->setPlayerState(PLAYERSTATE::PLAYER_IDLE);
+	playerSkillFire->setIsSkill(false);
+	playerSkillFire->setIsSkillMove(false);
+	playerSkillFire->setSkillEff(false);
+	playerSkillFire->setEffSpeed(0);
 }

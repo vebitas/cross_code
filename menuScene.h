@@ -55,5 +55,6 @@ public:
 	static void optionB();
 	static void exidB();
 
+	void setWindowsSize(int x, int y, int width, int height);
 };
 

@@ -35,5 +35,8 @@ public:
 
 	void move();
 	void bulletFire(float x, float y, float angle, float speed);
+
+	vector<tagBossBullet> getVBossBullet() { return _vBossBullet; }
+	vector<tagBossBullet>* setVBossBullet() { return &_vBossBullet; }
 };
 

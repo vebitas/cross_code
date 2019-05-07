@@ -17,7 +17,14 @@ enum ENEMYDIRECTION
 	HOG_DOWN_RIGHT,
 	HOG_UP_LEFT,
 	HOG_LEFT,
-	HOG_DOWN_LEFT
+	HOG_DOWN_LEFT,
+	//이지봇	방향
+	BOT_UP_RIGHT,
+	BOT_RIGHT,
+	BOT_DOWN_RIGHT,
+	BOT_UP_LEFT,
+	BOT_LEFT,
+	BOT_DOWN_LEFT,
 };
 
 enum ENEMYSTATE
@@ -32,8 +39,15 @@ enum ENEMYSTATE
 	HOG_MOVE,
 	HOG_ATTACK,
 	HOG_ATTACKED,
-	HOG_DEATH,
-
+	//이지봇
+	BOT_IDLE,
+	BOT_MOVE,
+	BOT_RED_MODE,
+	BOT_ATTACK,
+	BOT_ATTACKED,
+	//터렛
+	TURRET_IDLE,
+	TURRET_ATTACK
 };
 
 struct tagEnemy
@@ -78,6 +92,7 @@ public:
 	//설정, 접근자 모음
 	D2D1_RECT_F getEnemyRc() { return _enemy.rc; }
 	D2D1_RECT_F getEnemyAttackRc() { return _enemy.attackRc; }
+	D2D1_RECT_F getEnemyRangeRc() { return _enemy.rangeRc; }
 	string getEnemyName() { return _enemy.name; }
 	float getEnemyPosX() { return _enemy.x; }
 	float getEnemyPosY() { return _enemy.y; }
@@ -97,8 +112,8 @@ public:
 	void setEnemyDirection(ENEMYDIRECTION direction) { _enemy.direction = direction; }
 	void setEnemyPosX(float x) { _enemy.x = x; }
 	void setEnemyPosY(float y) { _enemy.y = y; }
-	void setEnemyIdX(int idX) { _enemy.x = idX; }
-	void setEnemyIdY(int idY) { _enemy.y = idY; }
+	void setEnemyIdX(int idX) { _enemy.idX = idX; }
+	void setEnemyIdY(int idY) { _enemy.idY = idY; }
 	void setEnemyMaxHP(int maxHP) { _enemy.maxHP = maxHP; }
 	void setEnemyHP(int HP) { _enemy.HP = HP; }
 	void setEnemySpeed(float speed) { _enemy.speed = speed; }

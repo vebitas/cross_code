@@ -13,29 +13,12 @@ menuScene::~menuScene()
 
 HRESULT menuScene::init()
 {
-	IMAGEMANAGER->addImage("glow_1", L"image/intro/glow_1.png", WINSIZEX, 34);
-	IMAGEMANAGER->addImage("glow_2", L"image/intro/glow_2.png", 128, 122);
-	IMAGEMANAGER->addImage("glow_3", L"image/intro/glow_3.png", 128, 122);
-	IMAGEMANAGER->addImage("rfgFish", L"image/intro/rfg-fish.png", 150, 150);
-	IMAGEMANAGER->addImage("rfgText", L"image/intro/rfg-Text.png", 254, 46);
-	IMAGEMANAGER->addImage("blackground", L"image/intro/lodingBackground.png", 1024, 768);
-	IMAGEMANAGER->addImage("blackground2", L"image/intro/lodingBackground2.png", 1024, 768);
-	IMAGEMANAGER->addImage("titleLogo", L"image/intro/title_logo.png", 325, 111);
-	IMAGEMANAGER->addImage("clouds", L"image/intro/clouds.png", 1024, 499);
-	IMAGEMANAGER->addImage("sky", L"image/intro/sky.png", 1024, 712);
-	IMAGEMANAGER->addImage("ground", L"image/intro/ground.png", 1024, 292);
-	IMAGEMANAGER->addImage("railings", L"image/intro/railings.png", 1024, 114);
-	IMAGEMANAGER->addImage("planet", L"image/intro/planet.png", 300, 525);
-	IMAGEMANAGER->addImage("keyboard", L"image/intro/keyboard.png", 102, 50);
-	IMAGEMANAGER->addFrameImage("lea", L"image/intro/lea.png", 1800, 399, 6, 1);
-	IMAGEMANAGER->addFrameImage("newGameB", L"image/intro/newGameButton.png", 288, 144 , 1, 3);
-	IMAGEMANAGER->addFrameImage("optionB", L"image/intro/optionButton.png", 288, 144, 1, 3);
-	IMAGEMANAGER->addFrameImage("exidB", L"image/intro/exidButton.png", 288, 144, 1, 3);
-
+	setWindowsSize(0, 0, GAMESIZEX, GAMESIZEY);
+	CAMERA->init(0, 0, GAMESIZEX, GAMESIZEY);
 	_fish = IMAGEMANAGER->findImage("rfgFish");
 	_fishText = IMAGEMANAGER->findImage("rfgText");
 
-	_rfgFishY = WINSIZEY / 2 - 200;
+	_rfgFishY = GAMESIZEY / 2 - 200;
 	_rfgAlpha = 0;
 	_rfgTextAlpha = 0;
 	_blackgroundAlpha = 0;
@@ -43,17 +26,17 @@ HRESULT menuScene::init()
 	_titleLogoAlpha = 0;
 	_titleLogoPosY = 0;
 	_titleLogoAlpha = 0;
-	_cloudPosY = WINSIZEY / 2 - 200;
+	_cloudPosY = GAMESIZEY / 2 - 200;
 	_cloudAlpha = 0;
-	_groundPosY = WINSIZEY / 2 + 100;
+	_groundPosY = GAMESIZEY / 2 + 100;
 	_groundAlpha = 0;
-	_skyPosY = WINSIZEY / 2;
+	_skyPosY = GAMESIZEY / 2;
 	_skyAlpha = 0;
 	_planetPosY = 0;
 	_planetAlpha = 0;
-	_railingsPosY = WINSIZEY / 2 + 535;
+	_railingsPosY = GAMESIZEY / 2 + 535;
 	_railingsAlpha = 0;
-	_leaPosY = WINSIZEY / 2 + 250;
+	_leaPosY = GAMESIZEY / 2 + 250;
 	_leaAlpha = 0;
 	_keyboardAlpha = 0;
 	_leaFrameX = 0;
@@ -63,15 +46,15 @@ HRESULT menuScene::init()
 	_buttonCount = 0;
 	_newGameBPosX = -150;
 	_newGameButton = new button;
-	_newGameButton->init("newGameB", _newGameBPosX, WINSIZEY / 2, PointMake(0, 2), PointMake(0, 0), PointMake(0, 1), newGameB);
+	_newGameButton->init("newGameB", _newGameBPosX, GAMESIZEY / 2, PointMake(0, 2), PointMake(0, 0), PointMake(0, 1), newGameB);
 	_optionBPosX = -150;
 	_optionButton = new button;
-	_optionButton->init("optionB", _optionBPosX, WINSIZEY / 2 + 100, PointMake(0, 2), PointMake(0, 0), PointMake(0, 1), optionB);
+	_optionButton->init("optionB", _optionBPosX, GAMESIZEY / 2 + 100, PointMake(0, 2), PointMake(0, 0), PointMake(0, 1), optionB);
 	_exidBPosX = -150;
 	_exidButton = new button;
-	_exidButton->init("exidB", _exidBPosX, WINSIZEY / 2 + 200, PointMake(0, 2), PointMake(0, 0), PointMake(0, 1), exidB);
+	_exidButton->init("exidB", _exidBPosX, GAMESIZEY / 2 + 200, PointMake(0, 2), PointMake(0, 0), PointMake(0, 1), exidB);
 
-
+	
 	return S_OK;
 }
 
@@ -96,31 +79,30 @@ void menuScene::update()
 void menuScene::render()
 {
 	//버튼 업데이트 
-	_newGameButton->update(_newGameBPosX, WINSIZEY / 2 + 50);
-	_optionButton->update(_optionBPosX, WINSIZEY / 2 + 150);
-	_exidButton->update(_exidBPosX, WINSIZEY / 2 + 250);
+	_newGameButton->update(_newGameBPosX, GAMESIZEY / 2 + 50);
+	_optionButton->update(_optionBPosX, GAMESIZEY / 2 + 150);
+	_exidButton->update(_exidBPosX, GAMESIZEY / 2 + 250);
 	introRender();
-	WCHAR str[128];
-	swprintf_s(str, L"길이 : %d", _next);
-	D2DMANAGER->drawText(str, 100, 100);
+	//WCHAR str[128];
+	//swprintf_s(str, L"길이 : %d", _next);
+	//D2DMANAGER->drawText(str, 100, 100);
 }
 
 void menuScene::introRender()
 {
 	IMAGEMANAGER->findImage("blackground")->render(_blackgroundAlpha);
 
-	IMAGEMANAGER->findImage("rfgFish")->render(WINSIZEX / 2 - 75, _rfgFishY, _rfgAlpha);
-	IMAGEMANAGER->findImage("rfgText")->render(WINSIZEX / 2 - 130, WINSIZEY / 2 + 70, _rfgTextAlpha);
-	
+	IMAGEMANAGER->findImage("rfgFish")->render(GAMESIZEX / 2 - 75, _rfgFishY, _rfgAlpha);
+	IMAGEMANAGER->findImage("rfgText")->render(GAMESIZEX / 2 - 130, GAMESIZEY / 2 + 70, _rfgTextAlpha);
 	
 	IMAGEMANAGER->findImage("sky")->render(0, _skyPosY - 300, _skyAlpha);
 	IMAGEMANAGER->findImage("planet")->render(0, _planetPosY, _planetAlpha);
 	IMAGEMANAGER->findImage("clouds")->render(0, _cloudPosY, _cloudAlpha);
 	IMAGEMANAGER->findImage("ground")->render(0, _groundPosY, _groundAlpha);
 	IMAGEMANAGER->findImage("railings")->render(0, _railingsPosY, _railingsAlpha);
-	IMAGEMANAGER->findImage("titleLogo")->render(WINSIZEX / 2 - 300, WINSIZEY / 2 - 100 + _titleLogoPosY, 600, 200, _titleLogoAlpha);
-	IMAGEMANAGER->findImage("lea")->frameRender(WINSIZEX / 2 + 150, _leaPosY , _leaFrameX, 0, _leaAlpha);
-	IMAGEMANAGER->findImage("keyboard")->render(WINSIZEX / 2 - 100, WINSIZEY / 2 - 80, 200, 98, _keyboardAlpha);
+	IMAGEMANAGER->findImage("titleLogo")->render(GAMESIZEX / 2 - 300, GAMESIZEY / 2 - 100 + _titleLogoPosY, 600, 200, _titleLogoAlpha);
+	IMAGEMANAGER->findImage("lea")->frameRender(GAMESIZEX / 2 + 150, _leaPosY , _leaFrameX, 0, _leaAlpha);
+	IMAGEMANAGER->findImage("keyboard")->render(GAMESIZEX / 2 - 100, GAMESIZEY / 2 - 80, 200, 98, _keyboardAlpha);
 	if (_buttonCount > 0)
 	{
 		_newGameButton->render();
@@ -140,7 +122,7 @@ void menuScene::introUpdate()
 	switch (_next)
 	{
 	case 0:
-		if (WINSIZEY / 2 - 80 > _rfgFishY)
+		if (GAMESIZEY / 2 - 80 > _rfgFishY)
 		{
 			_rfgFishY += 1;
 		}
@@ -170,11 +152,13 @@ void menuScene::introUpdate()
 		{
 			_rfgAlpha -= 0.01;
 			_rfgTextAlpha -= 0.01;
+			
 		}
 		break;
 	case 2:
 		if (_titleLogoAlpha <= 1)
 		{
+			SOUNDMANAGER->play("title", 1);
 			_titleLogoAlpha += 0.01;
 		}
 		else
@@ -265,7 +249,7 @@ void menuScene::newGameB()
 
 void menuScene::optionB()
 {
-	SCENEMANAGER->changeScene("uiScene");
+	SCENEMANAGER->changeScene("mapTool");
 }
 
 void menuScene::exidB()
@@ -273,4 +257,30 @@ void menuScene::exidB()
 	PostQuitMessage(0);
 }
 
+void menuScene::setWindowsSize(int x, int y, int width, int height)
+{
+	//SAFE_RELEASE2(D2DMANAGER->_renderTarget);
+	D2DMANAGER->_renderTarget->Resize(SizeU(width, height));
 
+	//---------------------------------------------------------------------------
+	//   Hwnd Render Target 생성
+	//---------------------------------------------------------------------------
+	//D2DMANAGER->_d2dFactory->CreateHwndRenderTarget(RenderTargetProperties(),
+	//	HwndRenderTargetProperties(_hWnd, SizeU(width, height)),
+	//	&D2DMANAGER->_renderTarget);
+
+	RECT winRect;
+
+	winRect.left = 0;
+	winRect.top = 0;
+	winRect.right = width;
+	winRect.bottom = height;
+
+	AdjustWindowRect(&winRect, WINSTYLE, false);
+
+	//실질적으로 클라이언트 영역 크기 셋팅을 한다
+	SetWindowPos(_hWnd, NULL, x, y,
+		(winRect.right - winRect.left),
+		(winRect.bottom - winRect.top),
+		SWP_NOZORDER | SWP_NOMOVE);
+}
